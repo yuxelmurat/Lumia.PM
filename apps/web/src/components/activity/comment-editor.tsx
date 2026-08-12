@@ -37,6 +37,7 @@ import type { MouseEvent as ReactMouseEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { bundledLanguages, type Highlighter } from "shiki";
+import ApprovalPanel from "@/components/asset-pin/approval-panel";
 import AssetPinViewer from "@/components/asset-pin/asset-pin-viewer";
 import ShareLinkManager from "@/components/asset-pin/share-link-manager";
 import { AttachmentCard } from "@/components/task/extensions/attachment-card";
@@ -1960,6 +1961,7 @@ export default function CommentEditor({
                   imageUrl={previewImage.src}
                   alt={previewImage.alt}
                 />
+                <ApprovalPanel assetId={previewImage.assetId} />
                 <ShareLinkManager assetId={previewImage.assetId} />
               </div>
             ) : (

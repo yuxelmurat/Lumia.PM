@@ -3,6 +3,7 @@ import {
   accountTable,
   activityTable,
   apikeyTable,
+  assetApprovalEventTable,
   assetGuestTable,
   assetPinNoteTable,
   assetPinTable,
@@ -207,6 +208,7 @@ export const assetTableRelations = relations(assetTable, ({ one, many }) => ({
   }),
   pins: many(assetPinTable),
   shareLinks: many(assetShareLinkTable),
+  approvalEvents: many(assetApprovalEventTable),
 }));
 
 export const assetShareLinkTableRelations = relations(
@@ -268,6 +270,24 @@ export const assetPinNoteTableRelations = relations(
     }),
     authorGuest: one(assetGuestTable, {
       fields: [assetPinNoteTable.authorGuestId],
+      references: [assetGuestTable.id],
+    }),
+  }),
+);
+
+export const assetApprovalEventTableRelations = relations(
+  assetApprovalEventTable,
+  ({ one }) => ({
+    asset: one(assetTable, {
+      fields: [assetApprovalEventTable.assetId],
+      references: [assetTable.id],
+    }),
+    actorUser: one(userTable, {
+      fields: [assetApprovalEventTable.actorUserId],
+      references: [userTable.id],
+    }),
+    actorGuest: one(assetGuestTable, {
+      fields: [assetApprovalEventTable.actorGuestId],
       references: [assetGuestTable.id],
     }),
   }),

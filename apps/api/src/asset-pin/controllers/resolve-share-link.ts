@@ -13,6 +13,7 @@ export async function resolveShareLink(token: string) {
       filename: assetTable.filename,
       mimeType: assetTable.mimeType,
       kind: assetTable.kind,
+      approvalStatus: assetTable.approvalStatus,
     })
     .from(assetShareLinkTable)
     .innerJoin(assetTable, eq(assetShareLinkTable.assetId, assetTable.id))

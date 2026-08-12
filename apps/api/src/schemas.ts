@@ -299,6 +299,15 @@ export const assetShareLinkSchema = v.object({
   createdAt: v.date(),
 });
 
+export const assetApprovalEventSchema = v.object({
+  id: v.string(),
+  assetId: v.string(),
+  status: v.picklist(["pending", "approved", "changes_requested"]),
+  note: v.nullable(v.string()),
+  createdAt: v.date(),
+  actor: assetPinAuthorSchema,
+});
+
 export const configSchema = v.object({
   disableRegistration: v.nullable(v.boolean()),
   disablePasswordRegistration: v.nullable(v.boolean()),

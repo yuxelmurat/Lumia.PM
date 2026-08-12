@@ -20,6 +20,7 @@ import {
 import * as v from "valibot";
 import activity from "./activity";
 import aps from "./aps";
+import assetApproval from "./asset-approval";
 import assetPin from "./asset-pin";
 import publicAssetPin from "./asset-pin/public";
 import assetShare from "./asset-share";
@@ -593,6 +594,7 @@ export function createApp() {
   const assetPinApi = api.route("/asset-pin", assetPin);
   const assetShareApi = api.route("/asset-share", assetShare);
   const assetApsApi = api.route("/asset-aps", aps);
+  const assetApprovalApi = api.route("/asset-approval", assetApproval);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -767,6 +769,7 @@ export function createApp() {
     assetPinApi,
     assetShareApi,
     assetApsApi,
+    assetApprovalApi,
     billingApi,
     columnApi,
     commentApi,
@@ -888,6 +891,7 @@ const {
   assetPinApi,
   assetShareApi,
   assetApsApi,
+  assetApprovalApi,
   billingApi,
   columnApi,
   commentApi,
@@ -937,6 +941,7 @@ export type AppType =
   | typeof assetPinApi
   | typeof assetShareApi
   | typeof assetApsApi
+  | typeof assetApprovalApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi

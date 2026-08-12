@@ -4,6 +4,7 @@ import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import { Box, FileText } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import ApprovalPanel from "@/components/asset-pin/approval-panel";
 import DwgPinViewer from "@/components/asset-pin/dwg-pin-viewer";
 import ShareLinkManager from "@/components/asset-pin/share-link-manager";
 import { Dialog, DialogPopup } from "@/components/ui/dialog";
@@ -86,6 +87,7 @@ function AttachmentCardView({ node }: NodeViewProps) {
           >
             <div className="flex max-h-[90vh] flex-col gap-3 p-4">
               <DwgPinViewer assetId={assetId} />
+              <ApprovalPanel assetId={assetId} />
               <ShareLinkManager assetId={assetId} />
             </div>
           </DialogPopup>

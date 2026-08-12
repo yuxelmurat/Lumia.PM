@@ -3,6 +3,7 @@ import { describeRoute, resolver, validator } from "hono-openapi";
 import * as v from "valibot";
 import { getViewerAccessToken, isApsConfigured } from "../aps/client";
 import getAssetTranslationStatus from "../aps/get-status";
+import decideApprovalAsGuest from "../asset-approval/controllers/decide-approval-guest";
 import { assetPinSchema } from "../schemas";
 import createGuest from "./controllers/create-guest";
 import createGuestPin from "./controllers/create-guest-pin";
@@ -43,6 +44,7 @@ const publicAssetPin = new Hono()
           filename: link.filename,
           mimeType: link.mimeType,
           kind: link.kind,
+          approvalStatus: link.approvalStatus,
           url: `${apiBaseUrl}/api/asset/${link.assetId}?shareToken=${token}`,
         },
         pins,
@@ -210,6 +212,44 @@ const publicAssetPin = new Hono()
       }
       const viewerToken = await getViewerAccessToken();
       return c.json(viewerToken);
+    },
+  )
+  .post(
+    "/:token/approval",
+    describeRoute({
+      operationId: "decidePublicAssetApproval",
+      tags: ["Public Asset Pins"],
+      description:
+        "Approve or request changes on a shared asset as a share-link guest. Only valid while the asset is pending approval.",
+      security: [],
+      responses: {
+        200: {
+          description: "Decision recorded",
+          content: { "application/json": { schema: resolver(v.any()) } },
+        },
+      },
+    }),
+    validator("param", v.object({ token: v.string() })),
+    validator(
+      "json",
+      v.object({
+        guestId: v.string(),
+        decision: v.picklist(["approved", "changes_requested"]),
+        note: v.optional(v.pipe(v.string(), v.maxLength(2000))),
+      }),
+    ),
+    async (c) => {
+      const { token } = c.req.valid("param");
+      const { guestId, decision, note } = c.req.valid("json");
+      const link = await resolveShareLink(token);
+      const events = await decideApprovalAsGuest(
+        link.assetId,
+        link.shareLinkId,
+        guestId,
+        decision,
+        note,
+      );
+      return c.json(events);
     },
   );
 

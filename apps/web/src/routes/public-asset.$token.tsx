@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import GuestIdentityForm from "@/components/asset-pin/guest-identity-form";
 import type { AssetPin } from "@/components/asset-pin/pin-overlay";
+import PublicApprovalPanel from "@/components/asset-pin/public-approval-panel";
 import PublicAssetPinViewer from "@/components/asset-pin/public-asset-pin-viewer";
 import PublicDwgPinViewer from "@/components/asset-pin/public-dwg-pin-viewer";
 import PageTitle from "@/components/page-title";
@@ -90,7 +91,12 @@ function RouteComponent() {
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex-1 p-6">
+        <main className="flex-1 flex flex-col gap-3 p-6">
+          <PublicApprovalPanel
+            token={token}
+            guestId={guestId}
+            approvalStatus={data.asset.approvalStatus}
+          />
           {data.asset.kind === "dwg" ? (
             <PublicDwgPinViewer
               token={token}

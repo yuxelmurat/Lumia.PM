@@ -582,6 +582,9 @@ export const assetTable = pgTable(
     // object URN the Model Derivative API and Viewer SDK key off of.
     apsUrn: text("aps_urn"),
     apsTranslationStatus: text("aps_translation_status"),
+    // Denormalized current approval state; null = no approval cycle started.
+    // Full history lives in assetApprovalEventTable.
+    approvalStatus: text("approval_status"),
   },
   (table) => [
     index("asset_workspaceId_idx").on(table.workspaceId),
@@ -704,6 +707,33 @@ export const assetPinNoteTable = pgTable(
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => [index("asset_pin_note_pinId_idx").on(table.pinId)],
+);
+
+export const assetApprovalEventTable = pgTable(
+  "asset_approval_event",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    status: text("status").notNull(),
+    actorUserId: text("actor_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    actorGuestId: text("actor_guest_id").references(() => assetGuestTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    note: text("note"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [index("asset_approval_event_assetId_idx").on(table.assetId)],
 );
 
 export const labelTable = pgTable(

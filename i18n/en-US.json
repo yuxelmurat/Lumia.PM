@@ -2147,6 +2147,26 @@
 			"translationFailed": "Preparing this DWG failed.",
 			"retry": "Retry",
 			"notReadyForGuest": "This file isn't ready to view yet — check back shortly."
+		},
+		"approval": {
+			"badge": {
+				"pending": "Pending approval",
+				"approved": "Approved",
+				"changes_requested": "Changes requested"
+			},
+			"sendForApproval": "Send for approval",
+			"sendForApprovalSuccess": "Sent for approval",
+			"sendForApprovalFailed": "Failed to send for approval",
+			"approve": "Approve",
+			"requestChanges": "Request changes",
+			"notePlaceholder": "Add a note (required for requesting changes)…",
+			"decideSuccess": "Decision recorded",
+			"decideFailed": "Failed to record decision",
+			"missingNote": "Please add a note explaining what should change",
+			"history": "Approval history",
+			"guestTitle": "This file is pending your approval",
+			"guestNotPending": "No decision needed right now.",
+			"resendAfterChanges": "Send for approval again"
 		}
 	}
 }
