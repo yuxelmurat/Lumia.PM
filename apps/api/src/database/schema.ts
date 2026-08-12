@@ -765,10 +765,10 @@ export const productSpecTable = pgTable(
       onUpdate: "cascade",
     }),
     notes: text("notes"),
-    createdByUserId: text("created_by_user_id").references(
-      () => userTable.id,
-      { onDelete: "set null", onUpdate: "cascade" },
-    ),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" })
       .defaultNow()

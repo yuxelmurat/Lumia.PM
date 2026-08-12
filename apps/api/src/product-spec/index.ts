@@ -4,10 +4,10 @@ import { describeRoute, resolver, validator } from "hono-openapi";
 import * as v from "valibot";
 import { requireEntitlement } from "../billing/require-entitlement-middleware";
 import { productSpecSchema } from "../schemas";
+import { validateTaskAssetUploadInput } from "../storage/s3";
 import { normalizeApiServerUrl } from "../utils/openapi-spec";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
-import { validateTaskAssetUploadInput } from "../storage/s3";
 import createProductSpecImageUpload from "./controllers/create-image-upload";
 import createProductSpec from "./controllers/create-product-spec";
 import deleteProductSpec from "./controllers/delete-product-spec";
@@ -38,7 +38,9 @@ const productSpec = new Hono<{
         200: {
           description: "List of product specs",
           content: {
-            "application/json": { schema: resolver(v.array(productSpecSchema)) },
+            "application/json": {
+              schema: resolver(v.array(productSpecSchema)),
+            },
           },
         },
       },
@@ -61,7 +63,9 @@ const productSpec = new Hono<{
       responses: {
         200: {
           description: "Product spec created successfully",
-          content: { "application/json": { schema: resolver(productSpecSchema) } },
+          content: {
+            "application/json": { schema: resolver(productSpecSchema) },
+          },
         },
       },
     }),
@@ -98,7 +102,9 @@ const productSpec = new Hono<{
       responses: {
         200: {
           description: "Product spec updated successfully",
-          content: { "application/json": { schema: resolver(productSpecSchema) } },
+          content: {
+            "application/json": { schema: resolver(productSpecSchema) },
+          },
         },
       },
     }),
@@ -135,7 +141,9 @@ const productSpec = new Hono<{
       responses: {
         200: {
           description: "Product spec deleted successfully",
-          content: { "application/json": { schema: resolver(productSpecSchema) } },
+          content: {
+            "application/json": { schema: resolver(productSpecSchema) },
+          },
         },
       },
     }),
@@ -206,7 +214,8 @@ const productSpec = new Hono<{
     describeRoute({
       operationId: "finalizeProductSpecImageUpload",
       tags: ["Product Specs"],
-      description: "Finalize an uploaded product spec image into an asset record",
+      description:
+        "Finalize an uploaded product spec image into an asset record",
       responses: {
         200: {
           description: "Image upload finalized successfully",
@@ -261,6 +270,7 @@ export default productSpec;
 function toUploadHttpException(error: unknown): HTTPException {
   if (error instanceof HTTPException) return error;
   return new HTTPException(400, {
-    message: error instanceof Error ? error.message : "Invalid image upload request",
+    message:
+      error instanceof Error ? error.message : "Invalid image upload request",
   });
 }

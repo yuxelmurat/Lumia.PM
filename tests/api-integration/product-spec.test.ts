@@ -44,9 +44,7 @@ describe("API integration: product specs (FF&E)", () => {
     expect(spec.status).toBe("proposed");
     expect(spec.roomLabel).toBe("Living Room");
 
-    const listResponse = await app.request(
-      `/api/product-spec/${project.id}`,
-    );
+    const listResponse = await app.request(`/api/product-spec/${project.id}`);
     expect(listResponse.status).toBe(200);
     await expect(listResponse.json()).resolves.toHaveLength(1);
 
@@ -86,9 +84,7 @@ describe("API integration: product specs (FF&E)", () => {
     mockAuthenticatedSession(member.user);
     const { app } = createApp();
 
-    const readResponse = await app.request(
-      `/api/product-spec/${project.id}`,
-    );
+    const readResponse = await app.request(`/api/product-spec/${project.id}`);
     expect(readResponse.status).toBe(200);
 
     const createResponse = await app.request(
