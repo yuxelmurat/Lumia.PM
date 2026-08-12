@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import ProductSpecForm from "@/components/product-spec/product-spec-form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import useCreateAssetPin from "@/hooks/mutations/asset-pin/use-create-asset-pin";
@@ -14,12 +15,14 @@ type AssetPinViewerProps = {
   assetId: string;
   imageUrl: string;
   alt: string;
+  projectId?: string;
 };
 
 export default function AssetPinViewer({
   assetId,
   imageUrl,
   alt,
+  projectId,
 }: AssetPinViewerProps) {
   const { t } = useTranslation();
   const { data: pins = [] } = useGetAssetPins(assetId);
@@ -35,6 +38,7 @@ export default function AssetPinViewer({
     null,
   );
   const [draftContent, setDraftContent] = useState("");
+  const [isAddingMaterial, setIsAddingMaterial] = useState(false);
 
   const typedPins = pins as AssetPin[];
   const selectedPin = typedPins.find((pin) => pin.id === selectedPinId) ?? null;
@@ -121,6 +125,21 @@ export default function AssetPinViewer({
                 pinId: selectedPin.id,
                 status: selectedPin.status === "resolved" ? "open" : "resolved",
               });
+            }}
+            onAddAsMaterial={
+              projectId ? () => setIsAddingMaterial(true) : undefined
+            }
+          />
+        )}
+        {projectId && selectedPin && (
+          <ProductSpecForm
+            projectId={projectId}
+            open={isAddingMaterial}
+            onClose={() => setIsAddingMaterial(false)}
+            prefill={{
+              name: selectedPin.notes[0]?.content.slice(0, 200) ?? "",
+              imageAssetId: assetId,
+              linkedPinId: selectedPin.id,
             }}
           />
         )}

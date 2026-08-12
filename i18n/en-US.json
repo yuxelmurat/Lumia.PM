@@ -2171,6 +2171,9 @@
 	},
 	"productSpec": {
 		"pageTitle": "Materials · {{name}}",
+		"pin": {
+			"addAsMaterial": "Add as material"
+		},
 		"status": {
 			"proposed": "Proposed",
 			"client_approved": "Client approved",

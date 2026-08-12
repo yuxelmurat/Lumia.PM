@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import ProductSpecForm from "@/components/product-spec/product-spec-form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import getAssetViewerToken from "@/fetchers/asset-aps/get-viewer-token";
@@ -17,9 +18,13 @@ import type { AssetPin } from "./pin-overlay";
 
 type DwgPinViewerProps = {
   assetId: string;
+  projectId?: string;
 };
 
-export default function DwgPinViewer({ assetId }: DwgPinViewerProps) {
+export default function DwgPinViewer({
+  assetId,
+  projectId,
+}: DwgPinViewerProps) {
   const { t } = useTranslation();
   const { data: status } = useGetAssetTranslationStatus(assetId);
   const { mutateAsync: translate, isPending: isTranslating } =
@@ -37,6 +42,7 @@ export default function DwgPinViewer({ assetId }: DwgPinViewerProps) {
     null,
   );
   const [draftContent, setDraftContent] = useState("");
+  const [isAddingMaterial, setIsAddingMaterial] = useState(false);
 
   const typedPins = pins as AssetPin[];
   const selectedPin = typedPins.find((pin) => pin.id === selectedPinId) ?? null;
@@ -172,6 +178,20 @@ export default function DwgPinViewer({ assetId }: DwgPinViewerProps) {
                 pinId: selectedPin.id,
                 status: selectedPin.status === "resolved" ? "open" : "resolved",
               });
+            }}
+            onAddAsMaterial={
+              projectId ? () => setIsAddingMaterial(true) : undefined
+            }
+          />
+        )}
+        {projectId && selectedPin && (
+          <ProductSpecForm
+            projectId={projectId}
+            open={isAddingMaterial}
+            onClose={() => setIsAddingMaterial(false)}
+            prefill={{
+              name: selectedPin.notes[0]?.content.slice(0, 200) ?? "",
+              linkedPinId: selectedPin.id,
             }}
           />
         )}

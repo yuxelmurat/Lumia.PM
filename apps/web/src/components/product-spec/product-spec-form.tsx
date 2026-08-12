@@ -28,11 +28,18 @@ export type ProductSpecFormValue = {
   notes: string | null;
 };
 
+type ProductSpecPrefill = {
+  name: string;
+  imageAssetId?: string;
+  linkedPinId?: string;
+};
+
 type ProductSpecFormProps = {
   projectId: string;
   open: boolean;
   onClose: () => void;
   editingSpec?: ProductSpecFormValue | null;
+  prefill?: ProductSpecPrefill;
 };
 
 export default function ProductSpecForm({
@@ -40,6 +47,7 @@ export default function ProductSpecForm({
   open,
   onClose,
   editingSpec,
+  prefill,
 }: ProductSpecFormProps) {
   const { t } = useTranslation();
   const [roomLabel, setRoomLabel] = useState("");
@@ -60,7 +68,7 @@ export default function ProductSpecForm({
   useEffect(() => {
     if (!open) return;
     setRoomLabel(editingSpec?.roomLabel ?? "");
-    setName(editingSpec?.name ?? "");
+    setName(editingSpec?.name ?? prefill?.name ?? "");
     setVendor(editingSpec?.vendor ?? "");
     setUnitCost(
       editingSpec?.unitCost != null
@@ -69,8 +77,8 @@ export default function ProductSpecForm({
     );
     setQuantity(editingSpec ? String(editingSpec.quantity) : "1");
     setNotes(editingSpec?.notes ?? "");
-    setImageAssetId(editingSpec?.imageAssetId ?? null);
-  }, [open, editingSpec]);
+    setImageAssetId(editingSpec?.imageAssetId ?? prefill?.imageAssetId ?? null);
+  }, [open, editingSpec, prefill]);
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -124,6 +132,7 @@ export default function ProductSpecForm({
           unitCost: parsedUnitCost ?? undefined,
           quantity: parsedQuantity,
           imageAssetId: imageAssetId ?? undefined,
+          linkedPinId: prefill?.linkedPinId,
           notes: notes.trim() || undefined,
         });
       }

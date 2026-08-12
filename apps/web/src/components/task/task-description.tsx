@@ -1918,6 +1918,7 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
                   assetId={previewImage.assetId}
                   imageUrl={previewImage.src}
                   alt={previewImage.alt}
+                  projectId={task?.projectId}
                 />
                 <ApprovalPanel assetId={previewImage.assetId} />
                 <ShareLinkManager assetId={previewImage.assetId} />

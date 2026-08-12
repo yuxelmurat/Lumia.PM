@@ -19,6 +19,7 @@ type PinNoteThreadProps = {
   onReply: (content: string) => Promise<void> | void;
   isSubmittingStatus?: boolean;
   onToggleResolved?: () => Promise<void> | void;
+  onAddAsMaterial?: () => void;
 };
 
 export default function PinNoteThread({
@@ -28,6 +29,7 @@ export default function PinNoteThread({
   onReply,
   isSubmittingStatus = false,
   onToggleResolved,
+  onAddAsMaterial,
 }: PinNoteThreadProps) {
   const { t } = useTranslation();
   const [reply, setReply] = useState("");
@@ -53,18 +55,25 @@ export default function PinNoteThread({
             ? t("assetPins:status.resolved", "Resolved")
             : t("assetPins:status.open", "Open")}
         </span>
-        {!readOnly && onToggleResolved && (
-          <Button
-            size="xs"
-            variant="ghost"
-            disabled={isSubmittingStatus}
-            onClick={() => onToggleResolved()}
-          >
-            {pin.status === "resolved"
-              ? t("assetPins:actions.reopen", "Reopen")
-              : t("assetPins:actions.resolve", "Mark resolved")}
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {!readOnly && onAddAsMaterial && (
+            <Button size="xs" variant="outline" onClick={onAddAsMaterial}>
+              {t("productSpec:pin.addAsMaterial", "Add as material")}
+            </Button>
+          )}
+          {!readOnly && onToggleResolved && (
+            <Button
+              size="xs"
+              variant="ghost"
+              disabled={isSubmittingStatus}
+              onClick={() => onToggleResolved()}
+            >
+              {pin.status === "resolved"
+                ? t("assetPins:actions.reopen", "Reopen")
+                : t("assetPins:actions.resolve", "Mark resolved")}
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
