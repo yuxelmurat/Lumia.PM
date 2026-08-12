@@ -1,3 +1,4 @@
+import { ImageOff } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ProductSpecForm, {
@@ -18,6 +19,7 @@ import {
 import useDeleteProductSpec from "@/hooks/mutations/product-spec/use-delete-product-spec";
 import useUpdateProductSpec from "@/hooks/mutations/product-spec/use-update-product-spec";
 import useGetProductSpecs from "@/hooks/queries/product-spec/use-get-product-specs";
+import { getProductSpecImageUrl } from "@/lib/product-spec-image-url";
 import { toast } from "@/lib/toast";
 
 function formatCost(unitCost: number | null) {
@@ -115,6 +117,7 @@ export default function ProductSpecList({ projectId }: ProductSpecListProps) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12" />
                 <TableHead>{t("productSpec:list.room", "Room")}</TableHead>
                 <TableHead>{t("productSpec:list.name", "Name")}</TableHead>
                 <TableHead>{t("productSpec:list.vendor", "Vendor")}</TableHead>
@@ -127,46 +130,64 @@ export default function ProductSpecList({ projectId }: ProductSpecListProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {specs.map((spec) => (
-                <TableRow key={spec.id}>
-                  <TableCell className="text-muted-foreground">
-                    {spec.roomLabel || "—"}
-                  </TableCell>
-                  <TableCell className="font-medium text-foreground">
-                    <button
-                      type="button"
-                      className="text-left hover:underline"
-                      onClick={() => handleEdit(spec)}
-                    >
-                      {spec.name}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {spec.vendor || "—"}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatCost(spec.unitCost)}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {spec.quantity}
-                  </TableCell>
-                  <TableCell>
-                    <ProductSpecStatusSelect
-                      value={spec.status as ProductSpecStatus}
-                      onChange={(status) => handleStatusChange(spec.id, status)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      onClick={() => handleDelete(spec.id)}
-                    >
-                      {t("productSpec:list.delete", "Delete")}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {specs.map((spec) => {
+                const imageUrl = getProductSpecImageUrl(spec.imageAssetId);
+                return (
+                  <TableRow key={spec.id}>
+                    <TableCell>
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={spec.name}
+                          className="size-9 rounded-md border border-border/60 object-cover"
+                        />
+                      ) : (
+                        <div className="flex size-9 items-center justify-center rounded-md border border-border/60 bg-muted/40 text-muted-foreground">
+                          <ImageOff className="size-3.5" />
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {spec.roomLabel || "—"}
+                    </TableCell>
+                    <TableCell className="font-medium text-foreground">
+                      <button
+                        type="button"
+                        className="text-left hover:underline"
+                        onClick={() => handleEdit(spec)}
+                      >
+                        {spec.name}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {spec.vendor || "—"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatCost(spec.unitCost)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {spec.quantity}
+                    </TableCell>
+                    <TableCell>
+                      <ProductSpecStatusSelect
+                        value={spec.status as ProductSpecStatus}
+                        onChange={(status) =>
+                          handleStatusChange(spec.id, status)
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => handleDelete(spec.id)}
+                      >
+                        {t("productSpec:list.delete", "Delete")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

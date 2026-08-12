@@ -2207,6 +2207,7 @@
 			"unitCost": "Unit cost",
 			"quantity": "Quantity",
 			"image": "Reference image",
+			"removeImage": "Remove",
 			"uploading": "Uploading…",
 			"imageUploadFailed": "Failed to upload image",
 			"notes": "Notes",

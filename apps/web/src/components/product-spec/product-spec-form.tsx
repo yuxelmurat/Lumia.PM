@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import useCreateProductSpec from "@/hooks/mutations/product-spec/use-create-product-spec";
 import useUpdateProductSpec from "@/hooks/mutations/product-spec/use-update-product-spec";
+import { getProductSpecImageUrl } from "@/lib/product-spec-image-url";
 import { toast } from "@/lib/toast";
 import { uploadProductSpecImage } from "@/lib/upload-product-spec-image";
 
@@ -58,6 +59,7 @@ export default function ProductSpecForm({
   const [notes, setNotes] = useState("");
   const [imageAssetId, setImageAssetId] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const imageUrl = getProductSpecImageUrl(imageAssetId);
 
   const { mutateAsync: createProductSpec, isPending: isCreating } =
     useCreateProductSpec(projectId);
@@ -236,6 +238,23 @@ export default function ProductSpecForm({
             <Label htmlFor="product-spec-image">
               {t("productSpec:form.image", "Reference image")}
             </Label>
+            {imageUrl && (
+              <div className="flex items-center gap-2">
+                <img
+                  src={imageUrl}
+                  alt=""
+                  className="size-14 rounded-md border border-border/60 object-cover"
+                />
+                <Button
+                  type="button"
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => setImageAssetId(null)}
+                >
+                  {t("productSpec:form.removeImage", "Remove")}
+                </Button>
+              </div>
+            )}
             <Input
               id="product-spec-image"
               type="file"
