@@ -2102,7 +2102,7 @@
 	"assetPins": {
 		"loading": "Loading…",
 		"linkInvalid": "This link is invalid, expired, or has been revoked.",
-		"clickToAnnotate": "Click anywhere on the image to leave a pin note.",
+		"clickToAnnotate": "Click anywhere to leave a pin note.",
 		"newPinPlaceholder": "What should change here?",
 		"replyPlaceholder": "Reply…",
 		"failedToCreate": "Failed to add pin",
@@ -2135,6 +2135,18 @@
 			"email": "Email",
 			"continue": "Continue",
 			"missingFields": "Please enter your name and email"
+		},
+		"dwg": {
+			"viewAndAnnotate": "View & annotate",
+			"loadingViewer": "Loading 3D viewer…",
+			"loadFailed": "Failed to load the DWG file: {{error}}",
+			"notTranslated": "This DWG hasn't been prepared for viewing yet.",
+			"translate": "Prepare for viewing",
+			"translateFailed": "Failed to submit for viewing",
+			"translating": "Preparing the DWG for viewing…",
+			"translationFailed": "Preparing this DWG failed.",
+			"retry": "Retry",
+			"notReadyForGuest": "This file isn't ready to view yet — check back shortly."
 		}
 	}
 }

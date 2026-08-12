@@ -577,6 +577,11 @@ export const assetTable = pgTable(
       onUpdate: "cascade",
     }),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    // Autodesk Platform Services (APS) fields, populated for kind="dwg" assets
+    // once a translation job has been submitted. `apsUrn` is the base64url
+    // object URN the Model Derivative API and Viewer SDK key off of.
+    apsUrn: text("aps_urn"),
+    apsTranslationStatus: text("aps_translation_status"),
   },
   (table) => [
     index("asset_workspaceId_idx").on(table.workspaceId),

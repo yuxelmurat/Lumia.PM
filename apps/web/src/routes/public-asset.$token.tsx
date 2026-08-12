@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import GuestIdentityForm from "@/components/asset-pin/guest-identity-form";
 import type { AssetPin } from "@/components/asset-pin/pin-overlay";
 import PublicAssetPinViewer from "@/components/asset-pin/public-asset-pin-viewer";
+import PublicDwgPinViewer from "@/components/asset-pin/public-dwg-pin-viewer";
 import PageTitle from "@/components/page-title";
 import { KaneoBranding } from "@/components/public-project/kaneo-branding";
 import { ThemeToggle } from "@/components/public-project/theme-toggle";
@@ -90,13 +91,21 @@ function RouteComponent() {
           </div>
         </header>
         <main className="flex-1 p-6">
-          <PublicAssetPinViewer
-            token={token}
-            guestId={guestId}
-            imageUrl={data.asset.url}
-            alt={data.asset.filename}
-            pins={data.pins as AssetPin[]}
-          />
+          {data.asset.kind === "dwg" ? (
+            <PublicDwgPinViewer
+              token={token}
+              guestId={guestId}
+              pins={data.pins as AssetPin[]}
+            />
+          ) : (
+            <PublicAssetPinViewer
+              token={token}
+              guestId={guestId}
+              imageUrl={data.asset.url}
+              alt={data.asset.filename}
+              pins={data.pins as AssetPin[]}
+            />
+          )}
         </main>
         <footer className="border-border border-t">
           <div className="px-6 py-3">

@@ -21,6 +21,7 @@ export type AssetPin = {
   assetId: string;
   x: number | null;
   y: number | null;
+  viewerState: unknown;
   status: "open" | "resolved";
   label: string | null;
   createdAt: string | Date;

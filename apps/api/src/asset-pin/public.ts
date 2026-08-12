@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import * as v from "valibot";
+import { getViewerAccessToken, isApsConfigured } from "../aps/client";
+import getAssetTranslationStatus from "../aps/get-status";
 import { assetPinSchema } from "../schemas";
 import createGuest from "./controllers/create-guest";
 import createGuestPin from "./controllers/create-guest-pin";
@@ -155,6 +157,59 @@ const publicAssetPin = new Hono()
         content,
       );
       return c.json(pin);
+    },
+  )
+  .get(
+    "/:token/aps-status",
+    describeRoute({
+      operationId: "getPublicAssetTranslationStatus",
+      tags: ["Public Asset Pins"],
+      description: "Reads DWG translation status for a shared asset",
+      security: [],
+      responses: {
+        200: {
+          description: "Translation status",
+          content: { "application/json": { schema: resolver(v.any()) } },
+        },
+      },
+    }),
+    validator("param", v.object({ token: v.string() })),
+    async (c) => {
+      const { token } = c.req.valid("param");
+      const link = await resolveShareLink(token);
+      const status = await getAssetTranslationStatus(link.assetId);
+      return c.json(status);
+    },
+  )
+  .get(
+    "/:token/aps-viewer-token",
+    describeRoute({
+      operationId: "getPublicAssetViewerToken",
+      tags: ["Public Asset Pins"],
+      description:
+        "Mints a short-lived, viewables-only Autodesk token for a share-link guest",
+      security: [],
+      responses: {
+        200: {
+          description: "Viewer access token",
+          content: { "application/json": { schema: resolver(v.any()) } },
+        },
+      },
+    }),
+    validator("param", v.object({ token: v.string() })),
+    async (c) => {
+      const { token } = c.req.valid("param");
+      // Resolving the share link still enforces token validity (and thus
+      // that this asset is actually shared) before minting a token.
+      await resolveShareLink(token);
+      if (!isApsConfigured()) {
+        return c.json(
+          { message: "Autodesk Platform Services is not configured" },
+          503,
+        );
+      }
+      const viewerToken = await getViewerAccessToken();
+      return c.json(viewerToken);
     },
   );
 

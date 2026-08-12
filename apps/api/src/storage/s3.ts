@@ -31,6 +31,21 @@ export function isImageContentType(contentType: string) {
   return allowedImageMimeTypes.has(contentType.toLowerCase());
 }
 
+const dwgMimeTypes = new Set([
+  "image/vnd.dwg",
+  "application/dwg",
+  "application/x-dwg",
+  "application/acad",
+  "drawing/x-dwg",
+]);
+
+export function isDwgAsset(filename: string, contentType: string) {
+  return (
+    dwgMimeTypes.has(contentType.toLowerCase()) ||
+    filename.toLowerCase().endsWith(".dwg")
+  );
+}
+
 type UploadSurface = "description" | "comment";
 
 type StorageConfig = {

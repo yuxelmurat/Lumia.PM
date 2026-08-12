@@ -15,6 +15,7 @@ import { taskSchema } from "../schemas";
 import {
   assertTaskImageKeyMatchesContext,
   createTaskImageUploadUrl,
+  isDwgAsset,
   isImageContentType,
   validateTaskAssetUploadInput,
 } from "../storage/s3";
@@ -824,7 +825,11 @@ const task = new Hono<{
               filename,
               mimeType: contentType,
               size,
-              kind: isImageContentType(contentType) ? "image" : "attachment",
+              kind: isImageContentType(contentType)
+                ? "image"
+                : isDwgAsset(filename, contentType)
+                  ? "dwg"
+                  : "attachment",
               surface,
               createdBy: userId || null,
             })
@@ -842,7 +847,11 @@ const task = new Hono<{
               filename,
               mimeType: contentType,
               size,
-              kind: isImageContentType(contentType) ? "image" : "attachment",
+              kind: isImageContentType(contentType)
+                ? "image"
+                : isDwgAsset(filename, contentType)
+                  ? "dwg"
+                  : "attachment",
               surface,
               createdBy: userId || null,
             })
