@@ -2168,5 +2168,48 @@
 			"guestNotPending": "No decision needed right now.",
 			"resendAfterChanges": "Send for approval again"
 		}
+	},
+	"productSpec": {
+		"pageTitle": "Materials · {{name}}",
+		"status": {
+			"proposed": "Proposed",
+			"client_approved": "Client approved",
+			"ordered": "Ordered",
+			"received": "Received",
+			"installed": "Installed"
+		},
+		"list": {
+			"title": "Materials",
+			"add": "Add material",
+			"empty": "No materials yet",
+			"emptySubtitle": "Add furniture, fixtures and equipment specs for this project.",
+			"room": "Room",
+			"name": "Name",
+			"vendor": "Vendor",
+			"unitCost": "Unit cost",
+			"quantity": "Qty",
+			"status": "Status",
+			"delete": "Delete",
+			"updateFailed": "Failed to update status",
+			"deleteFailed": "Failed to delete item"
+		},
+		"form": {
+			"createTitle": "Add material",
+			"editTitle": "Edit material",
+			"description": "Track FF&E and material specs for this project.",
+			"room": "Room",
+			"roomPlaceholder": "Living room",
+			"vendor": "Vendor",
+			"name": "Name",
+			"unitCost": "Unit cost",
+			"quantity": "Quantity",
+			"image": "Reference image",
+			"uploading": "Uploading…",
+			"imageUploadFailed": "Failed to upload image",
+			"notes": "Notes",
+			"save": "Save",
+			"create": "Add",
+			"saveFailed": "Failed to save item"
+		}
 	}
 }
