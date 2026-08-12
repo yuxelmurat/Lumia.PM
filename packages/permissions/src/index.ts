@@ -12,6 +12,7 @@ export const statement = {
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   asset: ["read", "update"],
+  productSpec: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 } as const;
 
@@ -23,6 +24,7 @@ export const viewer = ac.newRole({
   task: ["read"],
   label: ["read"],
   asset: ["read"],
+  productSpec: ["read"],
   workspace: ["read"],
 });
 
@@ -32,6 +34,7 @@ export const member = ac.newRole({
   task: ["create", "read", "update"],
   label: ["create", "read", "update", "delete"],
   asset: ["read", "update"],
+  productSpec: ["create", "read", "update", "delete"],
   workspace: ["read"],
 });
 
@@ -41,6 +44,7 @@ export const admin = ac.newRole({
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   asset: ["read", "update"],
+  productSpec: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "manage_settings"],
 });
 
@@ -50,6 +54,7 @@ export const owner = ac.newRole({
   task: ["create", "read", "update", "delete", "assign"],
   label: ["create", "read", "update", "delete"],
   asset: ["read", "update"],
+  productSpec: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 });
 

@@ -50,6 +50,7 @@ import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
+import productSpec from "./product-spec";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
@@ -595,6 +596,7 @@ export function createApp() {
   const assetShareApi = api.route("/asset-share", assetShare);
   const assetApsApi = api.route("/asset-aps", aps);
   const assetApprovalApi = api.route("/asset-approval", assetApproval);
+  const productSpecApi = api.route("/product-spec", productSpec);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -770,6 +772,7 @@ export function createApp() {
     assetShareApi,
     assetApsApi,
     assetApprovalApi,
+    productSpecApi,
     billingApi,
     columnApi,
     commentApi,
@@ -892,6 +895,7 @@ const {
   assetShareApi,
   assetApsApi,
   assetApprovalApi,
+  productSpecApi,
   billingApi,
   columnApi,
   commentApi,
@@ -942,6 +946,7 @@ export type AppType =
   | typeof assetShareApi
   | typeof assetApsApi
   | typeof assetApprovalApi
+  | typeof productSpecApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi

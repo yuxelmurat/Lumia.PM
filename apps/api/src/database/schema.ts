@@ -736,6 +736,51 @@ export const assetApprovalEventTable = pgTable(
   (table) => [index("asset_approval_event_assetId_idx").on(table.assetId)],
 );
 
+export const productSpecTable = pgTable(
+  "product_spec",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    roomLabel: text("room_label"),
+    name: text("name").notNull(),
+    vendor: text("vendor"),
+    // Stored in the smallest currency unit (e.g. cents) to avoid float
+    // rounding; nullable because a price may not be known yet.
+    unitCost: integer("unit_cost"),
+    quantity: integer("quantity").notNull().default(1),
+    status: text("status").notNull().default("proposed"),
+    imageAssetId: text("image_asset_id").references(() => assetTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    linkedPinId: text("linked_pin_id").references(() => assetPinTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    notes: text("notes"),
+    createdByUserId: text("created_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("product_spec_projectId_idx").on(table.projectId),
+    index("product_spec_status_idx").on(table.status),
+  ],
+);
+
 export const labelTable = pgTable(
   "label",
   {

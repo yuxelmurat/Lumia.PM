@@ -302,6 +302,13 @@
 			"when": 1786572123700,
 			"tag": "0042_youthful_veda",
 			"breakpoints": true
+		},
+		{
+			"idx": 43,
+			"version": "7",
+			"when": 1786572906460,
+			"tag": "0043_bent_magdalene",
+			"breakpoints": true
 		}
 	]
 }

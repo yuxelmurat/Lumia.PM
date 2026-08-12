@@ -17,6 +17,7 @@ import {
   invitationTable,
   labelTable,
   notificationTable,
+  productSpecTable,
   projectTable,
   sessionTable,
   taskRelationTable,
@@ -108,6 +109,7 @@ export const projectTableRelations = relations(
     }),
     tasks: many(taskTable),
     assets: many(assetTable),
+    productSpecs: many(productSpecTable),
     columns: many(columnTable),
     workflowRules: many(workflowRuleTable),
     githubIntegration: many(githubIntegrationTable),
@@ -289,6 +291,28 @@ export const assetApprovalEventTableRelations = relations(
     actorGuest: one(assetGuestTable, {
       fields: [assetApprovalEventTable.actorGuestId],
       references: [assetGuestTable.id],
+    }),
+  }),
+);
+
+export const productSpecTableRelations = relations(
+  productSpecTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [productSpecTable.projectId],
+      references: [projectTable.id],
+    }),
+    imageAsset: one(assetTable, {
+      fields: [productSpecTable.imageAssetId],
+      references: [assetTable.id],
+    }),
+    linkedPin: one(assetPinTable, {
+      fields: [productSpecTable.linkedPinId],
+      references: [assetPinTable.id],
+    }),
+    createdByUser: one(userTable, {
+      fields: [productSpecTable.createdByUserId],
+      references: [userTable.id],
     }),
   }),
 );

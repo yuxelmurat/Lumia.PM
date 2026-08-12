@@ -308,6 +308,28 @@ export const assetApprovalEventSchema = v.object({
   actor: assetPinAuthorSchema,
 });
 
+export const productSpecSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  roomLabel: v.nullable(v.string()),
+  name: v.string(),
+  vendor: v.nullable(v.string()),
+  unitCost: v.nullable(v.number()),
+  quantity: v.number(),
+  status: v.picklist([
+    "proposed",
+    "client_approved",
+    "ordered",
+    "received",
+    "installed",
+  ]),
+  imageAssetId: v.nullable(v.string()),
+  linkedPinId: v.nullable(v.string()),
+  notes: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
 export const configSchema = v.object({
   disableRegistration: v.nullable(v.boolean()),
   disablePasswordRegistration: v.nullable(v.boolean()),
