@@ -37,6 +37,8 @@ import type { MouseEvent as ReactMouseEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { bundledLanguages, type Highlighter } from "shiki";
+import AssetPinViewer from "@/components/asset-pin/asset-pin-viewer";
+import ShareLinkManager from "@/components/asset-pin/share-link-manager";
 import { AttachmentCard } from "@/components/task/extensions/attachment-card";
 import { EmbedBlock } from "@/components/task/extensions/embed-block";
 import { KaneoIssueLink } from "@/components/task/extensions/kaneo-issue-link";
@@ -245,6 +247,7 @@ export default function CommentEditor({
   const [previewImage, setPreviewImage] = useState<{
     src: string;
     alt: string;
+    assetId: string | null;
   } | null>(null);
   const codeLanguages = useMemo(
     () =>
@@ -950,9 +953,11 @@ export default function CommentEditor({
       if (!target.classList.contains("kaneo-editor-image")) return;
 
       event.preventDefault();
+      const src = target.currentSrc || target.src;
       setPreviewImage({
-        src: target.currentSrc || target.src,
+        src,
         alt: target.alt || t("activity:comment.editor.previewImageAlt"),
+        assetId: src.match(/\/asset\/([^/?]+)/)?.[1] ?? null,
       });
     };
 
@@ -1947,15 +1952,25 @@ export default function CommentEditor({
           showCloseButton={false}
           bottomStickOnMobile={false}
         >
-          {previewImage && (
-            <div className="flex max-h-[90vh] items-center justify-center p-4">
-              <img
-                src={previewImage.src}
-                alt={previewImage.alt}
-                className="max-h-[85vh] max-w-[92vw] rounded-xl border border-white/12 bg-black/30 object-contain shadow-2xl"
-              />
-            </div>
-          )}
+          {previewImage &&
+            (previewImage.assetId ? (
+              <div className="flex max-h-[90vh] flex-col gap-3 p-4">
+                <AssetPinViewer
+                  assetId={previewImage.assetId}
+                  imageUrl={previewImage.src}
+                  alt={previewImage.alt}
+                />
+                <ShareLinkManager assetId={previewImage.assetId} />
+              </div>
+            ) : (
+              <div className="flex max-h-[90vh] items-center justify-center p-4">
+                <img
+                  src={previewImage.src}
+                  alt={previewImage.alt}
+                  className="max-h-[85vh] max-w-[92vw] rounded-xl border border-white/12 bg-black/30 object-contain shadow-2xl"
+                />
+              </div>
+            ))}
         </DialogPopup>
       </Dialog>
     </section>

@@ -2098,5 +2098,43 @@
 		"branding": {
 			"poweredBy": "Powered by"
 		}
+	},
+	"assetPins": {
+		"loading": "Loading…",
+		"linkInvalid": "This link is invalid, expired, or has been revoked.",
+		"clickToAnnotate": "Click anywhere on the image to leave a pin note.",
+		"newPinPlaceholder": "What should change here?",
+		"replyPlaceholder": "Reply…",
+		"failedToCreate": "Failed to add pin",
+		"status": {
+			"open": "Open",
+			"resolved": "Resolved"
+		},
+		"actions": {
+			"addPin": "Add pin",
+			"reply": "Reply",
+			"resolve": "Mark resolved",
+			"reopen": "Reopen"
+		},
+		"shareLink": {
+			"title": "Share with client",
+			"create": "New link",
+			"empty": "No active links. Create one to let a client view and annotate this file without an account.",
+			"copy": "Copy",
+			"copied": "Copied",
+			"copyFailed": "Failed to copy link",
+			"revoke": "Revoke",
+			"created": "Share link created",
+			"createFailed": "Failed to create link",
+			"revokeFailed": "Failed to revoke link"
+		},
+		"guest": {
+			"title": "Leave feedback on this render",
+			"description": "Enter your name and email so the team knows who left the note. No account needed.",
+			"name": "Name",
+			"email": "Email",
+			"continue": "Continue",
+			"missingFields": "Please enter your name and email"
+		}
 	}
 }

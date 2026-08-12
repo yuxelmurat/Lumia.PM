@@ -18,7 +18,10 @@ type WorkspaceIdSource =
         | "activity"
         | "comment"
         | "column"
-        | "workflowRule";
+        | "workflowRule"
+        | "asset"
+        | "assetPin"
+        | "assetShareLink";
       idKey: string;
     }
   | {
@@ -137,7 +140,10 @@ async function lookupWorkspaceId(
     | "activity"
     | "comment"
     | "column"
-    | "workflowRule",
+    | "workflowRule"
+    | "asset"
+    | "assetPin"
+    | "assetShareLink",
   id: string,
 ): Promise<string | null> {
   try {
@@ -267,6 +273,41 @@ async function lookupWorkspaceId(
         return workflowRule?.workspaceId || null;
       }
 
+      case "asset": {
+        const [asset] = await db
+          .select({ workspaceId: schema.assetTable.workspaceId })
+          .from(schema.assetTable)
+          .where(eq(schema.assetTable.id, id))
+          .limit(1);
+        return asset?.workspaceId || null;
+      }
+
+      case "assetPin": {
+        const [pin] = await db
+          .select({ workspaceId: schema.assetTable.workspaceId })
+          .from(schema.assetPinTable)
+          .innerJoin(
+            schema.assetTable,
+            eq(schema.assetPinTable.assetId, schema.assetTable.id),
+          )
+          .where(eq(schema.assetPinTable.id, id))
+          .limit(1);
+        return pin?.workspaceId || null;
+      }
+
+      case "assetShareLink": {
+        const [shareLink] = await db
+          .select({ workspaceId: schema.assetTable.workspaceId })
+          .from(schema.assetShareLinkTable)
+          .innerJoin(
+            schema.assetTable,
+            eq(schema.assetShareLinkTable.assetId, schema.assetTable.id),
+          )
+          .where(eq(schema.assetShareLinkTable.id, id))
+          .limit(1);
+        return shareLink?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -356,6 +397,30 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "workflowRule", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromAssetId: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "asset", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromAssetPin: (idKey = "pinId") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "assetPin", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromAssetShareLink: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "assetShareLink", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

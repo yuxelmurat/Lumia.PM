@@ -7,6 +7,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  real,
   text,
   timestamp,
   unique,
@@ -584,6 +585,120 @@ export const assetTable = pgTable(
     index("asset_activityId_idx").on(table.activityId),
     index("asset_createdBy_idx").on(table.createdBy),
   ],
+);
+
+export const assetShareLinkTable = pgTable(
+  "asset_share_link",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    token: text("token").notNull().unique(),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    expiresAt: timestamp("expires_at", { mode: "date" }),
+    revokedAt: timestamp("revoked_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("asset_share_link_assetId_idx").on(table.assetId),
+    uniqueIndex("asset_share_link_token_uidx").on(table.token),
+  ],
+);
+
+export const assetGuestTable = pgTable(
+  "asset_guest",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    shareLinkId: text("share_link_id")
+      .notNull()
+      .references(() => assetShareLinkTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [index("asset_guest_shareLinkId_idx").on(table.shareLinkId)],
+);
+
+export const assetPinTable = pgTable(
+  "asset_pin",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    // Normalized 0-1 image-space coordinates, used for raster assets
+    // (renders). Left null for CAD/DWG pins, which use `viewerState`
+    // instead since their anchor is a camera/viewpoint, not a flat point.
+    x: real("x"),
+    y: real("y"),
+    viewerState: jsonb("viewer_state"),
+    status: text("status").notNull().default("open"),
+    label: text("label"),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdByGuestId: text("created_by_guest_id").references(
+      () => assetGuestTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    resolvedByUserId: text("resolved_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    resolvedAt: timestamp("resolved_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("asset_pin_assetId_idx").on(table.assetId),
+    index("asset_pin_createdByUserId_idx").on(table.createdByUserId),
+    index("asset_pin_createdByGuestId_idx").on(table.createdByGuestId),
+  ],
+);
+
+export const assetPinNoteTable = pgTable(
+  "asset_pin_note",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    pinId: text("pin_id")
+      .notNull()
+      .references(() => assetPinTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    content: text("content").notNull(),
+    authorUserId: text("author_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    authorGuestId: text("author_guest_id").references(
+      () => assetGuestTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [index("asset_pin_note_pinId_idx").on(table.pinId)],
 );
 
 export const labelTable = pgTable(

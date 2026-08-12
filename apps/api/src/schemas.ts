@@ -262,6 +262,43 @@ export const commentSchema = v.object({
   ),
 });
 
+export const assetPinAuthorSchema = v.object({
+  type: v.picklist(["user", "guest"]),
+  id: v.string(),
+  name: v.nullable(v.string()),
+});
+
+export const assetPinNoteSchema = v.object({
+  id: v.string(),
+  pinId: v.string(),
+  content: v.string(),
+  createdAt: v.date(),
+  author: assetPinAuthorSchema,
+});
+
+export const assetPinSchema = v.object({
+  id: v.string(),
+  assetId: v.string(),
+  x: v.nullable(v.number()),
+  y: v.nullable(v.number()),
+  viewerState: v.nullable(v.any()),
+  status: v.picklist(["open", "resolved"]),
+  label: v.nullable(v.string()),
+  createdAt: v.date(),
+  resolvedAt: v.nullable(v.date()),
+  author: assetPinAuthorSchema,
+  notes: v.array(assetPinNoteSchema),
+});
+
+export const assetShareLinkSchema = v.object({
+  id: v.string(),
+  assetId: v.string(),
+  token: v.string(),
+  expiresAt: v.nullable(v.date()),
+  revokedAt: v.nullable(v.date()),
+  createdAt: v.date(),
+});
+
 export const configSchema = v.object({
   disableRegistration: v.nullable(v.boolean()),
   disablePasswordRegistration: v.nullable(v.boolean()),

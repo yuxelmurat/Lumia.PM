@@ -6,7 +6,7 @@ import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import * as Sentry from "@sentry/node";
 import type { Session, User } from "better-auth/types";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -19,6 +19,9 @@ import {
 } from "hono-openapi";
 import * as v from "valibot";
 import activity from "./activity";
+import assetPin from "./asset-pin";
+import publicAssetPin from "./asset-pin/public";
+import assetShare from "./asset-share";
 import { auth } from "./auth";
 import billing from "./billing";
 import column from "./column";
@@ -245,6 +248,8 @@ export function createApp() {
     return c.json(project);
   });
 
+  const publicAssetPinApi = api.route("/public-asset", publicAssetPin);
+
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
   api.post(
@@ -320,7 +325,33 @@ export function createApp() {
         throw new HTTPException(404, { message: "Asset not found" });
       }
 
-      await authorizeAssetAccess(c, asset);
+      const shareToken = c.req.query("shareToken");
+      const hasValidShareToken = shareToken
+        ? await (async () => {
+            const [link] = await db
+              .select({
+                revokedAt: schema.assetShareLinkTable.revokedAt,
+                expiresAt: schema.assetShareLinkTable.expiresAt,
+              })
+              .from(schema.assetShareLinkTable)
+              .where(
+                and(
+                  eq(schema.assetShareLinkTable.token, shareToken),
+                  eq(schema.assetShareLinkTable.assetId, id),
+                ),
+              )
+              .limit(1);
+            return Boolean(
+              link &&
+                !link.revokedAt &&
+                (!link.expiresAt || link.expiresAt.getTime() > Date.now()),
+            );
+          })()
+        : false;
+
+      if (!hasValidShareToken) {
+        await authorizeAssetAccess(c, asset);
+      }
 
       try {
         const object = await getPrivateObject(asset.objectKey);
@@ -558,6 +589,8 @@ export function createApp() {
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
   const commentApi = api.route("/comment", comment);
+  const assetPinApi = api.route("/asset-pin", assetPin);
+  const assetShareApi = api.route("/asset-share", assetShare);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -729,6 +762,8 @@ export function createApp() {
     api,
     injectWebSocket,
     activityApi,
+    assetPinApi,
+    assetShareApi,
     billingApi,
     columnApi,
     commentApi,
@@ -745,6 +780,7 @@ export function createApp() {
     notificationPreferencesApi,
     projectApi,
     publicProjectApi,
+    publicAssetPinApi,
     searchApi,
     slackIntegrationApi,
     taskApi,
@@ -846,6 +882,8 @@ const {
   app,
   injectWebSocket,
   activityApi,
+  assetPinApi,
+  assetShareApi,
   billingApi,
   columnApi,
   commentApi,
@@ -862,6 +900,7 @@ const {
   notificationPreferencesApi,
   projectApi,
   publicProjectApi,
+  publicAssetPinApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
@@ -891,6 +930,8 @@ export type AppType =
   | typeof columnApi
   | typeof activityApi
   | typeof commentApi
+  | typeof assetPinApi
+  | typeof assetShareApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi
@@ -908,6 +949,7 @@ export type AppType =
   | typeof invitationApi
   | typeof workspaceApi
   | typeof publicProjectApi
+  | typeof publicAssetPinApi
   | typeof invitationPublicApi
   | typeof oauthApi;
 

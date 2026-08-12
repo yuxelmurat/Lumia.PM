@@ -3,6 +3,10 @@ import {
   accountTable,
   activityTable,
   apikeyTable,
+  assetGuestTable,
+  assetPinNoteTable,
+  assetPinTable,
+  assetShareLinkTable,
   assetTable,
   columnTable,
   commentTable,
@@ -180,7 +184,7 @@ export const activityTableRelations = relations(activityTable, ({ one }) => ({
   }),
 }));
 
-export const assetTableRelations = relations(assetTable, ({ one }) => ({
+export const assetTableRelations = relations(assetTable, ({ one, many }) => ({
   workspace: one(workspaceTable, {
     fields: [assetTable.workspaceId],
     references: [workspaceTable.id],
@@ -201,7 +205,73 @@ export const assetTableRelations = relations(assetTable, ({ one }) => ({
     fields: [assetTable.createdBy],
     references: [userTable.id],
   }),
+  pins: many(assetPinTable),
+  shareLinks: many(assetShareLinkTable),
 }));
+
+export const assetShareLinkTableRelations = relations(
+  assetShareLinkTable,
+  ({ one, many }) => ({
+    asset: one(assetTable, {
+      fields: [assetShareLinkTable.assetId],
+      references: [assetTable.id],
+    }),
+    createdBy: one(userTable, {
+      fields: [assetShareLinkTable.createdByUserId],
+      references: [userTable.id],
+    }),
+    guests: many(assetGuestTable),
+  }),
+);
+
+export const assetGuestTableRelations = relations(
+  assetGuestTable,
+  ({ one, many }) => ({
+    shareLink: one(assetShareLinkTable, {
+      fields: [assetGuestTable.shareLinkId],
+      references: [assetShareLinkTable.id],
+    }),
+    pins: many(assetPinTable),
+    notes: many(assetPinNoteTable),
+  }),
+);
+
+export const assetPinTableRelations = relations(
+  assetPinTable,
+  ({ one, many }) => ({
+    asset: one(assetTable, {
+      fields: [assetPinTable.assetId],
+      references: [assetTable.id],
+    }),
+    createdByUser: one(userTable, {
+      fields: [assetPinTable.createdByUserId],
+      references: [userTable.id],
+    }),
+    createdByGuest: one(assetGuestTable, {
+      fields: [assetPinTable.createdByGuestId],
+      references: [assetGuestTable.id],
+    }),
+    notes: many(assetPinNoteTable),
+  }),
+);
+
+export const assetPinNoteTableRelations = relations(
+  assetPinNoteTable,
+  ({ one }) => ({
+    pin: one(assetPinTable, {
+      fields: [assetPinNoteTable.pinId],
+      references: [assetPinTable.id],
+    }),
+    authorUser: one(userTable, {
+      fields: [assetPinNoteTable.authorUserId],
+      references: [userTable.id],
+    }),
+    authorGuest: one(assetGuestTable, {
+      fields: [assetPinNoteTable.authorGuestId],
+      references: [assetGuestTable.id],
+    }),
+  }),
+);
 
 export const labelTableRelations = relations(labelTable, ({ one }) => ({
   task: one(taskTable, {
