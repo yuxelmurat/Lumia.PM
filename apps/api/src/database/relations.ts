@@ -18,6 +18,7 @@ import {
   invitationTable,
   labelTable,
   notificationTable,
+  permitTable,
   productSpecTable,
   projectTable,
   rfiTable,
@@ -392,6 +393,23 @@ export const submittalTableRelations = relations(submittalTable, ({ one }) => ({
     fields: [submittalTable.reviewedByUserId],
     references: [userTable.id],
     relationName: "submittalReviewedBy",
+  }),
+}));
+
+export const permitTableRelations = relations(permitTable, ({ one }) => ({
+  project: one(projectTable, {
+    fields: [permitTable.projectId],
+    references: [projectTable.id],
+  }),
+  assignee: one(userTable, {
+    fields: [permitTable.assigneeUserId],
+    references: [userTable.id],
+    relationName: "permitAssignee",
+  }),
+  createdByUser: one(userTable, {
+    fields: [permitTable.createdByUserId],
+    references: [userTable.id],
+    relationName: "permitCreatedBy",
   }),
 }));
 

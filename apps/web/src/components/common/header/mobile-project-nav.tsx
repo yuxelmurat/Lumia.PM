@@ -8,6 +8,7 @@ import {
   Package,
   Plus,
   SquareKanban,
+  Stamp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,8 @@ type MobileProjectNavProps = {
     | "materials"
     | "rfis"
     | "changeOrders"
-    | "submittals";
+    | "submittals"
+    | "permits";
   onSelectBoard: () => void;
   onSelectBacklog: () => void;
   onSelectGantt: () => void;
@@ -37,6 +39,7 @@ type MobileProjectNavProps = {
   onSelectRfis: () => void;
   onSelectChangeOrders: () => void;
   onSelectSubmittals: () => void;
+  onSelectPermits: () => void;
   onSelectProject: (projectId: string) => void;
   onAddProject: () => void;
 };
@@ -52,6 +55,7 @@ export default function MobileProjectNav({
   onSelectRfis,
   onSelectChangeOrders,
   onSelectSubmittals,
+  onSelectPermits,
   onSelectProject,
   onAddProject,
 }: MobileProjectNavProps) {
@@ -166,6 +170,19 @@ export default function MobileProjectNav({
               >
                 <FileCheck2 className="size-3.5" />
                 Submittals
+              </button>
+              <button
+                type="button"
+                onClick={onSelectPermits}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "permits"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <Stamp className="size-3.5" />
+                Permits
               </button>
             </div>
           </div>

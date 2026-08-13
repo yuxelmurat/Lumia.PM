@@ -365,6 +365,13 @@
 			"when": 1786652944921,
 			"tag": "0051_icy_secret_warriors",
 			"breakpoints": true
+		},
+		{
+			"idx": 52,
+			"version": "7",
+			"when": 1786653671326,
+			"tag": "0052_talented_stone_men",
+			"breakpoints": true
 		}
 	]
 }

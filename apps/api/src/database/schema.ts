@@ -298,6 +298,7 @@ export const projectTable = pgTable(
       .notNull()
       .default(0),
     lastSubmittalNumber: integer("last_submittal_number").notNull().default(0),
+    lastPermitNumber: integer("last_permit_number").notNull().default(0),
     position: integer("position").notNull().default(0),
   },
   (table) => [
@@ -956,6 +957,49 @@ export const submittalTable = pgTable(
     index("submittal_supersedesSubmittalId_idx").on(
       table.supersedesSubmittalId,
     ),
+  ],
+);
+
+export const permitTable = pgTable(
+  "permit",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    jurisdictionName: text("jurisdiction_name").notNull(),
+    permitType: text("permit_type"),
+    status: text("status").notNull().default("not_submitted"),
+    // Official number issued by the AHJ/municipality once the permit is
+    // issued; distinct from the internal sequential `number` above.
+    permitNumber: text("permit_number"),
+    submittedDate: timestamp("submitted_date", { mode: "date" }),
+    approvalDate: timestamp("approval_date", { mode: "date" }),
+    notes: text("notes"),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("permit_project_number_unique").on(table.projectId, table.number),
+    index("permit_projectId_idx").on(table.projectId),
+    index("permit_status_idx").on(table.status),
   ],
 );
 

@@ -7,6 +7,7 @@ import {
   Package,
   SquareKanban,
   SquircleDashed,
+  Stamp,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import MobileProjectNav from "@/components/common/header/mobile-project-nav";
@@ -41,7 +42,8 @@ type ProjectLayoutProps = {
     | "materials"
     | "rfis"
     | "changeOrders"
-    | "submittals";
+    | "submittals"
+    | "permits";
 };
 
 export default function ProjectLayout({
@@ -74,7 +76,9 @@ export default function ProjectLayout({
               ? "changeOrders"
               : location.pathname.includes("/submittals")
                 ? "submittals"
-                : "board");
+                : location.pathname.includes("/permits")
+                  ? "permits"
+                  : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -125,6 +129,13 @@ export default function ProjectLayout({
     });
   };
 
+  const handleNavigateToPermits = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/permits",
+      params: { workspaceId, projectId },
+    });
+  };
+
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
       to:
@@ -140,7 +151,9 @@ export default function ProjectLayout({
                   ? "/dashboard/workspace/$workspaceId/project/$projectId/change-orders"
                   : resolvedView === "submittals"
                     ? "/dashboard/workspace/$workspaceId/project/$projectId/submittals"
-                    : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+                    : resolvedView === "permits"
+                      ? "/dashboard/workspace/$workspaceId/project/$projectId/permits"
+                      : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -198,6 +211,7 @@ export default function ProjectLayout({
                 onSelectRfis={handleNavigateToRfis}
                 onSelectChangeOrders={handleNavigateToChangeOrders}
                 onSelectSubmittals={handleNavigateToSubmittals}
+                onSelectPermits={handleNavigateToPermits}
                 onSelectProject={handleProjectSwitch}
                 onAddProject={() => setIsCreateProjectModalOpen(true)}
               />
@@ -292,6 +306,18 @@ export default function ProjectLayout({
                 >
                   <FileCheck2 className="size-3.5" />
                   Submittals
+                </Button>
+                <Button
+                  variant={resolvedView === "permits" ? "secondary" : "ghost"}
+                  size="xs"
+                  onClick={handleNavigateToPermits}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "permits" && "text-muted-foreground",
+                  )}
+                >
+                  <Stamp className="size-3.5" />
+                  Permits
                 </Button>
               </div>
             )}

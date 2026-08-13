@@ -50,6 +50,7 @@ import { migrateColumns } from "./migrations/column-migration";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
+import permit from "./permit";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import productSpec from "./product-spec";
@@ -606,6 +607,7 @@ export function createApp() {
   const rfiApi = api.route("/rfi", rfi);
   const changeOrderApi = api.route("/change-order", changeOrder);
   const submittalApi = api.route("/submittal", submittal);
+  const permitApi = api.route("/permit", permit);
   const workloadApi = api.route("/workload", workload);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
@@ -787,6 +789,7 @@ export function createApp() {
     rfiApi,
     changeOrderApi,
     submittalApi,
+    permitApi,
     workloadApi,
     billingApi,
     columnApi,
@@ -915,6 +918,7 @@ const {
   rfiApi,
   changeOrderApi,
   submittalApi,
+  permitApi,
   workloadApi,
   billingApi,
   columnApi,
@@ -971,6 +975,7 @@ export type AppType =
   | typeof rfiApi
   | typeof changeOrderApi
   | typeof submittalApi
+  | typeof permitApi
   | typeof workloadApi
   | typeof timeEntryApi
   | typeof labelApi

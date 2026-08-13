@@ -394,6 +394,32 @@ export const submittalSchema = v.object({
   updatedAt: v.date(),
 });
 
+export const permitSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  jurisdictionName: v.string(),
+  permitType: v.nullable(v.string()),
+  status: v.picklist([
+    "not_submitted",
+    "submitted",
+    "corrections_required",
+    "approved",
+    "issued",
+  ]),
+  permitNumber: v.nullable(v.string()),
+  submittedDate: v.nullable(v.date()),
+  approvalDate: v.nullable(v.date()),
+  notes: v.nullable(v.string()),
+  assignee: v.nullable(
+    v.object({ id: v.string(), name: v.nullable(v.string()) }),
+  ),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
 export const productSpecSchema = v.object({
   id: v.string(),
   projectId: v.string(),

@@ -59,6 +59,7 @@ import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProject
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_'
@@ -372,6 +373,15 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsR
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
     } as any,
   )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRouteImport.update(
+    {
+      id: '/project/$projectId/permits',
+      path: '/project/$projectId/permits',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute =
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRouteImport.update(
     {
@@ -448,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/permits': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/submittals': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
@@ -498,6 +509,7 @@ export interface FileRoutesByTo {
   '/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/permits': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/submittals': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
@@ -554,6 +566,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
@@ -609,6 +622,7 @@ export interface FileRouteTypes {
     | '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
     | '/dashboard/workspace/$workspaceId/project/$projectId/materials'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/permits'
     | '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
     | '/dashboard/workspace/$workspaceId/project/$projectId/submittals'
     | '/dashboard/workspace/$workspaceId/project/$projectId/'
@@ -659,6 +673,7 @@ export interface FileRouteTypes {
     | '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
     | '/dashboard/workspace/$workspaceId/project/$projectId/materials'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/permits'
     | '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
     | '/dashboard/workspace/$workspaceId/project/$projectId/submittals'
     | '/dashboard/workspace/$workspaceId/project/$projectId'
@@ -714,6 +729,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/'
@@ -1084,6 +1100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits'
+      path: '/project/$projectId/permits'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/permits'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
       path: '/project/$projectId/rfis'
@@ -1211,6 +1234,7 @@ interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren {
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
@@ -1237,6 +1261,8 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren: LayoutAuthe
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute:

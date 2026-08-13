@@ -2410,5 +2410,49 @@
 		"estimatedHoursPlaceholder": "e.g. 8",
 		"estimatedHoursFailed": "Failed to update estimated hours",
 		"save": "Save"
+	},
+	"permit": {
+		"pageTitle": "Permits \u00b7 {{name}}",
+		"unassigned": "Unassigned",
+		"status": {
+			"not_submitted": "Not submitted",
+			"submitted": "Submitted",
+			"corrections_required": "Corrections required",
+			"approved": "Approved",
+			"issued": "Issued"
+		},
+		"list": {
+			"title": "Permits",
+			"add": "New permit",
+			"empty": "No permits yet",
+			"emptySubtitle": "Track municipal permit applications and their status.",
+			"number": "#",
+			"jurisdiction": "Jurisdiction",
+			"type": "Type",
+			"assignee": "Assignee",
+			"permitNumber": "Permit #",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New permit",
+			"description": "Track a permit application's status with the local jurisdiction.",
+			"jurisdictionName": "Jurisdiction",
+			"jurisdictionPlaceholder": "Seattle DCI",
+			"permitType": "Permit type",
+			"permitTypePlaceholder": "Building permit",
+			"assignee": "Assignee",
+			"notes": "Notes",
+			"create": "Create permit",
+			"saveFailed": "Failed to create permit"
+		},
+		"detail": {
+			"status": "Status",
+			"permitNumber": "Official permit number",
+			"permitNumberPlaceholder": "Set once issued by the AHJ",
+			"save": "Save",
+			"saveFailed": "Failed to save details",
+			"statusFailed": "Failed to update status",
+			"assignFailed": "Failed to update assignee"
+		}
 	}
 }
