@@ -2201,6 +2201,15 @@
 			"guestTitle": "This file is pending your approval",
 			"guestNotPending": "No decision needed right now.",
 			"resendAfterChanges": "Send for approval again"
+		},
+		"revision": {
+			"title": "Revision history",
+			"uploadNew": "Upload new revision",
+			"uploadSuccess": "New revision uploaded",
+			"uploadFailed": "Failed to upload new revision",
+			"current": "Current",
+			"revisionLabel": "Rev {{n}} — {{name}}",
+			"unknownUploader": "Unknown"
 		}
 	},
 	"productSpec": {

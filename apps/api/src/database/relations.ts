@@ -211,6 +211,12 @@ export const assetTableRelations = relations(assetTable, ({ one, many }) => ({
   pins: many(assetPinTable),
   shareLinks: many(assetShareLinkTable),
   approvalEvents: many(assetApprovalEventTable),
+  supersedesAsset: one(assetTable, {
+    fields: [assetTable.supersedesAssetId],
+    references: [assetTable.id],
+    relationName: "assetRevision",
+  }),
+  supersededByAssets: many(assetTable, { relationName: "assetRevision" }),
 }));
 
 export const assetShareLinkTableRelations = relations(

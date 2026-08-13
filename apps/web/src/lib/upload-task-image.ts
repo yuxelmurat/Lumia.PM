@@ -35,10 +35,12 @@ export async function uploadTaskImage({
   taskId,
   surface,
   file,
+  supersedesAssetId,
 }: {
   taskId: string;
   surface: UploadSurface;
   file: File;
+  supersedesAssetId?: string;
 }) {
   if (!isSupportedImageFile(file)) {
     if (!isSupportedTaskAsset(file)) {
@@ -71,10 +73,12 @@ export async function uploadTaskImage({
     contentType: file.type,
     size: file.size,
     surface,
+    supersedesAssetId,
   });
 
   return {
     url: asset.url,
+    assetId: asset.id,
     alt: getImageAltText(file.name || "image"),
     filename: file.name || "file",
     kind: isSupportedImageFile(file) ? "image" : "attachment",

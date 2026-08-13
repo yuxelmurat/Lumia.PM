@@ -23,6 +23,7 @@ import aps from "./aps";
 import assetApproval from "./asset-approval";
 import assetPin from "./asset-pin";
 import publicAssetPin from "./asset-pin/public";
+import assetRevision from "./asset-revision";
 import assetShare from "./asset-share";
 import { auth } from "./auth";
 import billing from "./billing";
@@ -596,6 +597,7 @@ export function createApp() {
   const assetShareApi = api.route("/asset-share", assetShare);
   const assetApsApi = api.route("/asset-aps", aps);
   const assetApprovalApi = api.route("/asset-approval", assetApproval);
+  const assetRevisionApi = api.route("/asset-revision", assetRevision);
   const productSpecApi = api.route("/product-spec", productSpec);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
@@ -772,6 +774,7 @@ export function createApp() {
     assetShareApi,
     assetApsApi,
     assetApprovalApi,
+    assetRevisionApi,
     productSpecApi,
     billingApi,
     columnApi,
@@ -895,6 +898,7 @@ const {
   assetShareApi,
   assetApsApi,
   assetApprovalApi,
+  assetRevisionApi,
   productSpecApi,
   billingApi,
   columnApi,
@@ -946,6 +950,7 @@ export type AppType =
   | typeof assetShareApi
   | typeof assetApsApi
   | typeof assetApprovalApi
+  | typeof assetRevisionApi
   | typeof productSpecApi
   | typeof timeEntryApi
   | typeof labelApi

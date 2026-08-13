@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -45,6 +46,7 @@ import { useTranslation } from "react-i18next";
 import { bundledLanguages, type Highlighter } from "shiki";
 import ApprovalPanel from "@/components/asset-pin/approval-panel";
 import AssetPinViewer from "@/components/asset-pin/asset-pin-viewer";
+import RevisionTimeline from "@/components/asset-pin/revision-timeline";
 import ShareLinkManager from "@/components/asset-pin/share-link-manager";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogPopup } from "@/components/ui/dialog";
@@ -276,9 +278,11 @@ export default function TaskDescription({
   const { mutateAsync: updateTaskDescription } = useUpdateTaskDescription();
   const { canManageTasks } = useWorkspacePermission();
   const canEdit = canManageTasks();
+  const queryClient = useQueryClient();
 
   const editorShellRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const revisionInputRef = useRef<HTMLInputElement | null>(null);
   const dragDepthRef = useRef(0);
   const taskRef = useRef(task);
   const updateTaskRef = useRef(updateTaskDescription);
@@ -435,6 +439,51 @@ export default function TaskDescription({
       }
     },
     [insertUploadedAsset, t, taskId],
+  );
+
+  const handleUploadRevision = useCallback(
+    async (file: File, supersedesAssetId: string) => {
+      const loadingToast = toast.loading(
+        t("tasks:detail.editor.upload.loading"),
+      );
+
+      try {
+        const uploadedAsset = await uploadTaskImage({
+          taskId,
+          surface: "description",
+          file,
+          supersedesAssetId,
+        });
+
+        setPreviewImage({
+          src: uploadedAsset.url,
+          alt: uploadedAsset.alt,
+          assetId: uploadedAsset.assetId,
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["asset-revisions", supersedesAssetId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["asset-revisions", uploadedAsset.assetId],
+        });
+
+        toast.dismiss(loadingToast);
+        toast.success(
+          t("assetPins:revision.uploadSuccess", "New revision uploaded"),
+        );
+      } catch (error) {
+        toast.dismiss(loadingToast);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : t(
+                "assetPins:revision.uploadFailed",
+                "Failed to upload new revision",
+              ),
+        );
+      }
+    },
+    [queryClient, t, taskId],
   );
 
   const openImagePicker = useCallback(
@@ -1379,6 +1428,19 @@ export default function TaskDescription({
           event.target.value = "";
         }}
       />
+      <input
+        ref={revisionInputRef}
+        type="file"
+        className="sr-only"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          const supersedesAssetId = previewImage?.assetId;
+          if (file && supersedesAssetId) {
+            void handleUploadRevision(file, supersedesAssetId);
+          }
+          event.target.value = "";
+        }}
+      />
       {editor && hoveredCodeBlock && (
         <div
           className="kaneo-codeblock-language"
@@ -1926,6 +1988,17 @@ export default function TaskDescription({
                   workspaceId={workspaceId}
                 />
                 <ApprovalPanel assetId={previewImage.assetId} />
+                <RevisionTimeline assetId={previewImage.assetId} />
+                {canEdit && (
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    className="self-start"
+                    onClick={() => revisionInputRef.current?.click()}
+                  >
+                    {t("assetPins:revision.uploadNew", "Upload new revision")}
+                  </Button>
+                )}
                 <ShareLinkManager assetId={previewImage.assetId} />
               </div>
             ) : (

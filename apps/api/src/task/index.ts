@@ -755,6 +755,7 @@ const task = new Hono<{
         contentType: v.string(),
         size: v.number(),
         surface: v.picklist(["description", "comment"] as const),
+        supersedesAssetId: v.optional(v.string()),
       }),
     ),
     workspaceAccess.fromTask(),
@@ -762,7 +763,8 @@ const task = new Hono<{
     requireEntitlement,
     async (c) => {
       const { id } = c.req.valid("param");
-      const { key, filename, contentType, size, surface } = c.req.valid("json");
+      const { key, filename, contentType, size, surface, supersedesAssetId } =
+        c.req.valid("json");
       const userId = c.get("userId");
 
       try {
@@ -807,6 +809,20 @@ const task = new Hono<{
         throw new HTTPException(400, {
           message: "Image upload key does not match the task context.",
         });
+      }
+
+      if (supersedesAssetId) {
+        const [supersededAsset] = await db
+          .select({ taskId: assetTable.taskId })
+          .from(assetTable)
+          .where(eq(assetTable.id, supersedesAssetId))
+          .limit(1);
+
+        if (!supersededAsset || supersededAsset.taskId !== taskContext.taskId) {
+          throw new HTTPException(400, {
+            message: "supersedesAssetId must belong to the same task.",
+          });
+        }
       }
 
       const [existingAsset] = await db
@@ -854,6 +870,7 @@ const task = new Hono<{
                   : "attachment",
               surface,
               createdBy: userId || null,
+              supersedesAssetId: supersedesAssetId || null,
             })
             .returning({
               id: assetTable.id,

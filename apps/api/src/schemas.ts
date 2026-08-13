@@ -317,6 +317,18 @@ export const assetApprovalEventSchema = v.object({
   actor: assetPinAuthorSchema,
 });
 
+export const assetRevisionSchema = v.object({
+  id: v.string(),
+  filename: v.string(),
+  createdAt: v.date(),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  approvalStatus: v.nullable(
+    v.picklist(["pending", "approved", "changes_requested"]),
+  ),
+  revisionNumber: v.number(),
+});
+
 export const productSpecSchema = v.object({
   id: v.string(),
   projectId: v.string(),

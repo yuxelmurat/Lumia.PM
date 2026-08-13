@@ -1,6 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   foreignKey,
   index,
@@ -587,6 +588,12 @@ export const assetTable = pgTable(
     // Denormalized current approval state; null = no approval cycle started.
     // Full history lives in assetApprovalEventTable.
     approvalStatus: text("approval_status"),
+    // Self-reference: set when this asset was uploaded to replace an earlier
+    // one (e.g. after changes were requested). Forms a revision chain.
+    supersedesAssetId: text("supersedes_asset_id").references(
+      (): AnyPgColumn => assetTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
   },
   (table) => [
     index("asset_workspaceId_idx").on(table.workspaceId),
@@ -594,6 +601,7 @@ export const assetTable = pgTable(
     index("asset_taskId_idx").on(table.taskId),
     index("asset_activityId_idx").on(table.activityId),
     index("asset_createdBy_idx").on(table.createdBy),
+    index("asset_supersedesAssetId_idx").on(table.supersedesAssetId),
   ],
 );
 
