@@ -9,6 +9,7 @@ import {
   assetPinTable,
   assetShareLinkTable,
   assetTable,
+  changeOrderTable,
   columnTable,
   commentTable,
   externalLinkTable,
@@ -345,6 +346,26 @@ export const rfiTableRelations = relations(rfiTable, ({ one }) => ({
     relationName: "rfiAnsweredBy",
   }),
 }));
+
+export const changeOrderTableRelations = relations(
+  changeOrderTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [changeOrderTable.projectId],
+      references: [projectTable.id],
+    }),
+    createdByUser: one(userTable, {
+      fields: [changeOrderTable.createdByUserId],
+      references: [userTable.id],
+      relationName: "changeOrderCreatedBy",
+    }),
+    decidedByUser: one(userTable, {
+      fields: [changeOrderTable.decidedByUserId],
+      references: [userTable.id],
+      relationName: "changeOrderDecidedBy",
+    }),
+  }),
+);
 
 export const labelTableRelations = relations(labelTable, ({ one }) => ({
   task: one(taskTable, {

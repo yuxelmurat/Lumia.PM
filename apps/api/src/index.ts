@@ -27,6 +27,7 @@ import assetRevision from "./asset-revision";
 import assetShare from "./asset-share";
 import { auth } from "./auth";
 import billing from "./billing";
+import changeOrder from "./change-order";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
@@ -601,6 +602,7 @@ export function createApp() {
   const assetRevisionApi = api.route("/asset-revision", assetRevision);
   const productSpecApi = api.route("/product-spec", productSpec);
   const rfiApi = api.route("/rfi", rfi);
+  const changeOrderApi = api.route("/change-order", changeOrder);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -779,6 +781,7 @@ export function createApp() {
     assetRevisionApi,
     productSpecApi,
     rfiApi,
+    changeOrderApi,
     billingApi,
     columnApi,
     commentApi,
@@ -904,6 +907,7 @@ const {
   assetRevisionApi,
   productSpecApi,
   rfiApi,
+  changeOrderApi,
   billingApi,
   columnApi,
   commentApi,
@@ -957,6 +961,7 @@ export type AppType =
   | typeof assetRevisionApi
   | typeof productSpecApi
   | typeof rfiApi
+  | typeof changeOrderApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi

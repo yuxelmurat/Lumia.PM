@@ -294,6 +294,9 @@ export const projectTable = pgTable(
     completedAt: timestamp("completed_at", { mode: "date" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
     lastRfiNumber: integer("last_rfi_number").notNull().default(0),
+    lastChangeOrderNumber: integer("last_change_order_number")
+      .notNull()
+      .default(0),
     position: integer("position").notNull().default(0),
   },
   (table) => [
@@ -845,6 +848,52 @@ export const rfiTable = pgTable(
     unique("rfi_project_number_unique").on(table.projectId, table.number),
     index("rfi_projectId_idx").on(table.projectId),
     index("rfi_status_idx").on(table.status),
+  ],
+);
+
+export const changeOrderTable = pgTable(
+  "change_order",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    // Stored in the smallest currency unit (e.g. cents); nullable because
+    // cost impact may not be estimated yet.
+    costImpactCents: integer("cost_impact_cents"),
+    hoursImpact: integer("hours_impact"),
+    status: text("status").notNull().default("pending_review"),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    decidedByUserId: text("decided_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    decisionNote: text("decision_note"),
+    decidedAt: timestamp("decided_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("change_order_project_number_unique").on(
+      table.projectId,
+      table.number,
+    ),
+    index("change_order_projectId_idx").on(table.projectId),
+    index("change_order_status_idx").on(table.status),
   ],
 );
 

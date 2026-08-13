@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CalendarDays,
+  FileWarning,
   MessageCircleQuestion,
   Package,
   SquareKanban,
@@ -32,7 +33,13 @@ type ProjectLayoutProps = {
   headerActions?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
-  activeView?: "backlog" | "board" | "gantt" | "materials" | "rfis";
+  activeView?:
+    | "backlog"
+    | "board"
+    | "gantt"
+    | "materials"
+    | "rfis"
+    | "changeOrders";
 };
 
 export default function ProjectLayout({
@@ -61,7 +68,9 @@ export default function ProjectLayout({
           ? "materials"
           : location.pathname.includes("/rfis")
             ? "rfis"
-            : "board");
+            : location.pathname.includes("/change-orders")
+              ? "changeOrders"
+              : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -98,6 +107,13 @@ export default function ProjectLayout({
     });
   };
 
+  const handleNavigateToChangeOrders = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/change-orders",
+      params: { workspaceId, projectId },
+    });
+  };
+
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
       to:
@@ -109,7 +125,9 @@ export default function ProjectLayout({
               ? "/dashboard/workspace/$workspaceId/project/$projectId/materials"
               : resolvedView === "rfis"
                 ? "/dashboard/workspace/$workspaceId/project/$projectId/rfis"
-                : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+                : resolvedView === "changeOrders"
+                  ? "/dashboard/workspace/$workspaceId/project/$projectId/change-orders"
+                  : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -165,6 +183,7 @@ export default function ProjectLayout({
                 onSelectGantt={handleNavigateToGantt}
                 onSelectMaterials={handleNavigateToMaterials}
                 onSelectRfis={handleNavigateToRfis}
+                onSelectChangeOrders={handleNavigateToChangeOrders}
                 onSelectProject={handleProjectSwitch}
                 onAddProject={() => setIsCreateProjectModalOpen(true)}
               />
@@ -231,6 +250,20 @@ export default function ProjectLayout({
                 >
                   <MessageCircleQuestion className="size-3.5" />
                   RFIs
+                </Button>
+                <Button
+                  variant={
+                    resolvedView === "changeOrders" ? "secondary" : "ghost"
+                  }
+                  size="xs"
+                  onClick={handleNavigateToChangeOrders}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "changeOrders" && "text-muted-foreground",
+                  )}
+                >
+                  <FileWarning className="size-3.5" />
+                  Change Orders
                 </Button>
               </div>
             )}

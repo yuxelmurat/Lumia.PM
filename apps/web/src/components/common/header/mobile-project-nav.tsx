@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   Check,
+  FileWarning,
   Menu,
   MessageCircleQuestion,
   Package,
@@ -20,12 +21,19 @@ import { cn } from "@/lib/cn";
 type MobileProjectNavProps = {
   workspaceId: string;
   projectId: string;
-  activeView: "backlog" | "board" | "gantt" | "materials" | "rfis";
+  activeView:
+    | "backlog"
+    | "board"
+    | "gantt"
+    | "materials"
+    | "rfis"
+    | "changeOrders";
   onSelectBoard: () => void;
   onSelectBacklog: () => void;
   onSelectGantt: () => void;
   onSelectMaterials: () => void;
   onSelectRfis: () => void;
+  onSelectChangeOrders: () => void;
   onSelectProject: (projectId: string) => void;
   onAddProject: () => void;
 };
@@ -39,6 +47,7 @@ export default function MobileProjectNav({
   onSelectGantt,
   onSelectMaterials,
   onSelectRfis,
+  onSelectChangeOrders,
   onSelectProject,
   onAddProject,
 }: MobileProjectNavProps) {
@@ -127,6 +136,19 @@ export default function MobileProjectNav({
               >
                 <MessageCircleQuestion className="size-3.5" />
                 RFIs
+              </button>
+              <button
+                type="button"
+                onClick={onSelectChangeOrders}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "changeOrders"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <FileWarning className="size-3.5" />
+                Change Orders
               </button>
             </div>
           </div>

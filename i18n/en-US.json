@@ -2301,5 +2301,43 @@
 			"assignFailed": "Failed to update assignee",
 			"dueDateFailed": "Failed to update due date"
 		}
+	},
+	"changeOrder": {
+		"pageTitle": "Change Orders \u00b7 {{name}}",
+		"status": {
+			"pending_review": "Pending review",
+			"approved": "Approved",
+			"rejected": "Rejected"
+		},
+		"list": {
+			"title": "Change Orders",
+			"add": "New change order",
+			"empty": "No change orders yet",
+			"emptySubtitle": "Track client-requested scope changes with their cost and time impact.",
+			"number": "#",
+			"title2": "Title",
+			"costImpact": "Cost impact",
+			"hoursImpact": "Hours impact",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New change order",
+			"description": "Log a client-requested scope change with its cost and time impact.",
+			"title": "Title",
+			"descriptionLabel": "Description",
+			"costImpact": "Cost impact",
+			"hoursImpact": "Hours impact",
+			"create": "Create change order",
+			"saveFailed": "Failed to create change order"
+		},
+		"detail": {
+			"decisionNote": "Decision note",
+			"decisionNotePlaceholder": "Optional note explaining the decision\u2026",
+			"approve": "Approve",
+			"reject": "Reject",
+			"reopen": "Reopen for review",
+			"decisionFailed": "Failed to record decision",
+			"statusFailed": "Failed to update status"
+		}
 	}
 }

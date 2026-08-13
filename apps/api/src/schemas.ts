@@ -350,6 +350,25 @@ export const rfiSchema = v.object({
   updatedAt: v.date(),
 });
 
+export const changeOrderSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  title: v.string(),
+  description: v.string(),
+  costImpactCents: v.nullable(v.number()),
+  hoursImpact: v.nullable(v.number()),
+  status: v.picklist(["pending_review", "approved", "rejected"]),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  decidedByUserId: v.nullable(v.string()),
+  decidedByUserName: v.nullable(v.string()),
+  decisionNote: v.nullable(v.string()),
+  decidedAt: v.nullable(v.date()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
 export const productSpecSchema = v.object({
   id: v.string(),
   projectId: v.string(),

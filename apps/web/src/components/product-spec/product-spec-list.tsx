@@ -19,16 +19,9 @@ import {
 import useDeleteProductSpec from "@/hooks/mutations/product-spec/use-delete-product-spec";
 import useUpdateProductSpec from "@/hooks/mutations/product-spec/use-update-product-spec";
 import useGetProductSpecs from "@/hooks/queries/product-spec/use-get-product-specs";
+import { formatCurrencyFromCents } from "@/lib/format-currency";
 import { getProductSpecImageUrl } from "@/lib/product-spec-image-url";
 import { toast } from "@/lib/toast";
-
-function formatCost(unitCost: number | null) {
-  if (unitCost == null) return "—";
-  return (unitCost / 100).toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-  });
-}
 
 type ProductSpecListProps = {
   projectId: string;
@@ -163,7 +156,7 @@ export default function ProductSpecList({ projectId }: ProductSpecListProps) {
                       {spec.vendor || "—"}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {formatCost(spec.unitCost)}
+                      {formatCurrencyFromCents(spec.unitCost)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {spec.quantity}

@@ -55,6 +55,7 @@ import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowR
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/index'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
@@ -336,6 +337,15 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
     } as any,
   )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport.update(
+    {
+      id: '/project/$projectId/change-orders',
+      path: '/project/$projectId/change-orders',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute =
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport.update(
     {
@@ -417,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/projects/$projectId/workflow': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
@@ -464,6 +475,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/projects/$projectId/workflow': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
@@ -517,6 +529,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/settings/projects/$projectId/workflow': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdWorkflowRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
@@ -569,6 +582,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/projects/$projectId/workflow'
     | '/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
     | '/dashboard/workspace/$workspaceId/project/$projectId/materials'
     | '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
@@ -616,6 +630,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/projects/$projectId/workflow'
     | '/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
     | '/dashboard/workspace/$workspaceId/project/$projectId/materials'
     | '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
@@ -668,6 +683,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/settings/projects/$projectId/workflow'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
@@ -1011,6 +1027,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
+      path: '/project/$projectId/change-orders'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
       path: '/project/$projectId/gantt'
@@ -1141,6 +1164,7 @@ interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren {
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
@@ -1160,6 +1184,8 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren: LayoutAuthe
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute:
