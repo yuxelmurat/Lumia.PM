@@ -1,9 +1,14 @@
+import { CalendarClock, Wrench } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/cn";
+import { getInitials } from "@/lib/get-initials";
 import type { AssetPin } from "./pin-overlay";
+import PunchAssigneePopover from "./punch-assignee-popover";
+import PunchDueDatePopover from "./punch-due-date-popover";
 
 function formatAuthor(author: AssetPin["author"]) {
   if (author.name) {
@@ -11,6 +16,12 @@ function formatAuthor(author: AssetPin["author"]) {
   }
   return author.type === "guest" ? "Client" : "Team member";
 }
+
+type PunchMetaUpdate = {
+  isPunchItem?: boolean;
+  assigneeUserId?: string | null;
+  dueDate?: string | null;
+};
 
 type PinNoteThreadProps = {
   pin: AssetPin;
@@ -20,6 +31,8 @@ type PinNoteThreadProps = {
   isSubmittingStatus?: boolean;
   onToggleResolved?: () => Promise<void> | void;
   onAddAsMaterial?: () => void;
+  workspaceId?: string;
+  onUpdatePunchMeta?: (input: PunchMetaUpdate) => Promise<void> | void;
 };
 
 export default function PinNoteThread({
@@ -30,6 +43,8 @@ export default function PinNoteThread({
   isSubmittingStatus = false,
   onToggleResolved,
   onAddAsMaterial,
+  workspaceId,
+  onUpdatePunchMeta,
 }: PinNoteThreadProps) {
   const { t } = useTranslation();
   const [reply, setReply] = useState("");
@@ -56,6 +71,20 @@ export default function PinNoteThread({
             : t("assetPins:status.open", "Open")}
         </span>
         <div className="flex items-center gap-1">
+          {!readOnly && onUpdatePunchMeta && (
+            <Button
+              size="xs"
+              variant={pin.isPunchItem ? "secondary" : "outline"}
+              onClick={() =>
+                onUpdatePunchMeta({ isPunchItem: !pin.isPunchItem })
+              }
+            >
+              <Wrench className="size-3.5" />
+              {pin.isPunchItem
+                ? t("assetPins:punch.unmark", "Unmark punch item")
+                : t("assetPins:punch.mark", "Mark as punch item")}
+            </Button>
+          )}
           {!readOnly && onAddAsMaterial && (
             <Button size="xs" variant="outline" onClick={onAddAsMaterial}>
               {t("productSpec:pin.addAsMaterial", "Add as material")}
@@ -75,6 +104,67 @@ export default function PinNoteThread({
           )}
         </div>
       </div>
+
+      {pin.isPunchItem && (
+        <div className="flex items-center gap-2 rounded-lg bg-muted/40 px-2 py-1.5">
+          {!readOnly && onUpdatePunchMeta && workspaceId ? (
+            <PunchAssigneePopover
+              workspaceId={workspaceId}
+              assignee={pin.assignee}
+              onChange={(assigneeUserId) =>
+                onUpdatePunchMeta({ assigneeUserId })
+              }
+            >
+              <button
+                type="button"
+                className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-xs hover:bg-accent"
+              >
+                <Avatar className="size-5">
+                  <AvatarImage src="" alt={pin.assignee?.name ?? ""} />
+                  <AvatarFallback className="text-[10px]">
+                    {pin.assignee ? getInitials(pin.assignee.name ?? "") : "?"}
+                  </AvatarFallback>
+                </Avatar>
+                {pin.assignee?.name ??
+                  t("assetPins:punch.unassigned", "Unassigned")}
+              </button>
+            </PunchAssigneePopover>
+          ) : (
+            <span className="flex items-center gap-1.5 text-muted-foreground text-xs">
+              <Avatar className="size-5">
+                <AvatarFallback className="text-[10px]">
+                  {pin.assignee ? getInitials(pin.assignee.name ?? "") : "?"}
+                </AvatarFallback>
+              </Avatar>
+              {pin.assignee?.name ??
+                t("assetPins:punch.unassigned", "Unassigned")}
+            </span>
+          )}
+          {!readOnly && onUpdatePunchMeta ? (
+            <PunchDueDatePopover
+              dueDate={pin.dueDate}
+              onChange={(dueDate) => onUpdatePunchMeta({ dueDate })}
+            >
+              <button
+                type="button"
+                className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-muted-foreground text-xs hover:bg-accent"
+              >
+                <CalendarClock className="size-3.5" />
+                {pin.dueDate
+                  ? new Date(pin.dueDate).toLocaleDateString()
+                  : t("assetPins:punch.setDueDate", "Set due date")}
+              </button>
+            </PunchDueDatePopover>
+          ) : (
+            pin.dueDate && (
+              <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                <CalendarClock className="size-3.5" />
+                {new Date(pin.dueDate).toLocaleDateString()}
+              </span>
+            )
+          )}
+        </div>
+      )}
 
       <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
         {pin.notes.map((note) => (

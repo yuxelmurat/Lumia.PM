@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import useCreateAssetPin from "@/hooks/mutations/asset-pin/use-create-asset-pin";
 import useCreateAssetPinNote from "@/hooks/mutations/asset-pin/use-create-asset-pin-note";
-import useUpdateAssetPinStatus from "@/hooks/mutations/asset-pin/use-update-asset-pin-status";
+import useUpdateAssetPin from "@/hooks/mutations/asset-pin/use-update-asset-pin";
 import useGetAssetPins from "@/hooks/queries/asset-pin/use-get-asset-pins";
 import { toast } from "@/lib/toast";
 import PinNoteThread from "./pin-note-thread";
@@ -16,6 +16,7 @@ type AssetPinViewerProps = {
   imageUrl: string;
   alt: string;
   projectId?: string;
+  workspaceId?: string;
 };
 
 export default function AssetPinViewer({
@@ -23,6 +24,7 @@ export default function AssetPinViewer({
   imageUrl,
   alt,
   projectId,
+  workspaceId,
 }: AssetPinViewerProps) {
   const { t } = useTranslation();
   const { data: pins = [] } = useGetAssetPins(assetId);
@@ -30,8 +32,8 @@ export default function AssetPinViewer({
     useCreateAssetPin(assetId);
   const { mutateAsync: createNote, isPending: isCreatingNote } =
     useCreateAssetPinNote(assetId);
-  const { mutateAsync: updateStatus, isPending: isUpdatingStatus } =
-    useUpdateAssetPinStatus(assetId);
+  const { mutateAsync: updatePin, isPending: isUpdatingStatus } =
+    useUpdateAssetPin(assetId);
 
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [draftPin, setDraftPin] = useState<{ x: number; y: number } | null>(
@@ -121,7 +123,7 @@ export default function AssetPinViewer({
             }}
             isSubmittingStatus={isUpdatingStatus}
             onToggleResolved={async () => {
-              await updateStatus({
+              await updatePin({
                 pinId: selectedPin.id,
                 status: selectedPin.status === "resolved" ? "open" : "resolved",
               });
@@ -129,6 +131,10 @@ export default function AssetPinViewer({
             onAddAsMaterial={
               projectId ? () => setIsAddingMaterial(true) : undefined
             }
+            workspaceId={workspaceId}
+            onUpdatePunchMeta={async (input) => {
+              await updatePin({ pinId: selectedPin.id, ...input });
+            }}
           />
         )}
         {projectId && selectedPin && (

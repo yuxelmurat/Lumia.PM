@@ -793,7 +793,19 @@
 				"iconRequired": "Icon is required"
 			},
 			"importExportTasks": "Import/Export",
-			"importExportTasksDescription": "Import and export tasks."
+			"importExportTasksDescription": "Import and export tasks.",
+			"completionTitle": "Completion",
+			"completionSubtitle": "Mark this project as complete once all work is done.",
+			"markComplete": "Mark as complete",
+			"projectCompleted": "Project completed",
+			"reopenProject": "Reopen",
+			"openPunchItems": "{{count}} punch list item(s) still open",
+			"noPunchItems": "No open punch list items",
+			"completeBlockedTooltip": "Resolve all punch list items first",
+			"completeSuccess": "Project completed",
+			"completeError": "Failed to complete project",
+			"uncompleteSuccess": "Project reopened",
+			"uncompleteError": "Failed to reopen project"
 		},
 		"projectIntegrations": {
 			"pageTitle": "Project Integrations",
@@ -2162,6 +2174,13 @@
 			"translationFailed": "Preparing this DWG failed.",
 			"retry": "Retry",
 			"notReadyForGuest": "This file isn't ready to view yet — check back shortly."
+		},
+		"punch": {
+			"mark": "Mark as punch item",
+			"unmark": "Unmark punch item",
+			"unassigned": "Unassigned",
+			"setDueDate": "Set due date",
+			"clearDueDate": "Clear date"
 		},
 		"approval": {
 			"badge": {

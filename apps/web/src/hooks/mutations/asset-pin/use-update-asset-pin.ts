@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import updateAssetPinStatus from "@/fetchers/asset-pin/update-asset-pin-status";
+import updateAssetPin from "@/fetchers/asset-pin/update-asset-pin";
 
-function useUpdateAssetPinStatus(assetId: string) {
+function useUpdateAssetPin(assetId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateAssetPinStatus,
+    mutationFn: updateAssetPin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["asset-pins", assetId] });
     },
   });
 }
 
-export default useUpdateAssetPinStatus;
+export default useUpdateAssetPin;

@@ -7,7 +7,7 @@ import getAssetViewerToken from "@/fetchers/asset-aps/get-viewer-token";
 import useTranslateAsset from "@/hooks/mutations/asset-aps/use-translate-asset";
 import useCreateAssetPin from "@/hooks/mutations/asset-pin/use-create-asset-pin";
 import useCreateAssetPinNote from "@/hooks/mutations/asset-pin/use-create-asset-pin-note";
-import useUpdateAssetPinStatus from "@/hooks/mutations/asset-pin/use-update-asset-pin-status";
+import useUpdateAssetPin from "@/hooks/mutations/asset-pin/use-update-asset-pin";
 import useGetAssetTranslationStatus from "@/hooks/queries/asset-aps/use-get-asset-translation-status";
 import useGetAssetPins from "@/hooks/queries/asset-pin/use-get-asset-pins";
 import { toast } from "@/lib/toast";
@@ -19,11 +19,13 @@ import type { AssetPin } from "./pin-overlay";
 type DwgPinViewerProps = {
   assetId: string;
   projectId?: string;
+  workspaceId?: string;
 };
 
 export default function DwgPinViewer({
   assetId,
   projectId,
+  workspaceId,
 }: DwgPinViewerProps) {
   const { t } = useTranslation();
   const { data: status } = useGetAssetTranslationStatus(assetId);
@@ -34,8 +36,8 @@ export default function DwgPinViewer({
     useCreateAssetPin(assetId);
   const { mutateAsync: createNote, isPending: isCreatingNote } =
     useCreateAssetPinNote(assetId);
-  const { mutateAsync: updateStatus, isPending: isUpdatingStatus } =
-    useUpdateAssetPinStatus(assetId);
+  const { mutateAsync: updatePin, isPending: isUpdatingStatus } =
+    useUpdateAssetPin(assetId);
 
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [draftPoint, setDraftPoint] = useState<DwgViewerState["point"] | null>(
@@ -174,7 +176,7 @@ export default function DwgPinViewer({
             }}
             isSubmittingStatus={isUpdatingStatus}
             onToggleResolved={async () => {
-              await updateStatus({
+              await updatePin({
                 pinId: selectedPin.id,
                 status: selectedPin.status === "resolved" ? "open" : "resolved",
               });
@@ -182,6 +184,10 @@ export default function DwgPinViewer({
             onAddAsMaterial={
               projectId ? () => setIsAddingMaterial(true) : undefined
             }
+            workspaceId={workspaceId}
+            onUpdatePunchMeta={async (input) => {
+              await updatePin({ pinId: selectedPin.id, ...input });
+            }}
           />
         )}
         {projectId && selectedPin && (

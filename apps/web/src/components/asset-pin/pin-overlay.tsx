@@ -1,9 +1,14 @@
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import { CheckCircle2, MessageCircle, Wrench } from "lucide-react";
 import { type MouseEvent, useRef } from "react";
 import { cn } from "@/lib/cn";
 
 export type AssetPinAuthor = {
   type: "user" | "guest";
+  id: string;
+  name: string | null;
+};
+
+export type AssetPinAssignee = {
   id: string;
   name: string | null;
 };
@@ -25,6 +30,9 @@ export type AssetPin = {
   status: "open" | "resolved";
   label: string | null;
   createdAt: string | Date;
+  isPunchItem: boolean;
+  dueDate: string | Date | null;
+  assignee: AssetPinAssignee | null;
   author: AssetPinAuthor;
   notes: AssetPinNote[];
 };
@@ -54,6 +62,12 @@ function PinDot({
 }) {
   if (pin.x === null || pin.y === null) return null;
 
+  const isOverdue =
+    pin.isPunchItem &&
+    pin.status === "open" &&
+    pin.dueDate != null &&
+    new Date(pin.dueDate).getTime() < Date.now();
+
   return (
     <button
       type="button"
@@ -63,7 +77,13 @@ function PinDot({
       }}
       className={cn(
         "-translate-x-1/2 -translate-y-1/2 absolute flex size-6 items-center justify-center rounded-full border-2 border-white text-white shadow-lg transition-transform",
-        pin.status === "resolved" ? "bg-emerald-500" : "bg-amber-500",
+        pin.status === "resolved"
+          ? "bg-emerald-500"
+          : isOverdue
+            ? "bg-destructive"
+            : pin.isPunchItem
+              ? "bg-sky-500"
+              : "bg-amber-500",
         selected ? "scale-125 ring-2 ring-white/80" : "hover:scale-110",
       )}
       style={{ left: `${pin.x * 100}%`, top: `${pin.y * 100}%` }}
@@ -71,6 +91,8 @@ function PinDot({
     >
       {pin.status === "resolved" ? (
         <CheckCircle2 className="size-3.5" />
+      ) : pin.isPunchItem ? (
+        <Wrench className="size-3.5" />
       ) : (
         <MessageCircle className="size-3.5" />
       )}

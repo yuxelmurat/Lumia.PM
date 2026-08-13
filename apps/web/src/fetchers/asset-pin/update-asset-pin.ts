@@ -1,15 +1,21 @@
 import { client } from "@kaneo/libs";
 
-async function updateAssetPinStatus({
+async function updateAssetPin({
   pinId,
   status,
+  isPunchItem,
+  assigneeUserId,
+  dueDate,
 }: {
   pinId: string;
-  status: "open" | "resolved";
+  status?: "open" | "resolved";
+  isPunchItem?: boolean;
+  assigneeUserId?: string | null;
+  dueDate?: string | null;
 }) {
   const response = await client["asset-pin"].pin[":pinId"].$patch({
     param: { pinId },
-    json: { status },
+    json: { status, isPunchItem, assigneeUserId, dueDate },
   });
 
   if (!response.ok) {
@@ -20,4 +26,4 @@ async function updateAssetPinStatus({
   return response.json();
 }
 
-export default updateAssetPinStatus;
+export default updateAssetPin;

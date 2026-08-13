@@ -86,6 +86,7 @@ import "tippy.js/dist/tippy.css";
 
 type TaskDescriptionProps = {
   taskId: string;
+  workspaceId?: string;
 };
 
 type HoveredCodeBlock = {
@@ -266,7 +267,10 @@ const SLASH_COMMANDS: SlashCommand[] = [
   },
 ];
 
-export default function TaskDescription({ taskId }: TaskDescriptionProps) {
+export default function TaskDescription({
+  taskId,
+  workspaceId,
+}: TaskDescriptionProps) {
   const { t } = useTranslation();
   const { data: task } = useGetTask(taskId);
   const { mutateAsync: updateTaskDescription } = useUpdateTaskDescription();
@@ -1919,6 +1923,7 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
                   imageUrl={previewImage.src}
                   alt={previewImage.alt}
                   projectId={task?.projectId}
+                  workspaceId={workspaceId}
                 />
                 <ApprovalPanel assetId={previewImage.assetId} />
                 <ShareLinkManager assetId={previewImage.assetId} />

@@ -77,7 +77,7 @@ export default function TaskDetailsContent({
           {project?.slug}-{task?.number}
         </p>
         <TaskTitle taskId={taskId} />
-        <TaskDescription taskId={taskId} />
+        <TaskDescription taskId={taskId} workspaceId={workspaceId} />
       </div>
       {!isLoadingExternalLinks && externalLinks.length > 0 && (
         <div className="mt-4">
