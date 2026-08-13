@@ -7,7 +7,7 @@ import { workspaceAccess } from "../utils/workspace-access-middleware";
 import createPin from "./controllers/create-pin";
 import createPinNote from "./controllers/create-pin-note";
 import listPins from "./controllers/list-pins";
-import resolvePin from "./controllers/resolve-pin";
+import updatePin from "./controllers/update-pin";
 
 const assetPin = new Hono<{
   Variables: {
@@ -106,7 +106,8 @@ const assetPin = new Hono<{
     describeRoute({
       operationId: "updateAssetPinStatus",
       tags: ["Asset Pins"],
-      description: "Resolve or reopen a pin",
+      description:
+        "Update a pin: resolve/reopen it, or set its punch-list metadata (assignee, due date, punch flag)",
       responses: {
         200: {
           description: "Pin updated successfully",
@@ -115,14 +116,22 @@ const assetPin = new Hono<{
       },
     }),
     validator("param", v.object({ pinId: v.string() })),
-    validator("json", v.object({ status: v.picklist(["open", "resolved"]) })),
+    validator(
+      "json",
+      v.object({
+        status: v.optional(v.picklist(["open", "resolved"])),
+        isPunchItem: v.optional(v.boolean()),
+        assigneeUserId: v.optional(v.nullable(v.string())),
+        dueDate: v.optional(v.nullable(v.string())),
+      }),
+    ),
     workspaceAccess.fromAssetPin(),
     requireWorkspacePermission({ asset: ["update"] }),
     async (c) => {
       const { pinId } = c.req.valid("param");
-      const { status } = c.req.valid("json");
+      const input = c.req.valid("json");
       const userId = c.get("userId");
-      const pin = await resolvePin(pinId, userId, status);
+      const pin = await updatePin(pinId, userId, input);
       return c.json(pin);
     },
   );

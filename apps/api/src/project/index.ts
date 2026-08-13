@@ -6,12 +6,15 @@ import { projectSchema } from "../schemas";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import archiveProjectCtrl from "./controllers/archive-project";
+import completeProjectCtrl from "./controllers/complete-project";
 import createProjectCtrl from "./controllers/create-project";
 import deleteProjectCtrl from "./controllers/delete-project";
 import getProjectCtrl from "./controllers/get-project";
 import getProjectsCtrl from "./controllers/get-projects";
+import getPunchSummaryCtrl from "./controllers/get-punch-summary";
 import reorderProjectsCtrl from "./controllers/reorder-projects";
 import unarchiveProjectCtrl from "./controllers/unarchive-project";
+import uncompleteProjectCtrl from "./controllers/uncomplete-project";
 import updateProjectCtrl from "./controllers/update-project";
 
 const project = new Hono<{
@@ -278,6 +281,83 @@ const project = new Hono<{
       const workspaceId = c.get("workspaceId");
       const unarchivedProject = await unarchiveProjectCtrl(id, workspaceId);
       return c.json(unarchivedProject);
+    },
+  )
+  .put(
+    "/:id/complete",
+    describeRoute({
+      operationId: "completeProject",
+      tags: ["Projects"],
+      description:
+        "Mark a project complete. Fails with 409 if any punch-list items are still open",
+      responses: {
+        200: {
+          description: "Project marked complete",
+          content: {
+            "application/json": { schema: resolver(projectSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["update"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const workspaceId = c.get("workspaceId");
+      const completedProject = await completeProjectCtrl(id, workspaceId);
+      return c.json(completedProject);
+    },
+  )
+  .put(
+    "/:id/uncomplete",
+    describeRoute({
+      operationId: "uncompleteProject",
+      tags: ["Projects"],
+      description: "Reopen a completed project",
+      responses: {
+        200: {
+          description: "Project reopened",
+          content: {
+            "application/json": { schema: resolver(projectSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["update"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const workspaceId = c.get("workspaceId");
+      const uncompletedProject = await uncompleteProjectCtrl(id, workspaceId);
+      return c.json(uncompletedProject);
+    },
+  )
+  .get(
+    "/:id/punch-summary",
+    describeRoute({
+      operationId: "getProjectPunchSummary",
+      tags: ["Projects"],
+      description: "Get the count of open punch-list items for a project",
+      responses: {
+        200: {
+          description: "Punch-list summary",
+          content: {
+            "application/json": {
+              schema: resolver(v.object({ openCount: v.number() })),
+            },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["read"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const summary = await getPunchSummaryCtrl(id);
+      return c.json(summary);
     },
   );
 

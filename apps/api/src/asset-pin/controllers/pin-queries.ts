@@ -1,4 +1,5 @@
 import { asc, eq, inArray } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import db from "../../database";
 import {
   assetGuestTable,
@@ -6,6 +7,8 @@ import {
   assetPinTable,
   userTable,
 } from "../../database/schema";
+
+const assigneeUserTable = alias(userTable, "assigneeUser");
 
 type PinAuthor = { type: "user" | "guest"; id: string; name: string | null };
 
@@ -33,6 +36,10 @@ const pinColumns = {
   createdByUserName: userTable.name,
   createdByGuestId: assetPinTable.createdByGuestId,
   createdByGuestName: assetGuestTable.name,
+  isPunchItem: assetPinTable.isPunchItem,
+  dueDate: assetPinTable.dueDate,
+  assigneeUserId: assetPinTable.assigneeUserId,
+  assigneeUserName: assigneeUserTable.name,
 };
 
 async function fetchNotesForPins(pinIds: string[]) {
@@ -74,6 +81,10 @@ function shapePin(
     createdByUserName: string | null;
     createdByGuestId: string | null;
     createdByGuestName: string | null;
+    isPunchItem: boolean;
+    dueDate: Date | null;
+    assigneeUserId: string | null;
+    assigneeUserName: string | null;
   },
   notes: Awaited<ReturnType<typeof fetchNotesForPins>>,
 ) {
@@ -87,6 +98,11 @@ function shapePin(
     label: pin.label,
     createdAt: pin.createdAt,
     resolvedAt: pin.resolvedAt,
+    isPunchItem: pin.isPunchItem,
+    dueDate: pin.dueDate,
+    assignee: pin.assigneeUserId
+      ? { id: pin.assigneeUserId, name: pin.assigneeUserName }
+      : null,
     author: toAuthor(
       pin.createdByUserId,
       pin.createdByUserName,
@@ -119,6 +135,10 @@ export async function fetchPinsByAssetId(assetId: string) {
       assetGuestTable,
       eq(assetPinTable.createdByGuestId, assetGuestTable.id),
     )
+    .leftJoin(
+      assigneeUserTable,
+      eq(assetPinTable.assigneeUserId, assigneeUserTable.id),
+    )
     .where(eq(assetPinTable.assetId, assetId))
     .orderBy(asc(assetPinTable.createdAt));
 
@@ -135,6 +155,10 @@ export async function fetchPinById(pinId: string) {
     .leftJoin(
       assetGuestTable,
       eq(assetPinTable.createdByGuestId, assetGuestTable.id),
+    )
+    .leftJoin(
+      assigneeUserTable,
+      eq(assetPinTable.assigneeUserId, assigneeUserTable.id),
     )
     .where(eq(assetPinTable.id, pinId))
     .limit(1);

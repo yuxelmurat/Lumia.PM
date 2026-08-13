@@ -19,6 +19,7 @@ export const projectSchema = v.object({
   createdAt: v.date(),
   isPublic: v.nullable(v.boolean()),
   archivedAt: v.nullable(v.date()),
+  completedAt: v.nullable(v.date()),
   position: v.number(),
 });
 
@@ -276,6 +277,11 @@ export const assetPinNoteSchema = v.object({
   author: assetPinAuthorSchema,
 });
 
+export const assetPinAssigneeSchema = v.object({
+  id: v.string(),
+  name: v.nullable(v.string()),
+});
+
 export const assetPinSchema = v.object({
   id: v.string(),
   assetId: v.string(),
@@ -286,6 +292,9 @@ export const assetPinSchema = v.object({
   label: v.nullable(v.string()),
   createdAt: v.date(),
   resolvedAt: v.nullable(v.date()),
+  isPunchItem: v.boolean(),
+  dueDate: v.nullable(v.date()),
+  assignee: v.nullable(assetPinAssigneeSchema),
   author: assetPinAuthorSchema,
   notes: v.array(assetPinNoteSchema),
 });

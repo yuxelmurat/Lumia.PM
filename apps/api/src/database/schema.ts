@@ -290,6 +290,7 @@ export const projectTable = pgTable(
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     isPublic: boolean("is_public").default(false),
     archivedAt: timestamp("archived_at", { mode: "date" }),
+    completedAt: timestamp("completed_at", { mode: "date" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
     position: integer("position").notNull().default(0),
   },
@@ -675,12 +676,24 @@ export const assetPinTable = pgTable(
       { onDelete: "set null", onUpdate: "cascade" },
     ),
     resolvedAt: timestamp("resolved_at", { mode: "date" }),
+    // Punch-list fields: any pin can be flagged as a site-defect item that
+    // gates project completion (see projectTable.completedAt) until resolved.
+    isPunchItem: boolean("is_punch_item").default(false).notNull(),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    dueDate: timestamp("due_date", { mode: "date" }),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => [
     index("asset_pin_assetId_idx").on(table.assetId),
     index("asset_pin_createdByUserId_idx").on(table.createdByUserId),
     index("asset_pin_createdByGuestId_idx").on(table.createdByGuestId),
+    index("asset_pin_assetId_isPunchItem_idx").on(
+      table.assetId,
+      table.isPunchItem,
+    ),
   ],
 );
 
