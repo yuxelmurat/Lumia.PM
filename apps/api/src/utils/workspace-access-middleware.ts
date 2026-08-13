@@ -24,7 +24,8 @@ type WorkspaceIdSource =
         | "assetShareLink"
         | "productSpec"
         | "rfi"
-        | "changeOrder";
+        | "changeOrder"
+        | "submittal";
       idKey: string;
     }
   | {
@@ -149,7 +150,8 @@ async function lookupWorkspaceId(
     | "assetShareLink"
     | "productSpec"
     | "rfi"
-    | "changeOrder",
+    | "changeOrder"
+    | "submittal",
   id: string,
 ): Promise<string | null> {
   try {
@@ -353,6 +355,19 @@ async function lookupWorkspaceId(
         return changeOrder?.workspaceId || null;
       }
 
+      case "submittal": {
+        const [submittal] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.submittalTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.submittalTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.submittalTable.id, id))
+          .limit(1);
+        return submittal?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -490,6 +505,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "changeOrder", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromSubmittal: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "submittal", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

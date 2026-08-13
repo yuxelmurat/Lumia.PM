@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CalendarDays,
+  FileCheck2,
   FileWarning,
   MessageCircleQuestion,
   Package,
@@ -39,7 +40,8 @@ type ProjectLayoutProps = {
     | "gantt"
     | "materials"
     | "rfis"
-    | "changeOrders";
+    | "changeOrders"
+    | "submittals";
 };
 
 export default function ProjectLayout({
@@ -70,7 +72,9 @@ export default function ProjectLayout({
             ? "rfis"
             : location.pathname.includes("/change-orders")
               ? "changeOrders"
-              : "board");
+              : location.pathname.includes("/submittals")
+                ? "submittals"
+                : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -114,6 +118,13 @@ export default function ProjectLayout({
     });
   };
 
+  const handleNavigateToSubmittals = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/submittals",
+      params: { workspaceId, projectId },
+    });
+  };
+
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
       to:
@@ -127,7 +138,9 @@ export default function ProjectLayout({
                 ? "/dashboard/workspace/$workspaceId/project/$projectId/rfis"
                 : resolvedView === "changeOrders"
                   ? "/dashboard/workspace/$workspaceId/project/$projectId/change-orders"
-                  : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+                  : resolvedView === "submittals"
+                    ? "/dashboard/workspace/$workspaceId/project/$projectId/submittals"
+                    : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -184,6 +197,7 @@ export default function ProjectLayout({
                 onSelectMaterials={handleNavigateToMaterials}
                 onSelectRfis={handleNavigateToRfis}
                 onSelectChangeOrders={handleNavigateToChangeOrders}
+                onSelectSubmittals={handleNavigateToSubmittals}
                 onSelectProject={handleProjectSwitch}
                 onAddProject={() => setIsCreateProjectModalOpen(true)}
               />
@@ -264,6 +278,20 @@ export default function ProjectLayout({
                 >
                   <FileWarning className="size-3.5" />
                   Change Orders
+                </Button>
+                <Button
+                  variant={
+                    resolvedView === "submittals" ? "secondary" : "ghost"
+                  }
+                  size="xs"
+                  onClick={handleNavigateToSubmittals}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "submittals" && "text-muted-foreground",
+                  )}
+                >
+                  <FileCheck2 className="size-3.5" />
+                  Submittals
                 </Button>
               </div>
             )}

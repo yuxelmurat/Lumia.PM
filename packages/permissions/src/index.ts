@@ -15,6 +15,7 @@ export const statement = {
   productSpec: ["create", "read", "update", "delete"],
   rfi: ["create", "read", "update", "delete"],
   changeOrder: ["create", "read", "update", "delete"],
+  submittal: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 } as const;
 
@@ -29,6 +30,7 @@ export const viewer = ac.newRole({
   productSpec: ["read"],
   rfi: ["read"],
   changeOrder: ["read"],
+  submittal: ["read"],
   workspace: ["read"],
 });
 
@@ -41,6 +43,7 @@ export const member = ac.newRole({
   productSpec: ["create", "read", "update", "delete"],
   rfi: ["create", "read", "update", "delete"],
   changeOrder: ["create", "read", "update", "delete"],
+  submittal: ["create", "read", "update", "delete"],
   workspace: ["read"],
 });
 
@@ -53,6 +56,7 @@ export const admin = ac.newRole({
   productSpec: ["create", "read", "update", "delete"],
   rfi: ["create", "read", "update", "delete"],
   changeOrder: ["create", "read", "update", "delete"],
+  submittal: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "manage_settings"],
 });
 
@@ -65,6 +69,7 @@ export const owner = ac.newRole({
   productSpec: ["create", "read", "update", "delete"],
   rfi: ["create", "read", "update", "delete"],
   changeOrder: ["create", "read", "update", "delete"],
+  submittal: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 });
 

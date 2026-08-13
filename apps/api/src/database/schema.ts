@@ -297,6 +297,7 @@ export const projectTable = pgTable(
     lastChangeOrderNumber: integer("last_change_order_number")
       .notNull()
       .default(0),
+    lastSubmittalNumber: integer("last_submittal_number").notNull().default(0),
     position: integer("position").notNull().default(0),
   },
   (table) => [
@@ -894,6 +895,61 @@ export const changeOrderTable = pgTable(
     ),
     index("change_order_projectId_idx").on(table.projectId),
     index("change_order_status_idx").on(table.status),
+  ],
+);
+
+export const submittalTable = pgTable(
+  "submittal",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    specSection: text("spec_section"),
+    description: text("description").notNull(),
+    status: text("status").notNull().default("open"),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    dueDate: timestamp("due_date", { mode: "date" }),
+    // Set when this submittal was resubmitted in response to a
+    // "revise_resubmit" decision on an earlier one. Forms a resubmission
+    // chain, mirroring assetTable.supersedesAssetId.
+    supersedesSubmittalId: text("supersedes_submittal_id").references(
+      (): AnyPgColumn => submittalTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    reviewNote: text("review_note"),
+    reviewedByUserId: text("reviewed_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    reviewedAt: timestamp("reviewed_at", { mode: "date" }),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("submittal_project_number_unique").on(table.projectId, table.number),
+    index("submittal_projectId_idx").on(table.projectId),
+    index("submittal_status_idx").on(table.status),
+    index("submittal_supersedesSubmittalId_idx").on(
+      table.supersedesSubmittalId,
+    ),
   ],
 );
 

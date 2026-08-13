@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   Check,
+  FileCheck2,
   FileWarning,
   Menu,
   MessageCircleQuestion,
@@ -27,13 +28,15 @@ type MobileProjectNavProps = {
     | "gantt"
     | "materials"
     | "rfis"
-    | "changeOrders";
+    | "changeOrders"
+    | "submittals";
   onSelectBoard: () => void;
   onSelectBacklog: () => void;
   onSelectGantt: () => void;
   onSelectMaterials: () => void;
   onSelectRfis: () => void;
   onSelectChangeOrders: () => void;
+  onSelectSubmittals: () => void;
   onSelectProject: (projectId: string) => void;
   onAddProject: () => void;
 };
@@ -48,6 +51,7 @@ export default function MobileProjectNav({
   onSelectMaterials,
   onSelectRfis,
   onSelectChangeOrders,
+  onSelectSubmittals,
   onSelectProject,
   onAddProject,
 }: MobileProjectNavProps) {
@@ -149,6 +153,19 @@ export default function MobileProjectNav({
               >
                 <FileWarning className="size-3.5" />
                 Change Orders
+              </button>
+              <button
+                type="button"
+                onClick={onSelectSubmittals}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "submittals"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <FileCheck2 className="size-3.5" />
+                Submittals
               </button>
             </div>
           </div>

@@ -369,6 +369,30 @@ export const changeOrderSchema = v.object({
   updatedAt: v.date(),
 });
 
+export const submittalSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  title: v.string(),
+  specSection: v.nullable(v.string()),
+  description: v.string(),
+  status: v.picklist(["open", "approved", "revise_resubmit", "closed"]),
+  dueDate: v.nullable(v.date()),
+  assignee: v.nullable(
+    v.object({ id: v.string(), name: v.nullable(v.string()) }),
+  ),
+  supersedesSubmittalId: v.nullable(v.string()),
+  supersedesSubmittalNumber: v.nullable(v.number()),
+  reviewNote: v.nullable(v.string()),
+  reviewedByUserId: v.nullable(v.string()),
+  reviewedByUserName: v.nullable(v.string()),
+  reviewedAt: v.nullable(v.date()),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
 export const productSpecSchema = v.object({
   id: v.string(),
   projectId: v.string(),

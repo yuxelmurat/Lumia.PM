@@ -60,6 +60,7 @@ import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
+import submittal from "./submittal";
 import task from "./task";
 import taskRelation from "./task-relation";
 import telegramIntegration from "./telegram-integration";
@@ -603,6 +604,7 @@ export function createApp() {
   const productSpecApi = api.route("/product-spec", productSpec);
   const rfiApi = api.route("/rfi", rfi);
   const changeOrderApi = api.route("/change-order", changeOrder);
+  const submittalApi = api.route("/submittal", submittal);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -782,6 +784,7 @@ export function createApp() {
     productSpecApi,
     rfiApi,
     changeOrderApi,
+    submittalApi,
     billingApi,
     columnApi,
     commentApi,
@@ -908,6 +911,7 @@ const {
   productSpecApi,
   rfiApi,
   changeOrderApi,
+  submittalApi,
   billingApi,
   columnApi,
   commentApi,
@@ -962,6 +966,7 @@ export type AppType =
   | typeof productSpecApi
   | typeof rfiApi
   | typeof changeOrderApi
+  | typeof submittalApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi

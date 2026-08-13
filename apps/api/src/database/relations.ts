@@ -22,6 +22,7 @@ import {
   projectTable,
   rfiTable,
   sessionTable,
+  submittalTable,
   taskRelationTable,
   taskReminderSentTable,
   taskTable,
@@ -366,6 +367,33 @@ export const changeOrderTableRelations = relations(
     }),
   }),
 );
+
+export const submittalTableRelations = relations(submittalTable, ({ one }) => ({
+  project: one(projectTable, {
+    fields: [submittalTable.projectId],
+    references: [projectTable.id],
+  }),
+  assignee: one(userTable, {
+    fields: [submittalTable.assigneeUserId],
+    references: [userTable.id],
+    relationName: "submittalAssignee",
+  }),
+  supersedesSubmittal: one(submittalTable, {
+    fields: [submittalTable.supersedesSubmittalId],
+    references: [submittalTable.id],
+    relationName: "submittalRevision",
+  }),
+  createdByUser: one(userTable, {
+    fields: [submittalTable.createdByUserId],
+    references: [userTable.id],
+    relationName: "submittalCreatedBy",
+  }),
+  reviewedByUser: one(userTable, {
+    fields: [submittalTable.reviewedByUserId],
+    references: [userTable.id],
+    relationName: "submittalReviewedBy",
+  }),
+}));
 
 export const labelTableRelations = relations(labelTable, ({ one }) => ({
   task: one(taskTable, {

@@ -2339,5 +2339,57 @@
 			"decisionFailed": "Failed to record decision",
 			"statusFailed": "Failed to update status"
 		}
+	},
+	"submittal": {
+		"pageTitle": "Submittals \u00b7 {{name}}",
+		"unassigned": "Unassigned",
+		"clearDueDate": "Clear date",
+		"status": {
+			"open": "Open",
+			"approved": "Approved",
+			"revise_resubmit": "Revise & resubmit",
+			"closed": "Closed"
+		},
+		"list": {
+			"title": "Submittals",
+			"add": "New submittal",
+			"empty": "No submittals yet",
+			"emptySubtitle": "Track documents sent for review and their decisions.",
+			"number": "#",
+			"title2": "Title",
+			"specSection": "Spec section",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New submittal",
+			"resubmitTitle": "Resubmit",
+			"description": "Track a document sent for review and its decision.",
+			"title": "Title",
+			"specSection": "Spec section",
+			"descriptionLabel": "Description",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"setDueDate": "Set due date",
+			"create": "Create submittal",
+			"resubmit": "Resubmit",
+			"saveFailed": "Failed to create submittal"
+		},
+		"detail": {
+			"approve": "Approve",
+			"reviseResubmit": "Revise & resubmit",
+			"resubmit": "Resubmit",
+			"supersedes": "Supersedes",
+			"reviewNote": "Review note",
+			"reviewNotePlaceholder": "Notes for the reviewer's decision\u2026",
+			"reviewedBy": "Reviewed by",
+			"close": "Close",
+			"reopen": "Reopen",
+			"decisionFailed": "Failed to record decision",
+			"statusFailed": "Failed to update status",
+			"assignFailed": "Failed to update assignee",
+			"dueDateFailed": "Failed to update due date"
+		}
 	}
 }
