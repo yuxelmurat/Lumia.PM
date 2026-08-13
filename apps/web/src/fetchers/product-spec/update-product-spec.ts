@@ -11,6 +11,11 @@ async function updateProductSpec({
   imageAssetId,
   linkedPinId,
   notes,
+  poNumber,
+  expectedShipDate,
+  actualShipDate,
+  trackingNumber,
+  carrier,
 }: {
   id: string;
   roomLabel?: string | null;
@@ -27,6 +32,11 @@ async function updateProductSpec({
   imageAssetId?: string | null;
   linkedPinId?: string | null;
   notes?: string | null;
+  poNumber?: string | null;
+  expectedShipDate?: string | null;
+  actualShipDate?: string | null;
+  trackingNumber?: string | null;
+  carrier?: string | null;
 }) {
   const response = await client["product-spec"].item[":id"].$put({
     param: { id },
@@ -40,6 +50,11 @@ async function updateProductSpec({
       imageAssetId,
       linkedPinId,
       notes,
+      poNumber,
+      expectedShipDate,
+      actualShipDate,
+      trackingNumber,
+      carrier,
     },
   });
 

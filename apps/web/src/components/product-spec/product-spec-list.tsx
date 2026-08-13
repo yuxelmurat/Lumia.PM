@@ -71,6 +71,12 @@ export default function ProductSpecList({ projectId }: ProductSpecListProps) {
       quantity: spec.quantity,
       imageAssetId: spec.imageAssetId,
       notes: spec.notes,
+      status: spec.status,
+      poNumber: spec.poNumber,
+      expectedShipDate: spec.expectedShipDate,
+      actualShipDate: spec.actualShipDate,
+      trackingNumber: spec.trackingNumber,
+      carrier: spec.carrier,
     });
     setIsFormOpen(true);
   };
@@ -125,6 +131,11 @@ export default function ProductSpecList({ projectId }: ProductSpecListProps) {
             <TableBody>
               {specs.map((spec) => {
                 const imageUrl = getProductSpecImageUrl(spec.imageAssetId);
+                const isOverdue =
+                  spec.status === "ordered" &&
+                  !spec.actualShipDate &&
+                  !!spec.expectedShipDate &&
+                  new Date(spec.expectedShipDate) < new Date();
                 return (
                   <TableRow key={spec.id}>
                     <TableCell>
@@ -162,12 +173,19 @@ export default function ProductSpecList({ projectId }: ProductSpecListProps) {
                       {spec.quantity}
                     </TableCell>
                     <TableCell>
-                      <ProductSpecStatusSelect
-                        value={spec.status as ProductSpecStatus}
-                        onChange={(status) =>
-                          handleStatusChange(spec.id, status)
-                        }
-                      />
+                      <div className="flex items-center gap-1.5">
+                        <ProductSpecStatusSelect
+                          value={spec.status as ProductSpecStatus}
+                          onChange={(status) =>
+                            handleStatusChange(spec.id, status)
+                          }
+                        />
+                        {isOverdue && (
+                          <span className="whitespace-nowrap rounded-full bg-destructive/15 px-2 py-0.5 font-medium text-destructive text-xs">
+                            {t("productSpec:list.overdue", "Overdue")}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Button

@@ -10,6 +10,11 @@ type CreateProductSpecInput = {
   imageAssetId?: string | null;
   linkedPinId?: string | null;
   notes?: string | null;
+  poNumber?: string | null;
+  expectedShipDate?: string | null;
+  actualShipDate?: string | null;
+  trackingNumber?: string | null;
+  carrier?: string | null;
 };
 
 async function createProductSpec(
@@ -29,6 +34,15 @@ async function createProductSpec(
       imageAssetId: input.imageAssetId ?? null,
       linkedPinId: input.linkedPinId ?? null,
       notes: input.notes ?? null,
+      poNumber: input.poNumber ?? null,
+      expectedShipDate: input.expectedShipDate
+        ? new Date(input.expectedShipDate)
+        : null,
+      actualShipDate: input.actualShipDate
+        ? new Date(input.actualShipDate)
+        : null,
+      trackingNumber: input.trackingNumber ?? null,
+      carrier: input.carrier ?? null,
       createdByUserId: userId,
     })
     .returning();

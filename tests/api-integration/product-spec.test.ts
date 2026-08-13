@@ -125,4 +125,81 @@ describe("API integration: product specs (FF&E)", () => {
     // route wiring (permission + validation) runs before it ever reaches S3.
     expect([400, 503]).toContain(uploadResponse.status);
   });
+
+  it("tracks procurement details (PO number, ship dates, tracking) through updates", async () => {
+    const member = await createWorkspaceMember();
+    const { project } = await createProjectFixture({
+      workspaceId: member.workspace.id,
+    });
+
+    mockAuthenticatedSession(member.user);
+    const { app } = createApp();
+
+    const createResponse = await app.request(
+      `/api/product-spec/${project.id}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: "Dining table",
+          poNumber: "PO-1001",
+        }),
+      },
+    );
+    expect(createResponse.status).toBe(200);
+    const spec = (await createResponse.json()) as {
+      id: string;
+      poNumber: string | null;
+    };
+    expect(spec.poNumber).toBe("PO-1001");
+
+    const orderResponse = await app.request(
+      `/api/product-spec/item/${spec.id}`,
+      {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          status: "ordered",
+          poNumber: "PO-1002",
+          expectedShipDate: "2026-01-15T00:00:00.000Z",
+          trackingNumber: "1Z999",
+          carrier: "UPS",
+        }),
+      },
+    );
+    expect(orderResponse.status).toBe(200);
+    const ordered = (await orderResponse.json()) as {
+      status: string;
+      poNumber: string | null;
+      expectedShipDate: string | null;
+      actualShipDate: string | null;
+      trackingNumber: string | null;
+      carrier: string | null;
+    };
+    expect(ordered.status).toBe("ordered");
+    expect(ordered.poNumber).toBe("PO-1002");
+    expect(ordered.expectedShipDate).not.toBeNull();
+    expect(ordered.actualShipDate).toBeNull();
+    expect(ordered.trackingNumber).toBe("1Z999");
+    expect(ordered.carrier).toBe("UPS");
+
+    const receivedResponse = await app.request(
+      `/api/product-spec/item/${spec.id}`,
+      {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          status: "received",
+          actualShipDate: "2026-01-20T00:00:00.000Z",
+        }),
+      },
+    );
+    expect(receivedResponse.status).toBe(200);
+    const received = (await receivedResponse.json()) as {
+      status: string;
+      actualShipDate: string | null;
+    };
+    expect(received.status).toBe("received");
+    expect(received.actualShipDate).not.toBeNull();
+  });
 });

@@ -13,12 +13,28 @@ type UpdateProductSpecInput = Partial<{
   imageAssetId: string | null;
   linkedPinId: string | null;
   notes: string | null;
+  poNumber: string | null;
+  expectedShipDate: string | null;
+  actualShipDate: string | null;
+  trackingNumber: string | null;
+  carrier: string | null;
 }>;
 
 async function updateProductSpec(id: string, input: UpdateProductSpecInput) {
+  const { expectedShipDate, actualShipDate, ...rest } = input;
+
   const [updated] = await db
     .update(productSpecTable)
-    .set({ ...input, updatedAt: new Date() })
+    .set({
+      ...rest,
+      ...(expectedShipDate !== undefined && {
+        expectedShipDate: expectedShipDate ? new Date(expectedShipDate) : null,
+      }),
+      ...(actualShipDate !== undefined && {
+        actualShipDate: actualShipDate ? new Date(actualShipDate) : null,
+      }),
+      updatedAt: new Date(),
+    })
     .where(eq(productSpecTable.id, id))
     .returning();
 

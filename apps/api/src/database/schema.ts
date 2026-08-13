@@ -793,6 +793,11 @@ export const productSpecTable = pgTable(
       onUpdate: "cascade",
     }),
     notes: text("notes"),
+    poNumber: text("po_number"),
+    expectedShipDate: timestamp("expected_ship_date", { mode: "date" }),
+    actualShipDate: timestamp("actual_ship_date", { mode: "date" }),
+    trackingNumber: text("tracking_number"),
+    carrier: text("carrier"),
     createdByUserId: text("created_by_user_id").references(() => userTable.id, {
       onDelete: "set null",
       onUpdate: "cascade",

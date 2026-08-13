@@ -412,6 +412,11 @@ export const productSpecSchema = v.object({
   imageAssetId: v.nullable(v.string()),
   linkedPinId: v.nullable(v.string()),
   notes: v.nullable(v.string()),
+  poNumber: v.nullable(v.string()),
+  expectedShipDate: v.nullable(v.date()),
+  actualShipDate: v.nullable(v.date()),
+  trackingNumber: v.nullable(v.string()),
+  carrier: v.nullable(v.string()),
   createdAt: v.date(),
   updatedAt: v.date(),
 });

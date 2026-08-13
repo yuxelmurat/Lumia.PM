@@ -27,6 +27,12 @@ export type ProductSpecFormValue = {
   quantity: number;
   imageAssetId: string | null;
   notes: string | null;
+  status: string;
+  poNumber: string | null;
+  expectedShipDate: string | null;
+  actualShipDate: string | null;
+  trackingNumber: string | null;
+  carrier: string | null;
 };
 
 type ProductSpecPrefill = {
@@ -59,6 +65,14 @@ export default function ProductSpecForm({
   const [notes, setNotes] = useState("");
   const [imageAssetId, setImageAssetId] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [poNumber, setPoNumber] = useState("");
+  const [expectedShipDate, setExpectedShipDate] = useState("");
+  const [actualShipDate, setActualShipDate] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [carrier, setCarrier] = useState("");
+  const showOrderDetails =
+    !!editingSpec &&
+    ["ordered", "received", "installed"].includes(editingSpec.status);
   const imageUrl = getProductSpecImageUrl(imageAssetId);
 
   const { mutateAsync: createProductSpec, isPending: isCreating } =
@@ -80,6 +94,11 @@ export default function ProductSpecForm({
     setQuantity(editingSpec ? String(editingSpec.quantity) : "1");
     setNotes(editingSpec?.notes ?? "");
     setImageAssetId(editingSpec?.imageAssetId ?? prefill?.imageAssetId ?? null);
+    setPoNumber(editingSpec?.poNumber ?? "");
+    setExpectedShipDate(editingSpec?.expectedShipDate?.slice(0, 10) ?? "");
+    setActualShipDate(editingSpec?.actualShipDate?.slice(0, 10) ?? "");
+    setTrackingNumber(editingSpec?.trackingNumber ?? "");
+    setCarrier(editingSpec?.carrier ?? "");
   }, [open, editingSpec, prefill]);
 
   const handleImageChange = async (
@@ -124,6 +143,11 @@ export default function ProductSpecForm({
           quantity: parsedQuantity,
           imageAssetId,
           notes: notes.trim() || null,
+          poNumber: poNumber.trim() || null,
+          expectedShipDate: expectedShipDate || null,
+          actualShipDate: actualShipDate || null,
+          trackingNumber: trackingNumber.trim() || null,
+          carrier: carrier.trim() || null,
         });
       } else {
         await createProductSpec({
@@ -268,6 +292,75 @@ export default function ProductSpecForm({
               </p>
             )}
           </div>
+
+          {showOrderDetails && (
+            <div className="space-y-3 rounded-md border border-border/60 p-3">
+              <p className="text-xs font-semibold text-foreground">
+                {t("productSpec:form.orderDetails", "Order details")}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="product-spec-po-number">
+                    {t("productSpec:form.poNumber", "PO number")}
+                  </Label>
+                  <Input
+                    id="product-spec-po-number"
+                    value={poNumber}
+                    onChange={(event) => setPoNumber(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="product-spec-carrier">
+                    {t("productSpec:form.carrier", "Carrier")}
+                  </Label>
+                  <Input
+                    id="product-spec-carrier"
+                    value={carrier}
+                    onChange={(event) => setCarrier(event.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="product-spec-expected-ship-date">
+                    {t(
+                      "productSpec:form.expectedShipDate",
+                      "Expected ship date",
+                    )}
+                  </Label>
+                  <Input
+                    id="product-spec-expected-ship-date"
+                    type="date"
+                    value={expectedShipDate}
+                    onChange={(event) =>
+                      setExpectedShipDate(event.target.value)
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="product-spec-actual-ship-date">
+                    {t("productSpec:form.actualShipDate", "Actual ship date")}
+                  </Label>
+                  <Input
+                    id="product-spec-actual-ship-date"
+                    type="date"
+                    value={actualShipDate}
+                    onChange={(event) => setActualShipDate(event.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="product-spec-tracking-number">
+                  {t("productSpec:form.trackingNumber", "Tracking number")}
+                </Label>
+                <Input
+                  id="product-spec-tracking-number"
+                  value={trackingNumber}
+                  onChange={(event) => setTrackingNumber(event.target.value)}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="product-spec-notes">

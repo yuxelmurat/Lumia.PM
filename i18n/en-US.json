@@ -2238,7 +2238,8 @@
 			"status": "Status",
 			"delete": "Delete",
 			"updateFailed": "Failed to update status",
-			"deleteFailed": "Failed to delete item"
+			"deleteFailed": "Failed to delete item",
+			"overdue": "Overdue"
 		},
 		"form": {
 			"createTitle": "Add material",
@@ -2257,7 +2258,13 @@
 			"notes": "Notes",
 			"save": "Save",
 			"create": "Add",
-			"saveFailed": "Failed to save item"
+			"saveFailed": "Failed to save item",
+			"orderDetails": "Order details",
+			"poNumber": "PO number",
+			"carrier": "Carrier",
+			"expectedShipDate": "Expected ship date",
+			"actualShipDate": "Actual ship date",
+			"trackingNumber": "Tracking number"
 		}
 	},
 	"rfi": {
