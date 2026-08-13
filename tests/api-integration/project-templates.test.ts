@@ -176,6 +176,7 @@ describe("API integration: project templates and column budgets", () => {
       data: {
         columns: {
           slug: string;
+          columnId: string;
           budgetHours: number | null;
           consumedSeconds: number;
         }[];
@@ -186,6 +187,7 @@ describe("API integration: project templates and column budgets", () => {
       (column) => column.slug === "to-do",
     );
     expect(todoColumnData).toMatchObject({
+      columnId: todoColumn.id,
       budgetHours: 10,
       consumedSeconds: 4 * 60 * 60,
     });

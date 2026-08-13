@@ -243,6 +243,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
 
   const columns = projectColumns.map((column) => ({
     id: column.slug,
+    columnId: column.id,
     slug: column.slug,
     name: column.name,
     icon: column.icon,

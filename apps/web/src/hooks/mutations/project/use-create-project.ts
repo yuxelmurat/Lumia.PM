@@ -6,14 +6,17 @@ function useCreateProject({
   slug,
   workspaceId,
   icon,
+  projectType,
 }: {
   name: string;
   slug: string;
   workspaceId: string;
   icon: string;
+  projectType?: "generic" | "architecture" | "interior_design";
 }) {
   return useMutation({
-    mutationFn: () => createProject({ name, slug, workspaceId, icon }),
+    mutationFn: () =>
+      createProject({ name, slug, workspaceId, icon, projectType }),
   });
 }
 

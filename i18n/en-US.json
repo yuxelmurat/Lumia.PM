@@ -72,6 +72,12 @@
 				"projectName": "Project name",
 				"keyLabel": "Key:",
 				"keyHint": "Used for ticket IDs (e.g., {{example}}-123)",
+				"projectType": {
+					"label": "Project type",
+					"generic": "Generic",
+					"architecture": "Architecture",
+					"interior_design": "Interior Design"
+				},
 				"createButton": "Create Project",
 				"successToast": "Project created successfully",
 				"errorToast": "Failed to create project"
@@ -1511,6 +1517,15 @@
 		}
 	},
 	"tasks": {
+		"column": {
+			"budget": {
+				"setBudget": "Set budget",
+				"usage": "{{consumed}}h / {{budget}}h",
+				"hoursLabel": "Budget (hours)",
+				"placeholder": "No limit",
+				"updateFailed": "Failed to update budget"
+			}
+		},
 		"status": {
 			"label": "Status",
 			"to-do": "To Do",
