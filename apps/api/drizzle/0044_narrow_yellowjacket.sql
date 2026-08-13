@@ -1,0 +1,1 @@
+ALTER TABLE "column" ADD COLUMN "budget_hours" integer;

@@ -309,6 +309,13 @@
 			"when": 1786572906460,
 			"tag": "0043_bent_magdalene",
 			"breakpoints": true
+		},
+		{
+			"idx": 44,
+			"version": "7",
+			"when": 1786579033972,
+			"tag": "0044_narrow_yellowjacket",
+			"breakpoints": true
 		}
 	]
 }

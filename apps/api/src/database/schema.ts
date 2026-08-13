@@ -320,6 +320,7 @@ export const columnTable = pgTable(
     icon: text("icon"),
     color: text("color"),
     isFinal: boolean("is_final").default(false).notNull(),
+    budgetHours: integer("budget_hours"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" })
       .defaultNow()

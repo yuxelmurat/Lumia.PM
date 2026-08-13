@@ -36,6 +36,8 @@ describe("useTaskFiltersWithLabelsSupport", () => {
           name: "Todo",
           icon: null,
           isFinal: false,
+          budgetHours: null,
+          consumedSeconds: 0,
           tasks: [
             {
               id: "task-1",
@@ -124,6 +126,8 @@ describe("useTaskFiltersWithLabelsSupport", () => {
             name: "Todo",
             icon: null,
             isFinal: false,
+            budgetHours: null,
+            consumedSeconds: 0,
             tasks: [
               {
                 id: "task-123",
