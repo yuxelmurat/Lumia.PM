@@ -329,6 +329,27 @@ export const assetRevisionSchema = v.object({
   revisionNumber: v.number(),
 });
 
+export const rfiSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  subject: v.string(),
+  question: v.string(),
+  answer: v.nullable(v.string()),
+  status: v.picklist(["open", "answered", "closed"]),
+  dueDate: v.nullable(v.date()),
+  assignee: v.nullable(
+    v.object({ id: v.string(), name: v.nullable(v.string()) }),
+  ),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  answeredByUserId: v.nullable(v.string()),
+  answeredByUserName: v.nullable(v.string()),
+  answeredAt: v.nullable(v.date()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
 export const productSpecSchema = v.object({
   id: v.string(),
   projectId: v.string(),

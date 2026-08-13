@@ -54,6 +54,7 @@ import { migrateGitHubIntegration } from "./plugins/github/migration";
 import productSpec from "./product-spec";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
+import rfi from "./rfi";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import slackIntegration from "./slack-integration";
@@ -599,6 +600,7 @@ export function createApp() {
   const assetApprovalApi = api.route("/asset-approval", assetApproval);
   const assetRevisionApi = api.route("/asset-revision", assetRevision);
   const productSpecApi = api.route("/product-spec", productSpec);
+  const rfiApi = api.route("/rfi", rfi);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -776,6 +778,7 @@ export function createApp() {
     assetApprovalApi,
     assetRevisionApi,
     productSpecApi,
+    rfiApi,
     billingApi,
     columnApi,
     commentApi,
@@ -900,6 +903,7 @@ const {
   assetApprovalApi,
   assetRevisionApi,
   productSpecApi,
+  rfiApi,
   billingApi,
   columnApi,
   commentApi,
@@ -952,6 +956,7 @@ export type AppType =
   | typeof assetApprovalApi
   | typeof assetRevisionApi
   | typeof productSpecApi
+  | typeof rfiApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi

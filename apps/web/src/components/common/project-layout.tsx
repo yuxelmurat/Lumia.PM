@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CalendarDays,
+  MessageCircleQuestion,
   Package,
   SquareKanban,
   SquircleDashed,
@@ -31,7 +32,7 @@ type ProjectLayoutProps = {
   headerActions?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
-  activeView?: "backlog" | "board" | "gantt" | "materials";
+  activeView?: "backlog" | "board" | "gantt" | "materials" | "rfis";
 };
 
 export default function ProjectLayout({
@@ -58,7 +59,9 @@ export default function ProjectLayout({
         ? "gantt"
         : location.pathname.includes("/materials")
           ? "materials"
-          : "board");
+          : location.pathname.includes("/rfis")
+            ? "rfis"
+            : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -88,6 +91,13 @@ export default function ProjectLayout({
     });
   };
 
+  const handleNavigateToRfis = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/rfis",
+      params: { workspaceId, projectId },
+    });
+  };
+
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
       to:
@@ -97,7 +107,9 @@ export default function ProjectLayout({
             ? "/dashboard/workspace/$workspaceId/project/$projectId/gantt"
             : resolvedView === "materials"
               ? "/dashboard/workspace/$workspaceId/project/$projectId/materials"
-              : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+              : resolvedView === "rfis"
+                ? "/dashboard/workspace/$workspaceId/project/$projectId/rfis"
+                : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -152,6 +164,7 @@ export default function ProjectLayout({
                 onSelectBoard={handleNavigateToBoard}
                 onSelectGantt={handleNavigateToGantt}
                 onSelectMaterials={handleNavigateToMaterials}
+                onSelectRfis={handleNavigateToRfis}
                 onSelectProject={handleProjectSwitch}
                 onAddProject={() => setIsCreateProjectModalOpen(true)}
               />
@@ -206,6 +219,18 @@ export default function ProjectLayout({
                 >
                   <Package className="size-3.5" />
                   Materials
+                </Button>
+                <Button
+                  variant={resolvedView === "rfis" ? "secondary" : "ghost"}
+                  size="xs"
+                  onClick={handleNavigateToRfis}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "rfis" && "text-muted-foreground",
+                  )}
+                >
+                  <MessageCircleQuestion className="size-3.5" />
+                  RFIs
                 </Button>
               </div>
             )}

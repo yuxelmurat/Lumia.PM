@@ -22,7 +22,8 @@ type WorkspaceIdSource =
         | "asset"
         | "assetPin"
         | "assetShareLink"
-        | "productSpec";
+        | "productSpec"
+        | "rfi";
       idKey: string;
     }
   | {
@@ -145,7 +146,8 @@ async function lookupWorkspaceId(
     | "asset"
     | "assetPin"
     | "assetShareLink"
-    | "productSpec",
+    | "productSpec"
+    | "rfi",
   id: string,
 ): Promise<string | null> {
   try {
@@ -323,6 +325,19 @@ async function lookupWorkspaceId(
         return productSpec?.workspaceId || null;
       }
 
+      case "rfi": {
+        const [rfi] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.rfiTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.rfiTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.rfiTable.id, id))
+          .limit(1);
+        return rfi?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -444,6 +459,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "productSpec", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromRfi: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "rfi", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

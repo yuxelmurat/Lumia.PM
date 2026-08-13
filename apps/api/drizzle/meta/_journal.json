@@ -330,6 +330,13 @@
 			"when": 1786631016251,
 			"tag": "0046_keen_havok",
 			"breakpoints": true
+		},
+		{
+			"idx": 47,
+			"version": "7",
+			"when": 1786633010037,
+			"tag": "0047_talented_maverick",
+			"breakpoints": true
 		}
 	]
 }

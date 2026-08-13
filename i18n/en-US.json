@@ -2258,5 +2258,48 @@
 			"create": "Add",
 			"saveFailed": "Failed to save item"
 		}
+	},
+	"rfi": {
+		"pageTitle": "RFIs \u00b7 {{name}}",
+		"unassigned": "Unassigned",
+		"clearDueDate": "Clear date",
+		"status": {
+			"open": "Open",
+			"answered": "Answered",
+			"closed": "Closed"
+		},
+		"list": {
+			"title": "RFIs",
+			"add": "New RFI",
+			"empty": "No RFIs yet",
+			"emptySubtitle": "Track formal questions to the design team and their answers.",
+			"number": "#",
+			"subject": "Subject",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New RFI",
+			"description": "Ask the design team a formal question and track the answer.",
+			"subject": "Subject",
+			"question": "Question",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"setDueDate": "Set due date",
+			"create": "Create RFI",
+			"saveFailed": "Failed to create RFI"
+		},
+		"detail": {
+			"answer": "Answer",
+			"answerPlaceholder": "Write the formal answer\u2026",
+			"submitAnswer": "Submit answer",
+			"answerFailed": "Failed to submit answer",
+			"close": "Close",
+			"reopen": "Reopen",
+			"statusFailed": "Failed to update status",
+			"assignFailed": "Failed to update assignee",
+			"dueDateFailed": "Failed to update due date"
+		}
 	}
 }

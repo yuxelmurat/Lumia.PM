@@ -293,6 +293,7 @@ export const projectTable = pgTable(
     archivedAt: timestamp("archived_at", { mode: "date" }),
     completedAt: timestamp("completed_at", { mode: "date" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
+    lastRfiNumber: integer("last_rfi_number").notNull().default(0),
     position: integer("position").notNull().default(0),
   },
   (table) => [
@@ -800,6 +801,50 @@ export const productSpecTable = pgTable(
   (table) => [
     index("product_spec_projectId_idx").on(table.projectId),
     index("product_spec_status_idx").on(table.status),
+  ],
+);
+
+export const rfiTable = pgTable(
+  "rfi",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    subject: text("subject").notNull(),
+    question: text("question").notNull(),
+    answer: text("answer"),
+    status: text("status").notNull().default("open"),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    dueDate: timestamp("due_date", { mode: "date" }),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    answeredByUserId: text("answered_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    answeredAt: timestamp("answered_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("rfi_project_number_unique").on(table.projectId, table.number),
+    index("rfi_projectId_idx").on(table.projectId),
+    index("rfi_status_idx").on(table.status),
   ],
 );
 

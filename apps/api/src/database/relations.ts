@@ -19,6 +19,7 @@ import {
   notificationTable,
   productSpecTable,
   projectTable,
+  rfiTable,
   sessionTable,
   taskRelationTable,
   taskReminderSentTable,
@@ -322,6 +323,28 @@ export const productSpecTableRelations = relations(
     }),
   }),
 );
+
+export const rfiTableRelations = relations(rfiTable, ({ one }) => ({
+  project: one(projectTable, {
+    fields: [rfiTable.projectId],
+    references: [projectTable.id],
+  }),
+  assignee: one(userTable, {
+    fields: [rfiTable.assigneeUserId],
+    references: [userTable.id],
+    relationName: "rfiAssignee",
+  }),
+  createdByUser: one(userTable, {
+    fields: [rfiTable.createdByUserId],
+    references: [userTable.id],
+    relationName: "rfiCreatedBy",
+  }),
+  answeredByUser: one(userTable, {
+    fields: [rfiTable.answeredByUserId],
+    references: [userTable.id],
+    relationName: "rfiAnsweredBy",
+  }),
+}));
 
 export const labelTableRelations = relations(labelTable, ({ one }) => ({
   task: one(taskTable, {

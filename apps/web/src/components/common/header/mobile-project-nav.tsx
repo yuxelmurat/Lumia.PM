@@ -2,6 +2,7 @@ import {
   CalendarDays,
   Check,
   Menu,
+  MessageCircleQuestion,
   Package,
   Plus,
   SquareKanban,
@@ -19,11 +20,12 @@ import { cn } from "@/lib/cn";
 type MobileProjectNavProps = {
   workspaceId: string;
   projectId: string;
-  activeView: "backlog" | "board" | "gantt" | "materials";
+  activeView: "backlog" | "board" | "gantt" | "materials" | "rfis";
   onSelectBoard: () => void;
   onSelectBacklog: () => void;
   onSelectGantt: () => void;
   onSelectMaterials: () => void;
+  onSelectRfis: () => void;
   onSelectProject: (projectId: string) => void;
   onAddProject: () => void;
 };
@@ -36,6 +38,7 @@ export default function MobileProjectNav({
   onSelectBacklog,
   onSelectGantt,
   onSelectMaterials,
+  onSelectRfis,
   onSelectProject,
   onAddProject,
 }: MobileProjectNavProps) {
@@ -111,6 +114,19 @@ export default function MobileProjectNav({
               >
                 <Package className="size-3.5" />
                 Materials
+              </button>
+              <button
+                type="button"
+                onClick={onSelectRfis}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "rfis"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <MessageCircleQuestion className="size-3.5" />
+                RFIs
               </button>
             </div>
           </div>
