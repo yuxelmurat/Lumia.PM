@@ -351,6 +351,13 @@
 			"when": 1786650540346,
 			"tag": "0049_third_green_goblin",
 			"breakpoints": true
+		},
+		{
+			"idx": 50,
+			"version": "7",
+			"when": 1786651884248,
+			"tag": "0050_third_fabian_cortez",
+			"breakpoints": true
 		}
 	]
 }

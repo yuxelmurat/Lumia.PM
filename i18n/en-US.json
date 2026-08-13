@@ -1270,6 +1270,7 @@
 			"overview": "Overview",
 			"projects": "Projects",
 			"members": "Members",
+			"workload": "Workload",
 			"invitations": "Invitations",
 			"more": "More",
 			"backToBoard": "Back to board"
@@ -2391,5 +2392,16 @@
 			"assignFailed": "Failed to update assignee",
 			"dueDateFailed": "Failed to update due date"
 		}
+	},
+	"workload": {
+		"pageTitle": "Workload",
+		"member": "Member",
+		"unknownMember": "Unknown",
+		"empty": "No upcoming workload",
+		"emptySubtitle": "Assign tasks with a due date and estimated hours to see capacity here.",
+		"estimatedHours": "Estimated hours",
+		"estimatedHoursPlaceholder": "e.g. 8",
+		"estimatedHoursFailed": "Failed to update estimated hours",
+		"save": "Save"
 	}
 }

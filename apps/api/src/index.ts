@@ -87,6 +87,7 @@ import {
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
 import workflowRule from "./workflow-rule";
+import workload from "./workload";
 import workspace from "./workspace";
 import {
   addConnection,
@@ -605,6 +606,7 @@ export function createApp() {
   const rfiApi = api.route("/rfi", rfi);
   const changeOrderApi = api.route("/change-order", changeOrder);
   const submittalApi = api.route("/submittal", submittal);
+  const workloadApi = api.route("/workload", workload);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const notificationApi = api.route("/notification", notification);
@@ -785,6 +787,7 @@ export function createApp() {
     rfiApi,
     changeOrderApi,
     submittalApi,
+    workloadApi,
     billingApi,
     columnApi,
     commentApi,
@@ -912,6 +915,7 @@ const {
   rfiApi,
   changeOrderApi,
   submittalApi,
+  workloadApi,
   billingApi,
   columnApi,
   commentApi,
@@ -967,6 +971,7 @@ export type AppType =
   | typeof rfiApi
   | typeof changeOrderApi
   | typeof submittalApi
+  | typeof workloadApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof notificationApi
