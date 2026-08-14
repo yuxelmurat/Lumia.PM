@@ -401,6 +401,13 @@ export const taskTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    // Client approval on a public project's shared link. Single current
+    // status per task, not a history log — see AGENTS.md reverse-state
+    // guidance for the reset action that clears these back to null.
+    approvalStatus: text("approval_status"),
+    approvalNote: text("approval_note"),
+    approvalClientName: text("approval_client_name"),
+    approvalRespondedAt: timestamp("approval_responded_at", { mode: "date" }),
   },
   (table) => [
     index("task_projectId_idx").on(table.projectId),

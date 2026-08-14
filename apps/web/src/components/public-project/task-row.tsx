@@ -13,6 +13,7 @@ import type { ExternalLink } from "@/types/external-link";
 import type Task from "@/types/task";
 import { PublicPRBadge } from "./public-pr-badge";
 import { PublicTaskLabels } from "./public-task-labels";
+import { TaskApprovalBadge } from "./task-approval-badge";
 
 type PublicTaskRowProps = {
   task: Task & {
@@ -59,6 +60,11 @@ export function PublicTaskRow({
       </div>
 
       <div className="flex items-center gap-2">
+        <TaskApprovalBadge
+          approvalStatus={task.approvalStatus}
+          approvalClientName={task.approvalClientName}
+        />
+
         {task.assigneeName && (
           <div className="flex items-center gap-1.5">
             <Avatar className="h-5 w-5">

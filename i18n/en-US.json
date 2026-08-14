@@ -1802,6 +1802,18 @@
 			"updateSuccess": "Custom field updated",
 			"updateError": "Failed to update custom field"
 		},
+		"approval": {
+			"title": "Approval",
+			"statusApproved": "Approved",
+			"statusChangesRequested": "Changes requested",
+			"noResponse": "No client response yet",
+			"respondedBy": "Responded by {{name}}",
+			"respondedAt": "Responded {{date}}",
+			"note": "Note",
+			"reset": "Reset",
+			"resetSuccess": "Approval status reset",
+			"resetError": "Failed to reset approval status"
+		},
 		"move": {
 			"title": "Move task",
 			"projectLabel": "Destination project",
@@ -2222,6 +2234,24 @@
 		},
 		"branding": {
 			"poweredBy": "Powered by"
+		},
+		"approval": {
+			"sectionTitle": "Approval",
+			"statusApproved": "Approved",
+			"statusChangesRequested": "Changes requested",
+			"respondedAs": "Responded as {{name}}",
+			"respondedOn": "Responded {{date}}",
+			"approveButton": "Approve",
+			"requestChangesButton": "Request changes",
+			"nameLabel": "Your name",
+			"namePlaceholder": "Enter your name",
+			"nameRequired": "Please enter your name",
+			"noteLabel": "Note (optional)",
+			"notePlaceholder": "Add a note about what needs to change...",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"submitSuccess": "Your response has been recorded",
+			"submitError": "Failed to submit your response"
 		}
 	}
 }

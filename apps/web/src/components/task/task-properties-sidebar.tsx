@@ -39,6 +39,7 @@ import { getInitials } from "@/lib/get-initials";
 import { getPriorityLabel, getStatusDisplayLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
+import TaskApprovalSection from "./task-approval-section";
 import TaskAssigneePopover from "./task-assignee-popover";
 import TaskCustomFields from "./task-custom-fields";
 import TaskDueDatePopover from "./task-due-date-popover";
@@ -764,6 +765,8 @@ export default function TaskPropertiesSidebar({
             </div>
           </div>
         </div>
+
+        {taskId && <TaskApprovalSection taskId={taskId} />}
 
         {taskId && (
           <TaskCustomFields taskId={taskId} workspaceId={workspaceId} />

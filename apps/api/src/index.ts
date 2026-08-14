@@ -54,6 +54,7 @@ import search from "./search";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
+import setTaskApproval from "./task/controllers/set-task-approval";
 import taskRelation from "./task-relation";
 import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
@@ -246,6 +247,23 @@ export function createApp() {
 
     return c.json(project);
   });
+
+  const publicProjectApprovalApi = api.put(
+    "/public-project/:projectId/task/:taskId/approval",
+    async (c) => {
+      const { projectId, taskId } = c.req.param();
+      const body = await c.req.json();
+      const task = await setTaskApproval({
+        projectId,
+        taskId,
+        status: body?.status,
+        clientName: body?.clientName,
+        note: body?.note,
+      });
+
+      return c.json(task);
+    },
+  );
 
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
@@ -751,6 +769,7 @@ export function createApp() {
     notificationPreferencesApi,
     projectApi,
     publicProjectApi,
+    publicProjectApprovalApi,
     searchApi,
     slackIntegrationApi,
     taskApi,
@@ -870,6 +889,7 @@ const {
   notificationPreferencesApi,
   projectApi,
   publicProjectApi,
+  publicProjectApprovalApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
@@ -918,6 +938,7 @@ export type AppType =
   | typeof invitationApi
   | typeof workspaceApi
   | typeof publicProjectApi
+  | typeof publicProjectApprovalApi
   | typeof invitationPublicApi
   | typeof oauthApi;
 

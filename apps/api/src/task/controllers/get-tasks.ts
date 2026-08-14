@@ -136,6 +136,10 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     assigneeId: userTable.id,
     assigneeImage: userTable.image,
     projectId: taskTable.projectId,
+    approvalStatus: taskTable.approvalStatus,
+    approvalNote: taskTable.approvalNote,
+    approvalClientName: taskTable.approvalClientName,
+    approvalRespondedAt: taskTable.approvalRespondedAt,
   };
 
   const query = db

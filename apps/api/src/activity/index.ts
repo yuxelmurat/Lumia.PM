@@ -230,6 +230,26 @@ subscribeToEvent<{
 
 subscribeToEvent<{
   taskId: string;
+  status: "approved" | "changes_requested" | null;
+  clientName: string | null;
+  note: string | null;
+  type: string;
+}>("task.approval_updated", async (data) => {
+  await createActivity(
+    data.taskId,
+    data.type,
+    null,
+    data.note,
+    {
+      status: data.status,
+      clientName: data.clientName,
+    },
+    data.clientName ?? undefined,
+  );
+});
+
+subscribeToEvent<{
+  taskId: string;
   userId: string;
   oldPriority: string;
   newPriority: string;

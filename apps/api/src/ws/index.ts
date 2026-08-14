@@ -254,6 +254,7 @@ const taskUpdateEvents = [
   "task.label_unassigned",
   "task.label_created",
   "task.label_deleted",
+  "task.approval_updated",
   "task-relation.created",
   "task-relation.deleted",
   "comment.created",

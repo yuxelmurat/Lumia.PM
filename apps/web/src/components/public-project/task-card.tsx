@@ -13,6 +13,7 @@ import type { ExternalLink } from "@/types/external-link";
 import type Task from "@/types/task";
 import { PublicPRBadge } from "./public-pr-badge";
 import { PublicTaskLabels } from "./public-task-labels";
+import { TaskApprovalBadge } from "./task-approval-badge";
 
 type PublicTaskCardProps = {
   task: Task & {
@@ -80,8 +81,14 @@ export function PublicTaskCard({
       onClick={handleClick}
       aria-label={`View details for task ${task.title}`}
     >
-      <div className="text-[10px] font-mono text-muted-foreground mb-2">
-        {projectSlug}-{task.number}
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="text-[10px] font-mono text-muted-foreground">
+          {projectSlug}-{task.number}
+        </div>
+        <TaskApprovalBadge
+          approvalStatus={task.approvalStatus}
+          approvalClientName={task.approvalClientName}
+        />
       </div>
 
       {task.assigneeName && (

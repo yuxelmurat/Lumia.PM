@@ -247,6 +247,46 @@ subscribeToEvent<{
 
 subscribeToEvent<{
   taskId: string;
+  status: "approved" | "changes_requested" | null;
+  clientName: string | null;
+  note: string | null;
+  title: string;
+  assigneeId?: string;
+}>("task.approval_updated", async (data) => {
+  if (!data.assigneeId || data.status === null) return; // don't notify on reset
+
+  const [task] = await db
+    .select({ projectId: taskTable.projectId })
+    .from(taskTable)
+    .where(eq(taskTable.id, data.taskId))
+    .limit(1);
+
+  const [project] = task
+    ? await db
+        .select({ workspaceId: projectTable.workspaceId })
+        .from(projectTable)
+        .where(eq(projectTable.id, task.projectId))
+        .limit(1)
+    : [];
+
+  await createNotification({
+    userId: data.assigneeId,
+    type: "task_approval_updated",
+    eventData: {
+      taskTitle: data.title,
+      status: data.status,
+      clientName: data.clientName,
+      note: data.note,
+      projectId: task?.projectId ?? null,
+      workspaceId: project?.workspaceId ?? null,
+    },
+    resourceId: data.taskId,
+    resourceType: "task",
+  });
+});
+
+subscribeToEvent<{
+  taskId: string;
   userId: string;
   oldAssignee: string | null;
   newAssignee: string;

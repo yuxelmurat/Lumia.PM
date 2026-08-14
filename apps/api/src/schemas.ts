@@ -129,6 +129,12 @@ export const taskSchema = v.object({
   startDate: v.optional(v.date()),
   dueDate: v.optional(v.date()),
   createdAt: v.date(),
+  approvalStatus: v.optional(
+    v.nullable(v.picklist(["approved", "changes_requested"] as const)),
+  ),
+  approvalNote: v.optional(v.nullable(v.string())),
+  approvalClientName: v.optional(v.nullable(v.string())),
+  approvalRespondedAt: v.optional(v.nullable(v.date())),
 });
 
 export const activitySchema = v.object({
@@ -145,6 +151,7 @@ export const activitySchema = v.object({
     "title_changed",
     "description_changed",
     "create",
+    "approval_updated",
   ] as const),
   createdAt: v.date(),
   userId: v.nullable(v.string()),
@@ -184,6 +191,7 @@ export const notificationSchema = v.object({
     "task_overdue",
     "task_mention",
     "task_comment",
+    "task_approval_updated",
   ] as const),
   eventData: v.nullable(v.record(v.string(), v.unknown())),
   isRead: v.optional(v.boolean()),

@@ -38,6 +38,7 @@ import {
   requireBulkTaskPermission,
   requireTaskAssigneePermission,
 } from "./controllers/require-task-permission";
+import resetTaskApproval from "./controllers/reset-task-approval";
 import updateTask from "./controllers/update-task";
 import updateTaskAssignee from "./controllers/update-task-assignee";
 import updateTaskDescription from "./controllers/update-task-description";
@@ -515,6 +516,34 @@ const task = new Hono<{
       const currentUserId = c.get("userId");
 
       const task = await updateTaskStatus({ id, status, currentUserId });
+
+      return c.json(task);
+    },
+  )
+  .put(
+    "/:id/approval/reset",
+    describeRoute({
+      operationId: "resetTaskApproval",
+      tags: ["Tasks"],
+      description:
+        "Clear a task's client approval status so the client can re-review",
+      responses: {
+        200: {
+          description: "Task approval reset successfully",
+          content: {
+            "application/json": { schema: resolver(taskSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ task: ["update"] }),
+    requireEntitlement,
+    async (c) => {
+      const { id } = c.req.valid("param");
+
+      const task = await resetTaskApproval(id);
 
       return c.json(task);
     },
