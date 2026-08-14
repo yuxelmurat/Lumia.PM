@@ -4,11 +4,12 @@ import { Footer } from "@/components/landing/footer";
 import { Navbar } from "@/components/landing/navbar";
 import { PricingPlans } from "@/components/landing/pricing-plans";
 import { SectionSeparator } from "@/components/landing/section-separator";
+import { SUPPORT_EMAIL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: "Pricing",
+  title: "Fiyatlandırma",
   description:
-    "Simple pricing for Kaneo Cloud. Self-hosting stays free and open source forever.",
+    "Lumia.PM için basit fiyatlandırma: ücretsiz başlayın, ekibiniz büyüdükçe Premium'a geçin, kurumsal ihtiyaçlar için bize ulaşın.",
   alternates: {
     canonical: "/pricing",
   },
@@ -16,17 +17,17 @@ export const metadata: Metadata = {
 
 const notes = [
   {
-    title: "Already on Kaneo Cloud?",
-    body: "Accounts created before paid plans launched keep free access for at least 12 months, with 6 months notice before anything changes, and a full export or self-hosting path either way.",
+    title: "14 gün ücretsiz deneme",
+    body: "Premium plan için kredi kartı bilgisi girmeden 14 gün boyunca tüm özellikleri deneyin.",
   },
   {
-    title: "Fair billing",
-    body: "Payments are processed by Creem as merchant of record; applicable taxes are handled where required. Cancel anytime; your plan stays active until the end of the billing period.",
+    title: "İstediğiniz zaman iptal",
+    body: "Aboneliğinizi istediğiniz an iptal edebilirsiniz; planınız faturalandırma döneminin sonuna kadar aktif kalır.",
   },
   {
-    title: "Questions?",
-    body: "We answer billing and pricing questions at",
-    email: "support@kaneo.app",
+    title: "Sorularınız mı var?",
+    body: "Fiyatlandırma ve faturalandırma sorularınız için bize ulaşın:",
+    email: SUPPORT_EMAIL,
   },
 ];
 
@@ -39,19 +40,21 @@ export default function PricingPage() {
           <div className="mx-auto w-full max-w-6xl">
             <div className="max-w-2xl">
               <FadeIn delay={0}>
-                <p className="font-medium text-primary text-sm">Pricing</p>
+                <p className="font-medium text-primary text-sm">
+                  Fiyatlandırma
+                </p>
               </FadeIn>
               <FadeIn delay={60}>
                 <h1 className="mt-3 text-balance text-4xl font-medium leading-[1.06] md:text-5xl">
-                  Free to run yourself.
+                  Ücretsiz başlayın.
                   <br />
-                  Fair when we run it for you.
+                  Ekibiniz büyüdükçe siz de büyütün.
                 </h1>
               </FadeIn>
               <FadeIn delay={120}>
                 <p className="mt-5 text-balance text-foreground/70 text-lg leading-relaxed">
-                  Self-hosting is free forever. Kaneo Cloud starts with a 14-day
-                  free trial, no credit card required.
+                  Free plan sonsuza dek ücretsizdir. Premium 14 gün ücretsiz
+                  denemeyle başlar, kredi kartı gerekmez.
                 </p>
               </FadeIn>
             </div>

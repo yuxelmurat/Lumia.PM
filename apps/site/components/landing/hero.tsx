@@ -1,10 +1,8 @@
 "use client";
 
-import {} from "lucide-react";
-import { GithubIcon } from "@/components/icons/github-icon";
-import { AppPreview } from "@/components/landing/app-preview";
 import { FadeIn } from "@/components/landing/fade-in";
 import { Button } from "@/components/ui/button";
+import { SIGN_UP_URL } from "@/lib/site-config";
 
 export function Hero() {
   return (
@@ -13,15 +11,22 @@ export function Hero() {
         {/* ── Heading + description + buttons ── */}
         <div className="mb-10 max-w-2xl">
           <FadeIn delay={0}>
-            <h1 className="text-balance text-4xl font-medium leading-[1.06] md:text-5xl lg:text-6xl">
-              All you <span className="text-primary">need</span>. Nothing you
-              don&apos;t.
+            <p className="font-medium text-primary text-sm">
+              Mimarlık ve iç mimarlık ofisleri için
+            </p>
+          </FadeIn>
+          <FadeIn delay={40}>
+            <h1 className="mt-3 text-balance text-4xl font-medium leading-[1.06] md:text-5xl lg:text-6xl">
+              Projeleriniz{" "}
+              <span className="text-primary">Excel, e-posta ve WhatsApp</span>{" "}
+              arasında kaybolmasın.
             </h1>
           </FadeIn>
           <FadeIn delay={80}>
             <p className="mt-5 text-balance text-lg text-muted-foreground leading-relaxed md:text-xl">
-              Kaneo gives you clean planning, focused execution, and full
-              ownership of your workflow from backlog to release.
+              Lumia.PM; render onayı, malzeme (FF&E) ve tedarik takibi, RFI,
+              değişiklik emri, submittal ve ruhsat sürecini tek bir yerde
+              toplayan, mesleğinizin dilini konuşan proje yönetim platformu.
             </p>
           </FadeIn>
 
@@ -31,31 +36,10 @@ export function Hero() {
                 size="lg"
                 className="gap-2"
                 onClick={() => {
-                  window.location.href = "https://cloud.kaneo.app";
+                  window.location.href = SIGN_UP_URL;
                 }}
               >
-                Cloud
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2"
-                onClick={() => {
-                  window.location.href = "/docs/core";
-                }}
-              >
-                Get Started
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2"
-                onClick={() => {
-                  window.location.href = "https://github.com/usekaneo/kaneo";
-                }}
-              >
-                <GithubIcon className="h-4 w-4" />
-                GitHub
+                Ücretsiz Dene
               </Button>
               <Button
                 variant="outline"
@@ -65,15 +49,27 @@ export function Hero() {
                   window.location.href = "/pricing";
                 }}
               >
-                Pricing
+                Fiyatları Gör
               </Button>
             </div>
+            <p className="mt-3 text-muted-foreground text-xs">
+              Kredi kartı gerekmez · 14 gün ücretsiz · İstediğiniz zaman iptal
+              edin
+            </p>
           </FadeIn>
         </div>
 
-        {/* ── App preview: interactive mock of the real Kaneo UI ── */}
+        {/* ── Hero visual: a real screenshot of the product ── */}
         <FadeIn delay={240} distance={32}>
-          <AppPreview />
+          <div className="overflow-hidden rounded-xl border border-border/70 bg-background shadow-2xl ring-1 ring-black/5">
+            <img
+              src="/screenshots/board.png"
+              alt="Lumia.PM proje panosu — mimarlık projesi görevleri sütunlar hâlinde"
+              className="w-full"
+              width={1440}
+              height={900}
+            />
+          </div>
         </FadeIn>
       </div>
     </section>

@@ -3,8 +3,7 @@ import { FadeIn } from "@/components/landing/fade-in";
 import { Footer } from "@/components/landing/footer";
 import { Navbar } from "@/components/landing/navbar";
 import { SectionSeparator } from "@/components/landing/section-separator";
-
-const SIGN_UP = "https://cloud.kaneo.app/auth/sign-up";
+import { BRAND_NAME, SIGN_UP_URL } from "@/lib/site-config";
 
 type Cell = boolean | string;
 
@@ -12,23 +11,22 @@ export type Comparison = {
   competitor: string;
   heading: string;
   subheading: string;
-  rows: { feature: string; kaneo: Cell; them: Cell }[];
+  rows: { feature: string; lumia: Cell; them: Cell }[];
   reasons: { title: string; body: string }[];
   honestNote: string;
-  migration?: { body: string; href: string; linkText: string };
 };
 
 function CellValue({ value, emphasize }: { value: Cell; emphasize?: boolean }) {
   if (typeof value === "boolean") {
     return value ? (
       <Check
-        aria-label="Yes"
+        aria-label="Var"
         className={
           emphasize ? "size-4 text-primary" : "size-4 text-foreground/40"
         }
       />
     ) : (
-      <Minus aria-label="No" className="size-4 text-foreground/30" />
+      <Minus aria-label="Yok" className="size-4 text-foreground/30" />
     );
   }
   return (
@@ -48,7 +46,7 @@ export function ComparisonPage({ data }: { data: Comparison }) {
             <div className="max-w-2xl">
               <FadeIn delay={0}>
                 <p className="font-medium text-primary text-sm">
-                  Kaneo vs {data.competitor}
+                  {BRAND_NAME} vs {data.competitor}
                 </p>
               </FadeIn>
               <FadeIn delay={60}>
@@ -65,15 +63,15 @@ export function ComparisonPage({ data }: { data: Comparison }) {
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <a
                     className="inline-flex h-10 items-center justify-center rounded-lg border border-transparent bg-primary px-4 font-medium text-primary-foreground text-sm transition-colors hover:bg-primary/90"
-                    href={SIGN_UP}
+                    href={SIGN_UP_URL}
                   >
-                    Start 14-day free trial
+                    Ücretsiz Dene
                   </a>
                   <a
                     className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-transparent px-4 font-medium text-sm transition-colors hover:bg-accent"
-                    href="/docs/core/installation"
+                    href="/pricing"
                   >
-                    Self-host for free
+                    Fiyatları Gör
                   </a>
                 </div>
               </FadeIn>
@@ -84,7 +82,7 @@ export function ComparisonPage({ data }: { data: Comparison }) {
                 <div className="grid grid-cols-[1.4fr_1fr_1fr] text-sm">
                   <div className="border-border/50 border-b px-4 py-3 font-medium sm:px-6" />
                   <div className="border-border/50 border-b bg-primary/5 px-4 py-3 text-center font-medium sm:px-6">
-                    Kaneo
+                    {BRAND_NAME}
                   </div>
                   <div className="border-border/50 border-b px-4 py-3 text-center font-medium text-foreground/70 sm:px-6">
                     {data.competitor}
@@ -96,7 +94,7 @@ export function ComparisonPage({ data }: { data: Comparison }) {
                         {row.feature}
                       </div>
                       <div className="flex items-center justify-center border-border/40 border-b bg-primary/5 px-4 py-3 text-center sm:px-6">
-                        <CellValue value={row.kaneo} emphasize />
+                        <CellValue value={row.lumia} emphasize />
                       </div>
                       <div className="flex items-center justify-center border-border/40 border-b px-4 py-3 text-center sm:px-6">
                         <CellValue value={row.them} />
@@ -113,7 +111,7 @@ export function ComparisonPage({ data }: { data: Comparison }) {
           <section className="px-6 py-14 md:py-20">
             <div className="mx-auto w-full max-w-6xl">
               <h2 className="max-w-2xl text-2xl font-medium md:text-3xl">
-                Why teams choose Kaneo
+                Ofisler neden {BRAND_NAME}'i seçiyor
               </h2>
               <div className="mt-8 grid gap-8 md:grid-cols-3">
                 {data.reasons.map((reason) => (
@@ -126,22 +124,9 @@ export function ComparisonPage({ data }: { data: Comparison }) {
                 ))}
               </div>
 
-              {data.migration ? (
-                <p className="mt-14 max-w-2xl text-foreground/70 text-sm leading-relaxed">
-                  {data.migration.body}{" "}
-                  <a
-                    className="text-foreground underline underline-offset-4 transition-colors hover:text-primary"
-                    href={data.migration.href}
-                  >
-                    {data.migration.linkText}
-                  </a>
-                  .
-                </p>
-              ) : null}
-
               <div className="mt-14 max-w-2xl rounded-xl border border-border/70 bg-card/70 p-5">
                 <h3 className="font-medium text-sm">
-                  When {data.competitor} is the better choice
+                  {data.competitor} ne zaman daha doğru tercih olur
                 </h3>
                 <p className="mt-2 text-foreground/70 text-sm leading-relaxed">
                   {data.honestNote}
@@ -151,15 +136,15 @@ export function ComparisonPage({ data }: { data: Comparison }) {
               <div className="mt-12 flex flex-wrap items-center gap-3">
                 <a
                   className="inline-flex h-10 items-center justify-center rounded-lg border border-transparent bg-primary px-4 font-medium text-primary-foreground text-sm transition-colors hover:bg-primary/90"
-                  href={SIGN_UP}
+                  href={SIGN_UP_URL}
                 >
-                  Try Kaneo Cloud free
+                  {BRAND_NAME}'i ücretsiz dene
                 </a>
                 <a
                   className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-transparent px-4 font-medium text-sm transition-colors hover:bg-accent"
                   href="/pricing"
                 >
-                  See pricing
+                  Fiyatlandırmayı gör
                 </a>
               </div>
             </div>

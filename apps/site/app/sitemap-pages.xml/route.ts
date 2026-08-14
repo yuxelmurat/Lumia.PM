@@ -1,59 +1,31 @@
+import { SITE_URL } from "@/lib/site-config";
+
 export const dynamic = "force-static";
 
-const SITE = "https://kaneo.app";
+const paths = [
+  { loc: "/", changefreq: "weekly", priority: "1.0" },
+  { loc: "/pricing", changefreq: "monthly", priority: "0.8" },
+  { loc: "/monday-alternative", changefreq: "monthly", priority: "0.7" },
+  { loc: "/asana-alternative", changefreq: "monthly", priority: "0.7" },
+  { loc: "/excel-alternative", changefreq: "monthly", priority: "0.7" },
+];
 
 export function GET() {
   const lastmod = new Date().toISOString();
+  const urls = paths
+    .map(
+      (p) => `  <url>
+    <loc>${SITE_URL}${p.loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`,
+    )
+    .join("\n");
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${SITE}/</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${SITE}/pricing</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>${SITE}/privacy</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>${SITE}/terms</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>${SITE}/jira-alternative</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${SITE}/trello-alternative</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${SITE}/linear-alternative</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${SITE}/planka-alternative</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+${urls}
 </urlset>`;
 
   return new Response(xml, {

@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { SIGN_IN_URL, SIGN_UP_URL } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
 type LinkItem = {
@@ -41,68 +42,37 @@ const navigationLinks: NavigationLink[] = [
     items: [
       {
         description:
-          "Understand the product model and day-to-day workflows end to end.",
-        href: "/docs/core/functional",
-        label: "Functional Guides",
+          "Render/çizim onayı, FF&E ve tedarik takibi, RFI, değişiklik emri, submittal ve ruhsat takibi.",
+        href: "/#moduller",
+        label: "Modüller",
+      },
+      {
+        description: "Kim ne kadar dolu, projeler arası kapasite görünümü.",
+        href: "/#moduller",
+        label: "Kapasite (Workload) Görünümü",
       },
       {
         description:
-          "Set up your workspace structure and initial project configuration.",
-        href: "/docs/core/functional/create-workspace-and-project",
-        label: "Create Workspace & Project",
-      },
-      {
-        description:
-          "Run tasks across board and list views with clear ownership and status.",
-        href: "/docs/core/functional/plan-and-execute-tasks",
-        label: "Plan & Execute Tasks",
-      },
-      {
-        description:
-          "Use backlog planning to organize upcoming work and sequencing.",
-        href: "/docs/core/functional/backlog-planning",
-        label: "Backlog Planning",
-      },
-      {
-        description:
-          "Define and evolve project workflows to match your delivery process.",
-        href: "/docs/core/functional/configure-workflows",
-        label: "Configure Workflows",
+          "Kanban, backlog, Gantt, zaman takibi ve rol tabanlı izinler.",
+        href: "/#neden",
+        label: "Temel Proje Yönetimi",
       },
     ],
-    label: "Product",
+    label: "Ürün",
     submenu: true,
     type: "description",
   },
   {
     items: [
-      { href: "/docs/core", label: "Quick Start" },
-      { href: "/docs/core/installation", label: "Installation" },
-      { href: "/docs/core/functional", label: "Functional Guide" },
-      { href: "/docs/api-reference/introduction", label: "API Reference" },
+      { href: "/monday-alternative", label: "Lumia.PM vs Monday.com" },
+      { href: "/asana-alternative", label: "Lumia.PM vs Asana" },
+      { href: "/excel-alternative", label: "Lumia.PM vs Excel + E-posta" },
     ],
-    label: "Docs",
+    label: "Karşılaştırma",
     submenu: true,
     type: "simple",
   },
-  {
-    items: [
-      { href: "#why", label: "Why Kaneo" },
-      { href: "https://github.com/usekaneo/kaneo", label: "Open Source" },
-      {
-        href: "https://cloud.kaneo.app/public-project/vlu4ak2w8rs9rn1r4lirj2u1",
-        label: "Roadmap",
-      },
-      {
-        href: "https://github.com/usekaneo/kaneo/blob/main/CONTRIBUTING.md",
-        label: "Contributing",
-      },
-    ],
-    label: "About",
-    submenu: true,
-    type: "simple",
-  },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/pricing", label: "Fiyatlandırma" },
 ];
 
 export function Navbar() {
@@ -132,7 +102,7 @@ export function Navbar() {
                 width={16}
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <title>Menu</title>
+                <title>Menü</title>
                 <path
                   className="-translate-y-[7px] origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
                   d="M4 12L20 12"
@@ -189,7 +159,7 @@ export function Navbar() {
             <a
               className="flex h-8 items-center text-primary hover:text-primary"
               href="/"
-              aria-label="Kaneo home"
+              aria-label={"Lumia.PM anasayfa"}
             >
               <Logo />
             </a>
@@ -257,33 +227,23 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Button
-            className="text-sm max-sm:hidden"
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              window.location.href = "https://github.com/sponsors/andrejsshell";
-            }}
-          >
-            Sponsor
-          </Button>
-          <Button
             className="text-sm"
             size="sm"
             variant="ghost"
             onClick={() => {
-              window.location.href = "https://cloud.kaneo.app/auth/sign-in";
+              window.location.href = SIGN_IN_URL;
             }}
           >
-            Sign In
+            Panel Girişi
           </Button>
           <Button
             className="text-sm"
             size="sm"
             onClick={() => {
-              window.location.href = "https://cloud.kaneo.app";
+              window.location.href = SIGN_UP_URL;
             }}
           >
-            Get Started
+            Ücretsiz Dene
           </Button>
         </div>
       </div>

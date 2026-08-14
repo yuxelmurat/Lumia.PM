@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
+import { BRAND_NAME, SITE_URL } from "@/lib/site-config";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -9,49 +9,51 @@ export const viewport: Viewport = {
   ],
 };
 
+const TAGLINE =
+  "Mimarlık ve iç mimarlık ofisleri için proje yönetimi. Onay akışı, FF&E ve tedarik takibi, RFI, değişiklik emri, submittal ve ruhsat takibi tek yerde.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kaneo.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Kaneo - All you need. Nothing you don't.",
-    template: "%s | Kaneo",
+    default: `${BRAND_NAME} — Mimarlık ofisleri için proje yönetimi`,
+    template: `%s | ${BRAND_NAME}`,
   },
-  description:
-    "All you need. Nothing you don't. Open source project management that works for you, not against you.",
+  description: TAGLINE,
   keywords: [
-    "kaneo",
-    "project management",
-    "open source",
-    "kanban",
-    "task management",
-    "self-hosted",
-    "team collaboration",
+    "mimarlık proje yönetimi",
+    "iç mimarlık proje yönetimi",
+    "FF&E takibi",
+    "RFI takibi",
+    "değişiklik emri",
+    "submittal takibi",
+    "ruhsat takibi",
+    "inşaat idaresi yazılımı",
   ],
-  applicationName: "Kaneo",
+  applicationName: BRAND_NAME,
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    url: "https://kaneo.app",
-    siteName: "Kaneo",
-    title: "Kaneo - All you need. Nothing you don't.",
-    description:
-      "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
+    url: SITE_URL,
+    siteName: BRAND_NAME,
+    locale: "tr_TR",
+    title: `${BRAND_NAME} — Mimarlık ofisleri için proje yönetimi`,
+    description: TAGLINE,
     images: [
       {
-        url: "/images/hero.png",
-        width: 1200,
-        height: 630,
-        alt: "Kaneo",
+        url: "/screenshots/board.png",
+        width: 1440,
+        height: 900,
+        alt: BRAND_NAME,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kaneo - All you need. Nothing you don't.",
-    description:
-      "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
-    images: ["/images/hero.png"],
+    title: `${BRAND_NAME} — Mimarlık ofisleri için proje yönetimi`,
+    description: TAGLINE,
+    images: ["/screenshots/board.png"],
   },
   robots: {
     index: true,
@@ -63,37 +65,33 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   category: "productivity",
-  creator: "Kaneo",
-  publisher: "Kaneo",
+  creator: BRAND_NAME,
+  publisher: BRAND_NAME,
 };
 
 const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Kaneo",
-    url: "https://kaneo.app",
-    logo: "https://kaneo.app/logo-512.png",
-    sameAs: ["https://github.com/usekaneo/kaneo"],
+    name: BRAND_NAME,
+    url: SITE_URL,
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Kaneo",
-    url: "https://kaneo.app",
-    inLanguage: "en",
+    name: BRAND_NAME,
+    url: SITE_URL,
+    inLanguage: "tr",
   },
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Kaneo",
+    name: BRAND_NAME,
     applicationCategory: "BusinessApplication",
-    operatingSystem: "Web, Linux, macOS, Windows",
-    description:
-      "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
-    url: "https://kaneo.app",
-    image: "https://kaneo.app/images/hero.png",
-    license: "https://github.com/usekaneo/kaneo/blob/main/LICENSE",
+    operatingSystem: "Web",
+    description: TAGLINE,
+    url: SITE_URL,
+    image: `${SITE_URL}/screenshots/board.png`,
   },
 ];
 
@@ -101,7 +99,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="tr" suppressHydrationWarning>
       <body>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: This is necessary to apply the user's preferred color scheme before React hydration to prevent a flash of incorrect theme.
@@ -131,17 +129,6 @@ export default function RootLayout({
           // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data must be inlined as a script tag for search engines to parse.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Script
-          defer
-          data-domain="kaneo.app"
-          src="https://plausible.kaneo.app/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"
-          strategy="afterInteractive"
-        />
-        <Script id="plausible-init" strategy="afterInteractive">
-          {
-            "window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }"
-          }
-        </Script>
       </body>
     </html>
   );

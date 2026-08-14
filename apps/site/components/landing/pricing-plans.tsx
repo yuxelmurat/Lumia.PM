@@ -2,15 +2,13 @@
 
 import { Check } from "lucide-react";
 import { useState } from "react";
-
-const APP_URL = "https://cloud.kaneo.app";
+import { SIGN_UP_URL, SUPPORT_EMAIL } from "@/lib/site-config";
 
 type Interval = "monthly" | "annual";
 
 type Plan = {
   name: string;
   tagline: string;
-  checkout?: "personal" | "team";
   monthly: { price: string; suffix: string; note: string };
   annual: { price: string; suffix: string; note: string };
   features: string[];
@@ -20,55 +18,76 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    name: "Self-hosted",
-    tagline: "Run it on your own servers",
-    monthly: { price: "$0", suffix: "forever", note: "MIT licensed" },
-    annual: { price: "$0", suffix: "forever", note: "MIT licensed" },
-    features: [
-      "Unlimited users and projects",
-      "Every feature, including SSO",
-      "Your data on your servers",
-      "Community support on Discord",
-    ],
-    cta: { href: "/docs/core/installation", label: "Read installation guide" },
-  },
-  {
-    name: "Cloud Personal",
-    tagline: "Managed hosting for one",
-    checkout: "personal",
-    monthly: { price: "$4", suffix: "/ month", note: "Billed monthly" },
+    name: "Free",
+    tagline: "Ürünü denemek için",
+    monthly: {
+      price: "₺0",
+      suffix: "sonsuza dek",
+      note: "Kredi kartı gerekmez",
+    },
     annual: {
-      price: "$40",
-      suffix: "/ year",
-      note: "$3.33 / month, billed yearly",
+      price: "₺0",
+      suffix: "sonsuza dek",
+      note: "Kredi kartı gerekmez",
     },
     features: [
-      "Single user",
-      "Unlimited projects and tasks",
-      "Automatic backups and updates",
-      "Email support",
+      "3 kullanıcıya kadar",
+      "2 aktif proje",
+      "1 GB depolama",
+      "Kanban, Gantt, zaman takibi",
+      "Temel malzeme (FF&E) listesi",
+      "Topluluk desteği",
     ],
-    cta: { href: APP_URL, label: "Start 14-day free trial" },
+    cta: { href: SIGN_UP_URL, label: "Ücretsiz Başla" },
   },
   {
-    name: "Cloud Team",
-    tagline: "Managed hosting for teams",
-    checkout: "team",
-    monthly: { price: "$5", suffix: "/ user / month", note: "Billed monthly" },
+    name: "Premium",
+    tagline: "Aktif çalışan ofisler için",
+    monthly: {
+      price: "₺349",
+      suffix: "/ kullanıcı / ay",
+      note: "Aylık faturalandırma",
+    },
     annual: {
-      price: "$50",
-      suffix: "/ user / year",
-      note: "$4.17 / user / month, billed yearly",
+      price: "₺3.490",
+      suffix: "/ kullanıcı / yıl",
+      note: "₺291 / kullanıcı / ay, yıllık faturalandırma",
     },
     features: [
-      "Unlimited team members",
-      "Unlimited projects and tasks",
-      "Workspace roles and permissions",
-      "Automatic backups and updates",
-      "Priority email support",
+      "15 kullanıcıya kadar",
+      "Sınırsız proje",
+      "50 GB depolama",
+      "RFI, değişiklik emri, submittal, ruhsat takibi",
+      "Kapasite (workload) görünümü",
+      "DWG görüntüleyici",
+      "Proje şablonları ve faz bütçesi",
+      "Entegrasyonlar (Slack, GitHub, vb.)",
+      "E-posta destek",
     ],
-    cta: { href: APP_URL, label: "Start 14-day free trial" },
+    cta: { href: `${SIGN_UP_URL}?plan=premium`, label: "14 gün ücretsiz dene" },
     highlighted: true,
+  },
+  {
+    name: "Kurumsal",
+    tagline: "Büyük ofisler ve kendi sunucunuz için",
+    monthly: {
+      price: "Bize ulaşın",
+      suffix: "",
+      note: "Ekip büyüklüğüne göre",
+    },
+    annual: { price: "Bize ulaşın", suffix: "", note: "Ekip büyüklüğüne göre" },
+    features: [
+      "Sınırsız kullanıcı ve depolama",
+      "Kendi sunucunuzda çalıştırma seçeneği",
+      "SSO / tek oturum açma",
+      "Özel rol ve izin yapıları",
+      "Öncelikli destek ve SLA",
+      "Özel hesap yöneticisi",
+    ],
+    cta: {
+      href: `mailto:${SUPPORT_EMAIL}?subject=Kurumsal%20plan`,
+      label: "Bize ulaşın",
+    },
   },
 ];
 
@@ -90,13 +109,13 @@ export function PricingPlans() {
                   : "text-foreground/60 hover:text-foreground"
               }`}
             >
-              {value}
+              {value === "monthly" ? "Aylık" : "Yıllık"}
             </button>
           ))}
         </div>
         {interval === "annual" ? (
           <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-medium text-primary text-xs">
-            2 months free
+            2 ay bedava
           </span>
         ) : null}
       </div>
@@ -105,9 +124,6 @@ export function PricingPlans() {
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
           {plans.map((plan) => {
             const price = interval === "monthly" ? plan.monthly : plan.annual;
-            const href = plan.checkout
-              ? `${APP_URL}/auth/sign-up?checkout=${plan.checkout}-${interval}`
-              : plan.cta.href;
             return (
               <article
                 key={plan.name}
@@ -121,7 +137,7 @@ export function PricingPlans() {
                   <h2 className="font-medium text-sm">{plan.name}</h2>
                   {plan.highlighted ? (
                     <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-medium text-primary text-xs">
-                      Most popular
+                      En popüler
                     </span>
                   ) : null}
                 </div>
@@ -159,7 +175,7 @@ export function PricingPlans() {
                       ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/90"
                       : "border-border bg-transparent hover:bg-accent"
                   }`}
-                  href={href}
+                  href={plan.cta.href}
                 >
                   {plan.cta.label}
                 </a>

@@ -1,4 +1,5 @@
 import { Logo } from "@/components/landing/logo";
+import { SIGN_UP_URL, SUPPORT_EMAIL } from "@/lib/site-config";
 
 export function Footer() {
   return (
@@ -6,140 +7,66 @@ export function Footer() {
       <div className="mx-auto w-full max-w-6xl space-y-10">
         <div className="grid gap-10 md:grid-cols-5">
           <div className="space-y-4 md:col-span-2">
-            <a href="/" aria-label="Kaneo home" className="inline-flex">
+            <a href="/" aria-label="Lumia.PM anasayfa" className="inline-flex">
               <Logo />
             </a>
             <p className="max-w-sm text-balance text-muted-foreground text-sm">
-              All you need. Nothing you don&apos;t.
+              Mimarlık ve iç mimarlık ofisleri için proje yönetimi.
             </p>
           </div>
 
-          <div className="col-span-3 grid gap-6 sm:grid-cols-4">
+          <div className="col-span-3 grid gap-6 sm:grid-cols-3">
             <div className="space-y-3 text-sm">
-              <p className="font-medium">Product</p>
+              <p className="font-medium">Ürün</p>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://cloud.kaneo.app"
+                href={SIGN_UP_URL}
               >
-                Open Cloud
+                Ücretsiz Dene
               </a>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/docs/core"
+                href="/#moduller"
               >
-                Getting Started
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="#features"
-              >
-                Features
+                Modüller
               </a>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
                 href="/pricing"
               >
-                Pricing
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/jira-alternative"
-              >
-                vs Jira
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/trello-alternative"
-              >
-                vs Trello
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/linear-alternative"
-              >
-                vs Linear
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/planka-alternative"
-              >
-                vs PLANKA
+                Fiyatlandırma
               </a>
             </div>
 
             <div className="space-y-3 text-sm">
-              <p className="font-medium">Resources</p>
+              <p className="font-medium">Karşılaştırma</p>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/usekaneo/kaneo"
-                target="_blank"
-                rel="noreferrer"
+                href="/monday-alternative"
               >
-                GitHub
+                vs Monday.com
               </a>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/usekaneo/kaneo/blob/main/LICENSE"
-                target="_blank"
-                rel="noreferrer"
+                href="/asana-alternative"
               >
-                License
+                vs Asana
               </a>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/usekaneo/kaneo/blob/main/CONTRIBUTING.md"
-                target="_blank"
-                rel="noreferrer"
+                href="/excel-alternative"
               >
-                Contributing
+                vs Excel + E-posta
               </a>
             </div>
 
             <div className="space-y-3 text-sm">
-              <p className="font-medium">Community</p>
+              <p className="font-medium">İletişim</p>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://discord.com/invite/rU4tSyhXXU"
-                target="_blank"
-                rel="noreferrer"
+                href={`mailto:${SUPPORT_EMAIL}`}
               >
-                Discord
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/sponsors/andrejsshell"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Sponsor
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/docs"
-              >
-                Documentation
-              </a>
-            </div>
-
-            <div className="space-y-3 text-sm">
-              <p className="font-medium">Legal</p>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/privacy"
-              >
-                Privacy Policy
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/terms"
-              >
-                Terms of Service
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="mailto:support@kaneo.app"
-              >
-                support@kaneo.app
+                {SUPPORT_EMAIL}
               </a>
             </div>
           </div>
