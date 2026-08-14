@@ -1,8 +1,9 @@
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { projectTable, taskTable } from "../../database/schema";
+import { taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
+import { resolvePublicProject } from "../../utils/resolve-public-project";
 
 const VALID_APPROVAL_STATUSES = ["approved", "changes_requested"] as const;
 type ApprovalStatus = (typeof VALID_APPROVAL_STATUSES)[number];
@@ -11,13 +12,13 @@ const MAX_CLIENT_NAME_LENGTH = 100;
 const MAX_NOTE_LENGTH = 2000;
 
 async function setTaskApproval({
-  projectId,
+  token,
   taskId,
   status,
   clientName,
   note,
 }: {
-  projectId: string;
+  token: string;
   taskId: string;
   status: string;
   clientName: string;
@@ -48,29 +49,17 @@ async function setTaskApproval({
     });
   }
 
+  // Validates the link itself (exists, public, not expired) before ever
+  // touching the task, same as the read route.
+  const project = await resolvePublicProject(token);
+
   const task = await db.query.taskTable.findFirst({
     where: eq(taskTable.id, taskId),
   });
 
-  if (!task || task.projectId !== projectId) {
+  if (!task || task.projectId !== project.id) {
     throw new HTTPException(404, {
       message: "Task not found",
-    });
-  }
-
-  const project = await db.query.projectTable.findFirst({
-    where: eq(projectTable.id, projectId),
-  });
-
-  if (!project) {
-    throw new HTTPException(404, {
-      message: "Task not found",
-    });
-  }
-
-  if (!project.isPublic) {
-    throw new HTTPException(403, {
-      message: "Project is not public",
     });
   }
 

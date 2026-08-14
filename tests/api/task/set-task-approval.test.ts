@@ -91,7 +91,7 @@ describe("setTaskApproval", () => {
 
     await expect(
       setTaskApproval({
-        projectId: "proj-1",
+        token: "proj-1",
         taskId: "task-1",
         status: "changes_requested",
         clientName: "   ",
@@ -107,7 +107,7 @@ describe("setTaskApproval", () => {
 
     await expect(
       setTaskApproval({
-        projectId: "proj-1",
+        token: "proj-1",
         taskId: "task-1",
         status: "rejected",
         clientName: "Jane Client",
@@ -121,7 +121,7 @@ describe("setTaskApproval", () => {
 
     await expect(
       setTaskApproval({
-        projectId: "proj-1",
+        token: "proj-1",
         taskId: "task-1",
         status: "approved",
         clientName: "Jane Client",
@@ -132,11 +132,12 @@ describe("setTaskApproval", () => {
   });
 
   it("returns 404 when the task does not exist", async () => {
+    mockProjectFindFirst.mockResolvedValue(PUBLIC_PROJECT);
     mockTaskFindFirst.mockResolvedValue(undefined);
 
     await expect(
       setTaskApproval({
-        projectId: "proj-1",
+        token: "proj-1",
         taskId: "missing-task",
         status: "approved",
         clientName: "Jane Client",
@@ -146,19 +147,19 @@ describe("setTaskApproval", () => {
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 
-  it("returns 404 when the task belongs to a different project than :projectId", async () => {
+  it("returns 404 when the task belongs to a different project than the resolved link", async () => {
+    mockProjectFindFirst.mockResolvedValue(PUBLIC_PROJECT);
     mockTaskFindFirst.mockResolvedValue({ ...TASK, projectId: "other-proj" });
 
     await expect(
       setTaskApproval({
-        projectId: "proj-1",
+        token: "proj-1",
         taskId: "task-1",
         status: "approved",
         clientName: "Jane Client",
       }),
     ).rejects.toMatchObject({ status: 404 });
 
-    expect(mockProjectFindFirst).not.toHaveBeenCalled();
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 
@@ -168,7 +169,7 @@ describe("setTaskApproval", () => {
 
     await expect(
       setTaskApproval({
-        projectId: "proj-1",
+        token: "proj-1",
         taskId: "task-1",
         status: "changes_requested",
         clientName: "Jane Client",

@@ -924,7 +924,21 @@
 			"copy": "Copy",
 			"copiedToast": "Copied",
 			"toastUpdated": "Visibility updated",
-			"toastUpdateError": "Failed to update visibility"
+			"toastUpdateError": "Failed to update visibility",
+			"expiredNotice": "This link has expired and no longer works. Set a new expiry or regenerate the link.",
+			"expiryLabel": "Link expiry",
+			"expiryHint": "The public link stops working automatically after this date",
+			"expiryClear": "Remove expiry",
+			"expiryToastUpdated": "Link expiry updated",
+			"expiryToastUpdateError": "Failed to update link expiry",
+			"regenerateLabel": "Regenerate link",
+			"regenerateHint": "Get a new public URL and permanently invalidate the current one",
+			"regenerateButton": "Regenerate",
+			"regenerateModalTitle": "Regenerate the public link?",
+			"regenerateModalDescription": "The current public URL will stop working immediately for anyone who has it. You'll need to share the new link with your client.",
+			"regenerateModalConfirm": "Regenerate link",
+			"regenerateToastUpdated": "Link regenerated",
+			"regenerateToastUpdateError": "Failed to regenerate link"
 		},
 		"projectWorkflow": {
 			"pageTitle": "Workflow Settings",

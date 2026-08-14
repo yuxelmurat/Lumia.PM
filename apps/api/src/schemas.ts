@@ -108,6 +108,8 @@ export const projectSchema = v.object({
   isPublic: v.nullable(v.boolean()),
   archivedAt: v.nullable(v.date()),
   position: v.number(),
+  publicShareToken: v.optional(v.nullable(v.string())),
+  publicLinkExpiresAt: v.optional(v.nullable(v.date())),
 });
 
 export const taskSchema = v.object({

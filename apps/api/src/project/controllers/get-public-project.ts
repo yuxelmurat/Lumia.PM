@@ -3,19 +3,16 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { workspaceTable } from "../../database/schema";
 import getTasks from "../../task/controllers/get-tasks";
+import { resolvePublicProject } from "../../utils/resolve-public-project";
 
-export async function getPublicProject(id: string) {
-  const result = await getTasks(id);
+export async function getPublicProject(token: string) {
+  const project = await resolvePublicProject(token);
+
+  const result = await getTasks(project.id);
 
   if (!result.data) {
     throw new HTTPException(404, {
       message: "Project not found",
-    });
-  }
-
-  if (!result.data.isPublic) {
-    throw new HTTPException(403, {
-      message: "Project is not public",
     });
   }
 

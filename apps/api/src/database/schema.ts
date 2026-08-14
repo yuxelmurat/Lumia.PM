@@ -299,6 +299,15 @@ export const projectTable = pgTable(
     archivedAt: timestamp("archived_at", { mode: "date" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
     position: integer("position").notNull().default(0),
+    // The public share link is addressed by this token, not by `id`, so a
+    // leaked link can be revoked (regenerate the token) without disabling
+    // public access entirely. Existing installs are backfilled with
+    // publicShareToken = id (see migrate-public-share-tokens.ts) so
+    // already-shared links keep working until the owner regenerates.
+    publicShareToken: text("public_share_token").unique(),
+    publicLinkExpiresAt: timestamp("public_link_expires_at", {
+      mode: "date",
+    }),
   },
   (table) => [
     unique("project_workspace_id_id_unique").on(table.workspaceId, table.id),

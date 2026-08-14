@@ -63,6 +63,7 @@ import { authorizeAssetAccess } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
 import { migrateApiKeyReferenceId } from "./utils/migrate-apikey-reference-id";
 import { migrateNotificationPreferencesSchema } from "./utils/migrate-notification-preferences-schema";
+import { migratePublicShareTokens } from "./utils/migrate-public-share-tokens";
 import { migrateSessionColumn } from "./utils/migrate-session-column";
 import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import {
@@ -241,6 +242,9 @@ export function createApp() {
     },
   );
 
+  // `:id` here is the project's public share token, not its real id — see
+  // resolvePublicProject. Kept as `:id` in the URL for backward compatibility
+  // with links already shared before the token/id split existed.
   const publicProjectApi = api.get("/public-project/:id", async (c) => {
     const { id } = c.req.param();
     const project = await getPublicProject(id);
@@ -254,7 +258,7 @@ export function createApp() {
       const { projectId, taskId } = c.req.param();
       const body = await c.req.json();
       const task = await setTaskApproval({
-        projectId,
+        token: projectId,
         taskId,
         status: body?.status,
         clientName: body?.clientName,
@@ -812,6 +816,7 @@ export async function runStartupTasks() {
   await migrateNotificationPreferencesSchema();
   await migrateGitHubIntegration();
   await migrateColumns();
+  await migratePublicShareTokens();
   await seedDefaultWorkspaceRoles();
 
   initializePlugins();
