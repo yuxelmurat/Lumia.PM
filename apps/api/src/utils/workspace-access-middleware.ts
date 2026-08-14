@@ -14,6 +14,7 @@ type WorkspaceIdSource =
         | "project"
         | "task"
         | "label"
+        | "customFieldDefinition"
         | "timeEntry"
         | "activity"
         | "comment"
@@ -133,6 +134,7 @@ async function lookupWorkspaceId(
     | "project"
     | "task"
     | "label"
+    | "customFieldDefinition"
     | "timeEntry"
     | "activity"
     | "comment"
@@ -173,6 +175,17 @@ async function lookupWorkspaceId(
           .where(eq(schema.labelTable.id, id))
           .limit(1);
         return label?.workspaceId || null;
+      }
+
+      case "customFieldDefinition": {
+        const [field] = await db
+          .select({
+            workspaceId: schema.customFieldDefinitionTable.workspaceId,
+          })
+          .from(schema.customFieldDefinitionTable)
+          .where(eq(schema.customFieldDefinitionTable.id, id))
+          .limit(1);
+        return field?.workspaceId || null;
       }
 
       case "timeEntry": {
@@ -316,6 +329,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "label", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromCustomFieldDefinition: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "customFieldDefinition", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

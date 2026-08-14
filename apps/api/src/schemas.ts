@@ -9,6 +9,37 @@ export const labelSchema = v.object({
   workspaceId: v.nullable(v.string()),
 });
 
+export const customFieldTypeSchema = v.picklist([
+  "text",
+  "number",
+  "date",
+  "select",
+  "checkbox",
+]);
+
+export const customFieldDefinitionSchema = v.object({
+  id: v.string(),
+  workspaceId: v.string(),
+  name: v.string(),
+  type: customFieldTypeSchema,
+  options: v.nullable(v.array(v.string())),
+  isRequired: v.boolean(),
+  position: v.number(),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const customFieldValueSchema = v.object({
+  id: v.string(),
+  fieldId: v.string(),
+  taskId: v.string(),
+  value: v.nullable(
+    v.union([v.string(), v.number(), v.boolean(), v.array(v.string())]),
+  ),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
 export const projectSchema = v.object({
   id: v.string(),
   workspaceId: v.string(),

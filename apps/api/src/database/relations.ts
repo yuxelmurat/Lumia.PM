@@ -6,6 +6,8 @@ import {
   assetTable,
   columnTable,
   commentTable,
+  customFieldDefinitionTable,
+  customFieldValueTable,
   externalLinkTable,
   githubIntegrationTable,
   integrationTable,
@@ -77,6 +79,7 @@ export const workspaceTableRelations = relations(
     assets: many(assetTable),
     invitations: many(invitationTable),
     notificationWorkspaceRules: many(userNotificationWorkspaceRuleTable),
+    customFieldDefinitions: many(customFieldDefinitionTable),
   }),
 );
 
@@ -152,6 +155,7 @@ export const taskTableRelations = relations(taskTable, ({ one, many }) => ({
   comments: many(commentTable),
   assets: many(assetTable),
   labels: many(labelTable),
+  customFieldValues: many(customFieldValueTable),
   externalLinks: many(externalLinkTable),
   sourceRelations: many(taskRelationTable, { relationName: "sourceTask" }),
   targetRelations: many(taskRelationTable, { relationName: "targetTask" }),
@@ -209,6 +213,31 @@ export const labelTableRelations = relations(labelTable, ({ one }) => ({
     references: [taskTable.id],
   }),
 }));
+
+export const customFieldDefinitionTableRelations = relations(
+  customFieldDefinitionTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [customFieldDefinitionTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    values: many(customFieldValueTable),
+  }),
+);
+
+export const customFieldValueTableRelations = relations(
+  customFieldValueTable,
+  ({ one }) => ({
+    field: one(customFieldDefinitionTable, {
+      fields: [customFieldValueTable.fieldId],
+      references: [customFieldDefinitionTable.id],
+    }),
+    task: one(taskTable, {
+      fields: [customFieldValueTable.taskId],
+      references: [taskTable.id],
+    }),
+  }),
+);
 
 export const notificationTableRelations = relations(
   notificationTable,

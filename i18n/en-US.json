@@ -750,6 +750,44 @@
 			"deleteError": "Failed to delete label",
 			"nameRequired": "Label name is required"
 		},
+		"workspaceCustomFields": {
+			"pageTitle": "Custom Field Settings",
+			"title": "Custom Fields",
+			"subtitle": "Create, edit, and delete workspace-level custom fields.",
+			"cardDescription": "Manage custom fields that can be set on tasks.",
+			"createField": "Create Field",
+			"editField": "Edit Field",
+			"deleteField": "Delete",
+			"saveField": "Save",
+			"nameLabel": "Field name",
+			"namePlaceholder": "Enter field name",
+			"typeLabel": "Field type",
+			"requiredLabel": "Required",
+			"optionsLabel": "Options",
+			"optionPlaceholder": "Enter option",
+			"addOption": "Add option",
+			"createDescription": "Create a new custom field that can be set on tasks in this workspace.",
+			"editDescription": "Update this custom field. The field type cannot be changed after creation.",
+			"deleteConfirmTitle": "Delete this custom field?",
+			"deleteConfirmDescription": "This will permanently remove this field and its values from all tasks. This action cannot be undone.",
+			"empty": "No custom fields yet. Create your first field to get started.",
+			"createSuccess": "Custom field created",
+			"updateSuccess": "Custom field updated",
+			"deleteSuccess": "Custom field deleted",
+			"createError": "Failed to create custom field",
+			"updateError": "Failed to update custom field",
+			"deleteError": "Failed to delete custom field",
+			"nameRequired": "Field name is required",
+			"optionsRequired": "At least one option is required for select fields",
+			"required": "Required",
+			"types": {
+				"text": "Text",
+				"number": "Number",
+				"date": "Date",
+				"select": "Select",
+				"checkbox": "Checkbox"
+			}
+		},
 		"projectGeneral": {
 			"pageTitle": "Project Settings",
 			"title": "General Settings",
@@ -1687,6 +1725,15 @@
 			"start": "Start",
 			"startDate": "Start date",
 			"noDate": "No date"
+		},
+		"customFields": {
+			"title": "Custom Fields",
+			"empty": "No custom fields",
+			"selectPlaceholder": "Select...",
+			"noValue": "No value",
+			"clear": "Clear value",
+			"updateSuccess": "Custom field updated",
+			"updateError": "Failed to update custom field"
 		},
 		"move": {
 			"title": "Move task",
