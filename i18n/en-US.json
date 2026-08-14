@@ -1867,6 +1867,17 @@
 			"resizeDue": "Resize due date",
 			"taskAriaLabel": "{{title}}: open or drag to move"
 		},
+		"calendar": {
+			"pageTitle": "{{name}} – Calendar",
+			"title": "Calendar",
+			"searchPlaceholder": "Search tasks...",
+			"today": "Today",
+			"noTasks": "No scheduled tasks",
+			"noTasksSubtitle": "Add a due date or start date to tasks to place them on the calendar.",
+			"noTasksFound": "No tasks found",
+			"noTasksMatch": "No scheduled tasks match \"{{query}}\"",
+			"moreCount": "+{{count}} more"
+		},
 		"delete": {
 			"title": "Delete Task?",
 			"description": "This will permanently remove the task and all its data. You can't undo this action.",
