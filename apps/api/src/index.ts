@@ -386,17 +386,17 @@ export function createApp() {
     documentation: {
       openapi: "3.0.3",
       info: {
-        title: "Kaneo API",
+        title: "Lumia.PM API",
         version: "1.0.0",
         description:
-          "Kaneo Project Management API - Manage projects, tasks, labels, and more",
+          "Lumia.PM Project Management API - Manage projects, tasks, labels, and more",
       },
       servers: [
         {
           url: normalizeApiServerUrl(
             process.env.KANEO_API_URL || "https://cloud.kaneo.app",
           ),
-          description: "Kaneo API Server",
+          description: "Lumia.PM API Server",
         },
       ],
       components: {

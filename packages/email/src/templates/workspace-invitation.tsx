@@ -66,15 +66,16 @@ WorkspaceInvitationEmail.PreviewProps = {
   invitationLink: "https://kaneo.app/invite/abc123",
   to: "invitee@example.com",
   copy: {
-    subject: "{{inviterName}} invited you to join {{workspaceName}} on Kaneo",
-    preview: "You're invited to {{workspaceName}} on Kaneo",
+    subject:
+      "{{inviterName}} invited you to join {{workspaceName}} on Lumia.PM",
+    preview: "You're invited to {{workspaceName}} on Lumia.PM",
     title: "Join {{workspaceName}}",
     subtitle:
-      "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in Kaneo.",
+      "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in Lumia.PM.",
     cta: "Accept invitation",
     sameEmail: "You can accept with the same email that received this message.",
     ignore: "If this wasn't expected, you can safely ignore this email.",
-    footer: "Kaneo workspace invitation",
+    footer: "Lumia.PM workspace invitation",
   },
 } as WorkspaceInvitationEmailProps;
 

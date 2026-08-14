@@ -233,7 +233,7 @@ export function registerMcpTools(
   registerTool(
     "whoami",
     {
-      description: "Return the current Kaneo session and user.",
+      description: "Return the current Lumia.PM session and user.",
       inputSchema: z.object({}),
     },
     async () =>

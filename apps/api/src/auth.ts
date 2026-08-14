@@ -136,21 +136,21 @@ function getAuthEmailCopy(locale?: string | null) {
 
   if (localeKey === "de") {
     return {
-      magicLinkSubject: "Anmeldelink fuer Kaneo",
-      otpSubject: "Bestaetigungscode fuer Kaneo",
+      magicLinkSubject: "Anmeldelink fuer Lumia.PM",
+      otpSubject: "Bestaetigungscode fuer Lumia.PM",
     };
   }
 
   if (localeKey === "vi") {
     return {
-      magicLinkSubject: "Liên kết đăng nhập Kaneo",
-      otpSubject: "Mã xác minh Kaneo",
+      magicLinkSubject: "Liên kết đăng nhập Lumia.PM",
+      otpSubject: "Mã xác minh Lumia.PM",
     };
   }
 
   return {
-    magicLinkSubject: "Login for Kaneo",
-    otpSubject: "Authentication code for Kaneo",
+    magicLinkSubject: "Login for Lumia.PM",
+    otpSubject: "Authentication code for Lumia.PM",
   };
 }
 
