@@ -14,6 +14,11 @@ type UpdateWorkspaceRequest = {
   address?: string;
   phone?: string;
   contactEmail?: string;
+  watermarkEnabled?: boolean;
+  watermarkStyle?: string;
+  watermarkImageUrl?: string;
+  watermarkCorner?: string;
+  watermarkSizePercent?: number;
 };
 
 function useUpdateWorkspace() {
@@ -30,6 +35,11 @@ function useUpdateWorkspace() {
       address,
       phone,
       contactEmail,
+      watermarkEnabled,
+      watermarkStyle,
+      watermarkImageUrl,
+      watermarkCorner,
+      watermarkSizePercent,
     }: UpdateWorkspaceRequest) => {
       const updateData: {
         name?: string;
@@ -42,6 +52,11 @@ function useUpdateWorkspace() {
         address?: string;
         phone?: string;
         contactEmail?: string;
+        watermarkEnabled?: boolean;
+        watermarkStyle?: string;
+        watermarkImageUrl?: string;
+        watermarkCorner?: string;
+        watermarkSizePercent?: number;
       } = {};
 
       if (name !== undefined) {
@@ -85,6 +100,26 @@ function useUpdateWorkspace() {
 
       if (contactEmail !== undefined) {
         updateData.contactEmail = contactEmail;
+      }
+
+      if (watermarkEnabled !== undefined) {
+        updateData.watermarkEnabled = watermarkEnabled;
+      }
+
+      if (watermarkStyle !== undefined) {
+        updateData.watermarkStyle = watermarkStyle;
+      }
+
+      if (watermarkImageUrl !== undefined) {
+        updateData.watermarkImageUrl = watermarkImageUrl;
+      }
+
+      if (watermarkCorner !== undefined) {
+        updateData.watermarkCorner = watermarkCorner;
+      }
+
+      if (watermarkSizePercent !== undefined) {
+        updateData.watermarkSizePercent = watermarkSizePercent;
       }
 
       const { data, error } = await authClient.organization.update({

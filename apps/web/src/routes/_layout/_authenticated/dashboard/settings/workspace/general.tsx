@@ -41,6 +41,7 @@ import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import useGetFullWorkspace from "@/hooks/queries/workspace/use-get-full-workspace";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { toast } from "@/lib/toast";
+import { getWorkspaceProfileField } from "@/lib/workspace-profile-fields";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/settings/workspace/general",
@@ -83,37 +84,6 @@ function normalizeWorkspaceValues(
     phone: (data.phone ?? "").trim(),
     contactEmail: (data.contactEmail ?? "").trim(),
   };
-}
-
-type WorkspaceWithProfileFields = {
-  description?: string | null;
-  logo?: string | null;
-  legalName?: string | null;
-  taxId?: string | null;
-  address?: string | null;
-  phone?: string | null;
-  contactEmail?: string | null;
-  metadata?: unknown;
-};
-
-/** Better Auth persists these as organization additional fields (real DB columns), not only inside metadata. */
-function getWorkspaceProfileField(
-  workspace: WorkspaceWithProfileFields | null | undefined,
-  field: keyof Omit<WorkspaceWithProfileFields, "metadata">,
-): string {
-  if (!workspace) return "";
-  const direct = workspace[field];
-  if (typeof direct === "string") {
-    return direct;
-  }
-  if (
-    typeof workspace.metadata === "object" &&
-    workspace.metadata &&
-    field in workspace.metadata
-  ) {
-    return String((workspace.metadata as Record<string, unknown>)[field] ?? "");
-  }
-  return "";
 }
 
 function RouteComponent() {

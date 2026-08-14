@@ -316,6 +316,13 @@
 			"when": 1786734777182,
 			"tag": "0044_sparkling_purple_man",
 			"breakpoints": true
+		},
+		{
+			"idx": 45,
+			"version": "7",
+			"when": 1786735381731,
+			"tag": "0045_chemical_skrulls",
+			"breakpoints": true
 		}
 	]
 }

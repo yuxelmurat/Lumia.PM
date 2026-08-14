@@ -123,6 +123,25 @@ export const workspaceTable = pgTable("workspace", {
   address: text("address"),
   phone: text("phone"),
   contactEmail: text("contact_email"),
+  // Watermark settings: a branding/deterrent for images uploaded to tasks in
+  // *public* projects (see task finalize-upload flow). This is not DRM — it's
+  // a visible stamp meant to discourage casual reuse of unapproved renders,
+  // nothing more. Applied once at upload time; toggling these later only
+  // affects future uploads, not images already stored.
+  watermarkEnabled: boolean("watermark_enabled").default(false),
+  // One of "tile" | "center" | "corner"; validated in application code
+  // (see apply-watermark.ts), matching this codebase's text-column +
+  // app-level enum convention rather than a DB enum.
+  watermarkStyle: text("watermark_style").default("corner"),
+  // Nullable; when unset, watermarking falls back to workspaceTable.logo.
+  watermarkImageUrl: text("watermark_image_url"),
+  // One of "top-left" | "top-right" | "bottom-left" | "bottom-right"; only
+  // meaningful when watermarkStyle is "corner".
+  watermarkCorner: text("watermark_corner").default("bottom-right"),
+  // Watermark width as a percentage of the base image's shorter dimension.
+  // Used by "corner" and "center" styles; clamped to a sane range in
+  // application code regardless of what's stored here.
+  watermarkSizePercent: integer("watermark_size_percent").default(20),
   createdAt: timestamp("created_at", { mode: "date" }).notNull(),
 });
 

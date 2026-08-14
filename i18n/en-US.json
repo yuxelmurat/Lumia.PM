@@ -855,6 +855,55 @@
 			"taskTitleRequired": "Every starter task needs a title",
 			"taskColumnRequired": "Every starter task needs a column"
 		},
+		"workspaceWatermark": {
+			"pageTitle": "Watermark Settings",
+			"title": "Watermark",
+			"subtitle": "Stamp a visible mark onto images uploaded to tasks in public projects.",
+			"scopeNotice": "Watermarking only applies to images uploaded to tasks in public projects, and only to new uploads going forward — turning this on (or changing settings) does not retroactively watermark or re-watermark images already uploaded.",
+			"enableLabel": "Enable watermarking",
+			"enableHint": "This is a branding/deterrent measure, not real protection — it discourages casual reuse, but anyone can still screenshot or crop it out.",
+			"styleTitle": "Style",
+			"styleSubtitle": "Choose how the watermark is applied to the image.",
+			"styleLabel": "Watermark style",
+			"styles": {
+				"corner": {
+					"label": "Corner",
+					"description": "A small badge tucked into one corner. Reads clearly, ~90% opacity."
+				},
+				"center": {
+					"label": "Center",
+					"description": "One large centered mark over the whole image, ~28% opacity so the render underneath stays visible."
+				},
+				"tile": {
+					"label": "Tile",
+					"description": "A repeating, rotated, low-opacity texture across the entire image."
+				}
+			},
+			"imageTitle": "Watermark image",
+			"imageSubtitle": "Provide the image used as the watermark, or fall back to your company logo.",
+			"imageUrlLabel": "Watermark image URL",
+			"imageUrlHint": "Optional. If left blank, the workspace's company logo (set in Company Profile) is used instead.",
+			"imageUrlPlaceholder": "https://example.com/watermark.png",
+			"positionTitle": "Position & size",
+			"positionSubtitle": "Fine-tune where and how large the watermark appears.",
+			"cornerLabel": "Corner position",
+			"cornerHint": "Only used when the style is Corner.",
+			"corners": {
+				"top-left": "Top left",
+				"top-right": "Top right",
+				"bottom-left": "Bottom left",
+				"bottom-right": "Bottom right"
+			},
+			"sizeLabel": "Size (% of shorter side)",
+			"sizeHint": "Watermark width as a percentage of the image's shorter side (5-80).",
+			"sizeCenterHint": "For the Center style, the size automatically floors at 50% regardless of this value.",
+			"toastUpdated": "Watermark settings updated",
+			"toastUpdateError": "Failed to update watermark settings",
+			"validation": {
+				"imageUrlInvalid": "Enter a valid URL",
+				"sizeRange": "Size must be between 5 and 80"
+			}
+		},
 		"projectGeneral": {
 			"pageTitle": "Project Settings",
 			"title": "General Settings",

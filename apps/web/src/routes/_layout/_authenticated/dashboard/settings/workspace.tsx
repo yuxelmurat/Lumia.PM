@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import {
   CreditCard,
+  ImageIcon,
   LayoutTemplate,
   ListChecks,
   Settings,
@@ -90,6 +91,13 @@ function RouteComponent() {
       }),
       url: "/dashboard/settings/workspace/project-templates",
       icon: LayoutTemplate,
+    },
+    {
+      title: t("settings:workspaceWatermark.title", {
+        defaultValue: "Watermark",
+      }),
+      url: "/dashboard/settings/workspace/watermark",
+      icon: ImageIcon,
     },
     ...(config?.billingEnabled
       ? [

@@ -46,6 +46,7 @@ import updateTaskDueDate from "./controllers/update-task-due-date";
 import updateTaskPriority from "./controllers/update-task-priority";
 import updateTaskStatus from "./controllers/update-task-status";
 import updateTaskTitle from "./controllers/update-task-title";
+import { watermarkTaskImageIfNeeded } from "./utils/watermark-task-image";
 import { VALID_PRIORITIES } from "./validate-task-fields";
 
 const task = new Hono<{
@@ -809,6 +810,13 @@ const task = new Hono<{
           taskId: taskTable.id,
           projectId: taskTable.projectId,
           workspaceId: workspaceTable.id,
+          isPublic: projectTable.isPublic,
+          watermarkEnabled: workspaceTable.watermarkEnabled,
+          watermarkImageUrl: workspaceTable.watermarkImageUrl,
+          workspaceLogo: workspaceTable.logo,
+          watermarkStyle: workspaceTable.watermarkStyle,
+          watermarkCorner: workspaceTable.watermarkCorner,
+          watermarkSizePercent: workspaceTable.watermarkSizePercent,
         })
         .from(taskTable)
         .innerJoin(projectTable, eq(taskTable.projectId, projectTable.id))
@@ -836,6 +844,21 @@ const task = new Hono<{
           message: "Image upload key does not match the task context.",
         });
       }
+
+      // Branding/deterrent watermark for renders shared via the public-
+      // project link — see watermark-task-image.ts. No-op (and never
+      // throws) unless the project is public and the workspace opted in.
+      await watermarkTaskImageIfNeeded({
+        isPublic: Boolean(taskContext.isPublic),
+        watermarkEnabled: Boolean(taskContext.watermarkEnabled),
+        watermarkImageUrl:
+          taskContext.watermarkImageUrl || taskContext.workspaceLogo,
+        watermarkStyle: taskContext.watermarkStyle,
+        watermarkCorner: taskContext.watermarkCorner,
+        watermarkSizePercent: taskContext.watermarkSizePercent,
+        objectKey: normalizedKey,
+        contentType,
+      });
 
       const [existingAsset] = await db
         .select({ id: assetTable.id })

@@ -46,6 +46,7 @@ import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceGeneralRouteImpor
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/labels'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/project-templates'
 import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceRolesRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/roles'
+import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRouteImport } from './routes/_layout/_authenticated/dashboard/settings/workspace/watermark'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/index'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/members'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/search'
@@ -268,6 +269,12 @@ const LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute =
     path: '/roles',
     getParentRoute: () => LayoutAuthenticatedDashboardSettingsWorkspaceRoute,
   } as any)
+const LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute =
+  LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRouteImport.update({
+    id: '/watermark',
+    path: '/watermark',
+    getParentRoute: () => LayoutAuthenticatedDashboardSettingsWorkspaceRoute,
+  } as any)
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute =
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRouteImport.update({
     id: '/',
@@ -409,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   '/dashboard/settings/workspace/project-templates': typeof LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRoute
   '/dashboard/settings/workspace/roles': typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
+  '/dashboard/settings/workspace/watermark': typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
   '/dashboard/workspace/$workspaceId/members': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   '/dashboard/workspace/$workspaceId/search': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
   '/dashboard/workspace/$workspaceId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
@@ -456,6 +464,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   '/dashboard/settings/workspace/project-templates': typeof LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRoute
   '/dashboard/settings/workspace/roles': typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
+  '/dashboard/settings/workspace/watermark': typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
   '/dashboard/workspace/$workspaceId/members': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   '/dashboard/workspace/$workspaceId/search': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
   '/dashboard/workspace/$workspaceId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
@@ -509,6 +518,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/settings/workspace/labels': typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   '/_layout/_authenticated/dashboard/settings/workspace/project-templates': typeof LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRoute
   '/_layout/_authenticated/dashboard/settings/workspace/roles': typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
+  '/_layout/_authenticated/dashboard/settings/workspace/watermark': typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/members': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/search': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
@@ -561,6 +571,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/workspace/labels'
     | '/dashboard/settings/workspace/project-templates'
     | '/dashboard/settings/workspace/roles'
+    | '/dashboard/settings/workspace/watermark'
     | '/dashboard/workspace/$workspaceId/members'
     | '/dashboard/workspace/$workspaceId/search'
     | '/dashboard/workspace/$workspaceId/'
@@ -608,6 +619,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/workspace/labels'
     | '/dashboard/settings/workspace/project-templates'
     | '/dashboard/settings/workspace/roles'
+    | '/dashboard/settings/workspace/watermark'
     | '/dashboard/workspace/$workspaceId/members'
     | '/dashboard/workspace/$workspaceId/search'
     | '/dashboard/workspace/$workspaceId'
@@ -660,6 +672,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/settings/workspace/labels'
     | '/_layout/_authenticated/dashboard/settings/workspace/project-templates'
     | '/_layout/_authenticated/dashboard/settings/workspace/roles'
+    | '/_layout/_authenticated/dashboard/settings/workspace/watermark'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/members'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/search'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/'
@@ -947,6 +960,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceRoute
     }
+    '/_layout/_authenticated/dashboard/settings/workspace/watermark': {
+      id: '/_layout/_authenticated/dashboard/settings/workspace/watermark'
+      path: '/watermark'
+      fullPath: '/dashboard/settings/workspace/watermark'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceRoute
+    }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/'
       path: '/'
@@ -1096,6 +1116,7 @@ interface LayoutAuthenticatedDashboardSettingsWorkspaceRouteChildren {
   LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceLabelsRoute
   LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRoute
   LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute
+  LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute: typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
 }
 
 const LayoutAuthenticatedDashboardSettingsWorkspaceRouteChildren: LayoutAuthenticatedDashboardSettingsWorkspaceRouteChildren =
@@ -1112,6 +1133,8 @@ const LayoutAuthenticatedDashboardSettingsWorkspaceRouteChildren: LayoutAuthenti
       LayoutAuthenticatedDashboardSettingsWorkspaceProjectTemplatesRoute,
     LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute:
       LayoutAuthenticatedDashboardSettingsWorkspaceRolesRoute,
+    LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute:
+      LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute,
   }
 
 const LayoutAuthenticatedDashboardSettingsWorkspaceRouteWithChildren =
