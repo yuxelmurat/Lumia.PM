@@ -9,6 +9,11 @@ type UpdateWorkspaceRequest = {
   slug?: string;
   logo?: string;
   metadata?: Record<string, unknown>;
+  legalName?: string;
+  taxId?: string;
+  address?: string;
+  phone?: string;
+  contactEmail?: string;
 };
 
 function useUpdateWorkspace() {
@@ -20,6 +25,11 @@ function useUpdateWorkspace() {
       slug,
       logo,
       metadata,
+      legalName,
+      taxId,
+      address,
+      phone,
+      contactEmail,
     }: UpdateWorkspaceRequest) => {
       const updateData: {
         name?: string;
@@ -27,6 +37,11 @@ function useUpdateWorkspace() {
         slug?: string;
         logo?: string;
         metadata?: Record<string, unknown>;
+        legalName?: string;
+        taxId?: string;
+        address?: string;
+        phone?: string;
+        contactEmail?: string;
       } = {};
 
       if (name !== undefined) {
@@ -50,6 +65,26 @@ function useUpdateWorkspace() {
 
       if (metadata !== undefined) {
         updateData.metadata = metadata;
+      }
+
+      if (legalName !== undefined) {
+        updateData.legalName = legalName;
+      }
+
+      if (taxId !== undefined) {
+        updateData.taxId = taxId;
+      }
+
+      if (address !== undefined) {
+        updateData.address = address;
+      }
+
+      if (phone !== undefined) {
+        updateData.phone = phone;
+      }
+
+      if (contactEmail !== undefined) {
+        updateData.contactEmail = contactEmail;
       }
 
       const { data, error } = await authClient.organization.update({

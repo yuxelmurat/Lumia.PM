@@ -67,6 +67,24 @@ function RouteComponent() {
       <PageTitle title={t("publicProject:pageTitle")} />
       <div className="min-h-screen bg-background flex flex-col w-full">
         <header className="border-b border-border sticky top-0 z-10 bg-background">
+          {project.workspaceName || project.workspaceLogo ? (
+            <div className="px-6 py-2 border-b border-border/60 bg-muted/30">
+              <div className="flex items-center gap-2">
+                {project.workspaceLogo ? (
+                  <img
+                    src={project.workspaceLogo}
+                    alt={project.workspaceName ?? ""}
+                    className="h-6 w-6 rounded object-contain"
+                  />
+                ) : null}
+                {project.workspaceName ? (
+                  <span className="text-sm font-medium text-foreground truncate">
+                    {project.workspaceName}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
           <div className="px-6 py-2.5">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 flex-1 min-w-0">

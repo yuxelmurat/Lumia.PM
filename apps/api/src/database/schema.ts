@@ -115,6 +115,14 @@ export const workspaceTable = pgTable("workspace", {
   logo: text("logo"),
   metadata: text("metadata"),
   description: text("description"),
+  // Company profile fields, shown on client-facing surfaces (e.g. the public
+  // project header) and used for invoicing. legalName/taxId/address/phone
+  // are private and never exposed on public routes; only name+logo are.
+  legalName: text("legal_name"),
+  taxId: text("tax_id"),
+  address: text("address"),
+  phone: text("phone"),
+  contactEmail: text("contact_email"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull(),
 });
 
