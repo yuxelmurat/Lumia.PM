@@ -363,6 +363,28 @@ export async function getPrivateObject(key: string): Promise<AssetObject> {
   };
 }
 
+/**
+ * Directly writes bytes to an existing object key (as opposed to
+ * `createTaskImageUploadUrl`, which only presigns a client-side PUT). Used
+ * to overwrite an already-uploaded task image with its watermarked version.
+ */
+export async function putPrivateObject(
+  key: string,
+  body: Buffer,
+  contentType: string,
+): Promise<void> {
+  const config = getStorageConfig();
+  const client = getClient(config);
+  await client.send(
+    new PutObjectCommand({
+      Bucket: config.bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    }),
+  );
+}
+
 export async function deleteS3Object(key: string): Promise<void> {
   const config = getStorageConfig();
   const client = getClient(config);

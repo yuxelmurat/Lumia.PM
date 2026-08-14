@@ -9,6 +9,16 @@ type UpdateWorkspaceRequest = {
   slug?: string;
   logo?: string;
   metadata?: Record<string, unknown>;
+  legalName?: string;
+  taxId?: string;
+  address?: string;
+  phone?: string;
+  contactEmail?: string;
+  watermarkEnabled?: boolean;
+  watermarkStyle?: string;
+  watermarkImageUrl?: string;
+  watermarkCorner?: string;
+  watermarkSizePercent?: number;
 };
 
 function useUpdateWorkspace() {
@@ -20,6 +30,16 @@ function useUpdateWorkspace() {
       slug,
       logo,
       metadata,
+      legalName,
+      taxId,
+      address,
+      phone,
+      contactEmail,
+      watermarkEnabled,
+      watermarkStyle,
+      watermarkImageUrl,
+      watermarkCorner,
+      watermarkSizePercent,
     }: UpdateWorkspaceRequest) => {
       const updateData: {
         name?: string;
@@ -27,6 +47,16 @@ function useUpdateWorkspace() {
         slug?: string;
         logo?: string;
         metadata?: Record<string, unknown>;
+        legalName?: string;
+        taxId?: string;
+        address?: string;
+        phone?: string;
+        contactEmail?: string;
+        watermarkEnabled?: boolean;
+        watermarkStyle?: string;
+        watermarkImageUrl?: string;
+        watermarkCorner?: string;
+        watermarkSizePercent?: number;
       } = {};
 
       if (name !== undefined) {
@@ -50,6 +80,46 @@ function useUpdateWorkspace() {
 
       if (metadata !== undefined) {
         updateData.metadata = metadata;
+      }
+
+      if (legalName !== undefined) {
+        updateData.legalName = legalName;
+      }
+
+      if (taxId !== undefined) {
+        updateData.taxId = taxId;
+      }
+
+      if (address !== undefined) {
+        updateData.address = address;
+      }
+
+      if (phone !== undefined) {
+        updateData.phone = phone;
+      }
+
+      if (contactEmail !== undefined) {
+        updateData.contactEmail = contactEmail;
+      }
+
+      if (watermarkEnabled !== undefined) {
+        updateData.watermarkEnabled = watermarkEnabled;
+      }
+
+      if (watermarkStyle !== undefined) {
+        updateData.watermarkStyle = watermarkStyle;
+      }
+
+      if (watermarkImageUrl !== undefined) {
+        updateData.watermarkImageUrl = watermarkImageUrl;
+      }
+
+      if (watermarkCorner !== undefined) {
+        updateData.watermarkCorner = watermarkCorner;
+      }
+
+      if (watermarkSizePercent !== undefined) {
+        updateData.watermarkSizePercent = watermarkSizePercent;
       }
 
       const { data, error } = await authClient.organization.update({

@@ -6,6 +6,8 @@ import {
   assetTable,
   columnTable,
   commentTable,
+  customFieldDefinitionTable,
+  customFieldValueTable,
   externalLinkTable,
   githubIntegrationTable,
   integrationTable,
@@ -13,6 +15,9 @@ import {
   labelTable,
   notificationTable,
   projectTable,
+  projectTemplateColumnTable,
+  projectTemplateTable,
+  projectTemplateTaskTable,
   sessionTable,
   taskRelationTable,
   taskReminderSentTable,
@@ -77,6 +82,40 @@ export const workspaceTableRelations = relations(
     assets: many(assetTable),
     invitations: many(invitationTable),
     notificationWorkspaceRules: many(userNotificationWorkspaceRuleTable),
+    customFieldDefinitions: many(customFieldDefinitionTable),
+    projectTemplates: many(projectTemplateTable),
+  }),
+);
+
+export const projectTemplateTableRelations = relations(
+  projectTemplateTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [projectTemplateTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    columns: many(projectTemplateColumnTable),
+    tasks: many(projectTemplateTaskTable),
+  }),
+);
+
+export const projectTemplateColumnTableRelations = relations(
+  projectTemplateColumnTable,
+  ({ one }) => ({
+    template: one(projectTemplateTable, {
+      fields: [projectTemplateColumnTable.templateId],
+      references: [projectTemplateTable.id],
+    }),
+  }),
+);
+
+export const projectTemplateTaskTableRelations = relations(
+  projectTemplateTaskTable,
+  ({ one }) => ({
+    template: one(projectTemplateTable, {
+      fields: [projectTemplateTaskTable.templateId],
+      references: [projectTemplateTable.id],
+    }),
   }),
 );
 
@@ -152,6 +191,7 @@ export const taskTableRelations = relations(taskTable, ({ one, many }) => ({
   comments: many(commentTable),
   assets: many(assetTable),
   labels: many(labelTable),
+  customFieldValues: many(customFieldValueTable),
   externalLinks: many(externalLinkTable),
   sourceRelations: many(taskRelationTable, { relationName: "sourceTask" }),
   targetRelations: many(taskRelationTable, { relationName: "targetTask" }),
@@ -209,6 +249,31 @@ export const labelTableRelations = relations(labelTable, ({ one }) => ({
     references: [taskTable.id],
   }),
 }));
+
+export const customFieldDefinitionTableRelations = relations(
+  customFieldDefinitionTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [customFieldDefinitionTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    values: many(customFieldValueTable),
+  }),
+);
+
+export const customFieldValueTableRelations = relations(
+  customFieldValueTable,
+  ({ one }) => ({
+    field: one(customFieldDefinitionTable, {
+      fields: [customFieldValueTable.fieldId],
+      references: [customFieldDefinitionTable.id],
+    }),
+    task: one(taskTable, {
+      fields: [customFieldValueTable.taskId],
+      references: [taskTable.id],
+    }),
+  }),
+);
 
 export const notificationTableRelations = relations(
   notificationTable,

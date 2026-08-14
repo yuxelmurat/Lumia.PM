@@ -115,6 +115,33 @@ export const workspaceTable = pgTable("workspace", {
   logo: text("logo"),
   metadata: text("metadata"),
   description: text("description"),
+  // Company profile fields, shown on client-facing surfaces (e.g. the public
+  // project header) and used for invoicing. legalName/taxId/address/phone
+  // are private and never exposed on public routes; only name+logo are.
+  legalName: text("legal_name"),
+  taxId: text("tax_id"),
+  address: text("address"),
+  phone: text("phone"),
+  contactEmail: text("contact_email"),
+  // Watermark settings: a branding/deterrent for images uploaded to tasks in
+  // *public* projects (see task finalize-upload flow). This is not DRM — it's
+  // a visible stamp meant to discourage casual reuse of unapproved renders,
+  // nothing more. Applied once at upload time; toggling these later only
+  // affects future uploads, not images already stored.
+  watermarkEnabled: boolean("watermark_enabled").default(false),
+  // One of "tile" | "center" | "corner"; validated in application code
+  // (see apply-watermark.ts), matching this codebase's text-column +
+  // app-level enum convention rather than a DB enum.
+  watermarkStyle: text("watermark_style").default("corner"),
+  // Nullable; when unset, watermarking falls back to workspaceTable.logo.
+  watermarkImageUrl: text("watermark_image_url"),
+  // One of "top-left" | "top-right" | "bottom-left" | "bottom-right"; only
+  // meaningful when watermarkStyle is "corner".
+  watermarkCorner: text("watermark_corner").default("bottom-right"),
+  // Watermark width as a percentage of the base image's shorter dimension.
+  // Used by "corner" and "center" styles; clamped to a sane range in
+  // application code regardless of what's stored here.
+  watermarkSizePercent: integer("watermark_size_percent").default(20),
   createdAt: timestamp("created_at", { mode: "date" }).notNull(),
 });
 
@@ -291,6 +318,15 @@ export const projectTable = pgTable(
     archivedAt: timestamp("archived_at", { mode: "date" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
     position: integer("position").notNull().default(0),
+    // The public share link is addressed by this token, not by `id`, so a
+    // leaked link can be revoked (regenerate the token) without disabling
+    // public access entirely. Existing installs are backfilled with
+    // publicShareToken = id (see migrate-public-share-tokens.ts) so
+    // already-shared links keep working until the owner regenerates.
+    publicShareToken: text("public_share_token").unique(),
+    publicLinkExpiresAt: timestamp("public_link_expires_at", {
+      mode: "date",
+    }),
   },
   (table) => [
     unique("project_workspace_id_id_unique").on(table.workspaceId, table.id),
@@ -393,6 +429,13 @@ export const taskTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    // Client approval on a public project's shared link. Single current
+    // status per task, not a history log — see AGENTS.md reverse-state
+    // guidance for the reset action that clears these back to null.
+    approvalStatus: text("approval_status"),
+    approvalNote: text("approval_note"),
+    approvalClientName: text("approval_client_name"),
+    approvalRespondedAt: timestamp("approval_responded_at", { mode: "date" }),
   },
   (table) => [
     index("task_projectId_idx").on(table.projectId),
@@ -615,6 +658,156 @@ export const labelTable = pgTable(
     uniqueIndex("label_workspace_name_unique")
       .on(table.workspaceId, table.name)
       .where(sql`${table.taskId} is null`),
+  ],
+);
+
+export const customFieldDefinitionTable = pgTable(
+  "custom_field_definition",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    type: text("type").notNull(),
+    options: jsonb("options"),
+    isRequired: boolean("is_required").default(false).notNull(),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("custom_field_definition_workspace_id_idx").on(table.workspaceId),
+    unique("custom_field_definition_workspace_name_unique").on(
+      table.workspaceId,
+      table.name,
+    ),
+  ],
+);
+
+export const projectTemplateTable = pgTable(
+  "project_template",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    description: text("description"),
+    icon: text("icon").default("Layout"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("project_template_workspace_id_idx").on(table.workspaceId),
+    unique("project_template_workspace_name_unique").on(
+      table.workspaceId,
+      table.name,
+    ),
+  ],
+);
+
+export const projectTemplateColumnTable = pgTable(
+  "project_template_column",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    templateId: text("template_id")
+      .notNull()
+      .references(() => projectTemplateTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    position: integer("position").notNull().default(0),
+    isFinal: boolean("is_final").notNull().default(false),
+    icon: text("icon"),
+    color: text("color"),
+  },
+  (table) => [
+    index("project_template_column_template_id_idx").on(table.templateId),
+    unique("project_template_column_template_slug_unique").on(
+      table.templateId,
+      table.slug,
+    ),
+  ],
+);
+
+export const projectTemplateTaskTable = pgTable(
+  "project_template_task",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    templateId: text("template_id")
+      .notNull()
+      .references(() => projectTemplateTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    title: text("title").notNull(),
+    description: text("description"),
+    // Must match one of the template's own column slugs. Not enforced at the
+    // DB level (Postgres can't easily express a composite reference here);
+    // validated in the controller instead.
+    columnSlug: text("column_slug").notNull(),
+    position: integer("position").notNull().default(0),
+  },
+  (table) => [
+    index("project_template_task_template_id_idx").on(table.templateId),
+  ],
+);
+
+export const customFieldValueTable = pgTable(
+  "custom_field_value",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    fieldId: text("field_id")
+      .notNull()
+      .references(() => customFieldDefinitionTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => taskTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    value: jsonb("value"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("custom_field_value_field_id_idx").on(table.fieldId),
+    index("custom_field_value_task_id_idx").on(table.taskId),
+    unique("custom_field_value_field_task_unique").on(
+      table.fieldId,
+      table.taskId,
+    ),
   ],
 );
 

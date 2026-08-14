@@ -2,24 +2,37 @@ import {
   Calendar,
   CalendarClock,
   CalendarX,
+  CheckCircle2,
   ExternalLink as ExternalLinkIcon,
   GitBranch,
   GitMerge,
   GitPullRequest,
+  MessageCircleWarning,
   X,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogPopup } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import useSetPublicTaskApproval from "@/hooks/mutations/project/use-set-public-task-approval";
+import { cn } from "@/lib/cn";
 import {
   dueDateStatusColors,
   getDueDateStatus,
   isTaskCompleted,
 } from "@/lib/due-date-status";
-import { formatDateMedium, formatDateShort } from "@/lib/format";
+import {
+  formatDateMedium,
+  formatDateShort,
+  formatDateTime,
+} from "@/lib/format";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
+import { toast } from "@/lib/toast";
 import type { ExternalLink } from "@/types/external-link";
 import type Task from "@/types/task";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -49,6 +62,67 @@ export function PublicTaskDetailModal({
 }: PublicTaskDetailModalProps) {
   const taskIsCompleted = isTaskCompleted(task?.status ?? "", columns);
   const { t } = useTranslation();
+
+  const [pendingAction, setPendingAction] = useState<
+    "approved" | "changes_requested" | null
+  >(null);
+  const [clientName, setClientName] = useState("");
+  const [note, setNote] = useState("");
+  const [nameError, setNameError] = useState(false);
+
+  const setApproval = useSetPublicTaskApproval();
+
+  // Discard any in-progress response form when a different task is opened
+  // or the modal is closed, so it never resurfaces stale draft state.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on task/open change
+  useEffect(() => {
+    setPendingAction(null);
+    setClientName("");
+    setNote("");
+    setNameError(false);
+  }, [task?.id, open]);
+
+  const closeApprovalForm = () => {
+    setPendingAction(null);
+    setClientName("");
+    setNote("");
+    setNameError(false);
+  };
+
+  const openApprovalForm = (action: "approved" | "changes_requested") => {
+    setPendingAction(action);
+    setClientName(task?.approvalClientName ?? "");
+    setNote(action === "changes_requested" ? (task?.approvalNote ?? "") : "");
+    setNameError(false);
+  };
+
+  const handleSubmitApproval = async () => {
+    if (!task || !pendingAction) return;
+
+    const trimmedName = clientName.trim();
+    if (!trimmedName) {
+      setNameError(true);
+      return;
+    }
+
+    try {
+      await setApproval.mutateAsync({
+        projectId: task.projectId,
+        taskId: task.id,
+        status: pendingAction,
+        clientName: trimmedName,
+        note: pendingAction === "changes_requested" ? note.trim() : undefined,
+      });
+      toast.success(t("publicProject:approval.submitSuccess"));
+      closeApprovalForm();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("publicProject:approval.submitError"),
+      );
+    }
+  };
 
   const getPRStatus = useMemo(
     () => (pr: { metadata?: { merged?: boolean; draft?: boolean } | null }) => {
@@ -299,6 +373,153 @@ export function PublicTaskDetailModal({
                   <div className="text-sm text-foreground">
                     {formatDateMedium(task.dueDate)}
                   </div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-border/50">
+              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {t("publicProject:approval.sectionTitle")}
+              </h3>
+
+              {task.approvalStatus && (
+                <div
+                  className={cn(
+                    "flex flex-col gap-1.5 p-3 rounded-md border",
+                    task.approvalStatus === "approved"
+                      ? "bg-success/8 border-success/16"
+                      : "bg-warning/8 border-warning/16",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={
+                        task.approvalStatus === "approved"
+                          ? "success"
+                          : "warning"
+                      }
+                      className="gap-1 px-2 py-0.5 text-[10px] font-medium"
+                    >
+                      {task.approvalStatus === "approved" ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : (
+                        <MessageCircleWarning className="w-3 h-3" />
+                      )}
+                      {task.approvalStatus === "approved"
+                        ? t("publicProject:approval.statusApproved")
+                        : t("publicProject:approval.statusChangesRequested")}
+                    </Badge>
+                    {task.approvalClientName && (
+                      <span className="text-xs text-muted-foreground">
+                        {t("publicProject:approval.respondedAs", {
+                          name: task.approvalClientName,
+                        })}
+                      </span>
+                    )}
+                  </div>
+                  {task.approvalRespondedAt && (
+                    <span className="text-xs text-muted-foreground">
+                      {t("publicProject:approval.respondedOn", {
+                        date: formatDateTime(task.approvalRespondedAt),
+                      })}
+                    </span>
+                  )}
+                  {task.approvalNote && (
+                    <p className="text-sm text-foreground whitespace-pre-wrap">
+                      {task.approvalNote}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {pendingAction ? (
+                <div className="flex flex-col gap-2.5 p-3 rounded-md border border-border bg-muted/30">
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="approval-client-name"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      {t("publicProject:approval.nameLabel")}
+                    </label>
+                    <Input
+                      id="approval-client-name"
+                      value={clientName}
+                      placeholder={t("publicProject:approval.namePlaceholder")}
+                      onChange={(e) => {
+                        setClientName(e.target.value);
+                        if (e.target.value.trim()) setNameError(false);
+                      }}
+                      aria-invalid={nameError || undefined}
+                    />
+                    {nameError && (
+                      <span className="text-xs text-destructive">
+                        {t("publicProject:approval.nameRequired")}
+                      </span>
+                    )}
+                  </div>
+
+                  {pendingAction === "changes_requested" && (
+                    <div className="flex flex-col gap-1">
+                      <label
+                        htmlFor="approval-note"
+                        className="text-xs font-medium text-muted-foreground"
+                      >
+                        {t("publicProject:approval.noteLabel")}
+                      </label>
+                      <Textarea
+                        id="approval-note"
+                        value={note}
+                        placeholder={t(
+                          "publicProject:approval.notePlaceholder",
+                        )}
+                        onChange={(e) => setNote(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={closeApprovalForm}
+                      disabled={setApproval.isPending}
+                    >
+                      {t("publicProject:approval.cancel")}
+                    </Button>
+                    <Button
+                      variant={
+                        pendingAction === "approved" ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={handleSubmitApproval}
+                      disabled={setApproval.isPending}
+                    >
+                      {t("publicProject:approval.submit")}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={
+                      task.approvalStatus === "approved" ? "outline" : "default"
+                    }
+                    size="sm"
+                    onClick={() => openApprovalForm("approved")}
+                    className="gap-1.5"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {t("publicProject:approval.approveButton")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openApprovalForm("changes_requested")}
+                    className="gap-1.5"
+                  >
+                    <MessageCircleWarning className="w-3.5 h-3.5" />
+                    {t("publicProject:approval.requestChangesButton")}
+                  </Button>
                 </div>
               )}
             </div>

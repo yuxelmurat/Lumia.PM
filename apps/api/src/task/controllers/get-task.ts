@@ -20,6 +20,10 @@ async function getTask(taskId: string) {
       assigneeName: userTable.name,
       assigneeId: userTable.id,
       projectId: taskTable.projectId,
+      approvalStatus: taskTable.approvalStatus,
+      approvalNote: taskTable.approvalNote,
+      approvalClientName: taskTable.approvalClientName,
+      approvalRespondedAt: taskTable.approvalRespondedAt,
     })
     .from(taskTable)
     .leftJoin(userTable, eq(taskTable.userId, userTable.id))

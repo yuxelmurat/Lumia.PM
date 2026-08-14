@@ -10,7 +10,9 @@ import createProjectCtrl from "./controllers/create-project";
 import deleteProjectCtrl from "./controllers/delete-project";
 import getProjectCtrl from "./controllers/get-project";
 import getProjectsCtrl from "./controllers/get-projects";
+import regeneratePublicLinkCtrl from "./controllers/regenerate-public-link";
 import reorderProjectsCtrl from "./controllers/reorder-projects";
+import setPublicLinkExpiryCtrl from "./controllers/set-public-link-expiry";
 import unarchiveProjectCtrl from "./controllers/unarchive-project";
 import updateProjectCtrl from "./controllers/update-project";
 
@@ -75,15 +77,22 @@ const project = new Hono<{
         workspaceId: v.string(),
         icon: v.string(),
         slug: v.string(),
+        templateId: v.optional(v.string()),
       }),
     ),
     workspaceAccess.fromBody(),
     requireWorkspacePermission({ project: ["create"] }),
     requireEntitlement,
     async (c) => {
-      const { name, icon, slug } = c.req.valid("json");
+      const { name, icon, slug, templateId } = c.req.valid("json");
       const workspaceId = c.get("workspaceId");
-      const newProject = await createProjectCtrl(workspaceId, name, icon, slug);
+      const newProject = await createProjectCtrl(
+        workspaceId,
+        name,
+        icon,
+        slug,
+        templateId,
+      );
       return c.json(newProject);
     },
   )
@@ -269,6 +278,68 @@ const project = new Hono<{
       const workspaceId = c.get("workspaceId");
       const unarchivedProject = await unarchiveProjectCtrl(id, workspaceId);
       return c.json(unarchivedProject);
+    },
+  )
+  .put(
+    "/:id/public-link",
+    describeRoute({
+      operationId: "setProjectPublicLinkExpiry",
+      tags: ["Projects"],
+      description: "Set or clear the public share link's expiry date",
+      responses: {
+        200: {
+          description: "Public link expiry updated successfully",
+          content: {
+            "application/json": { schema: resolver(projectSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    validator(
+      "json",
+      v.object({
+        expiresAt: v.nullable(v.string()),
+      }),
+    ),
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["share"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const { expiresAt } = c.req.valid("json");
+      const workspaceId = c.get("workspaceId");
+      const updatedProject = await setPublicLinkExpiryCtrl(
+        id,
+        workspaceId,
+        expiresAt ? new Date(expiresAt) : null,
+      );
+      return c.json(updatedProject);
+    },
+  )
+  .post(
+    "/:id/public-link/regenerate",
+    describeRoute({
+      operationId: "regenerateProjectPublicLink",
+      tags: ["Projects"],
+      description:
+        "Rotate the project's public share token, invalidating any previously shared link",
+      responses: {
+        200: {
+          description: "Public link regenerated successfully",
+          content: {
+            "application/json": { schema: resolver(projectSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    workspaceAccess.fromProject(),
+    requireWorkspacePermission({ project: ["share"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const workspaceId = c.get("workspaceId");
+      const updatedProject = await regeneratePublicLinkCtrl(id, workspaceId);
+      return c.json(updatedProject);
     },
   );
 

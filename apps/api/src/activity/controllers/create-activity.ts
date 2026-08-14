@@ -4,9 +4,10 @@ import { activityTable } from "../../database/schema";
 async function createActivity(
   taskId: string,
   type: string,
-  userId: string,
+  userId: string | null,
   content: string | null,
   eventData?: Record<string, unknown> | null,
+  externalUserName?: string,
 ) {
   const [activity] = await db
     .insert(activityTable)
@@ -16,6 +17,7 @@ async function createActivity(
       userId,
       content,
       eventData: eventData ?? null,
+      externalUserName: externalUserName ?? null,
     })
     .returning();
   return activity;

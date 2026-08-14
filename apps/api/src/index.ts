@@ -24,6 +24,7 @@ import billing from "./billing";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
+import customField from "./custom-field";
 import db, { getDatabase, schema } from "./database";
 import { prepareDatabaseStartup } from "./database/prepare-database-startup";
 import { waitForDatabase } from "./database/wait-for-database";
@@ -47,11 +48,13 @@ import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
+import projectTemplate from "./project-template";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
+import setTaskApproval from "./task/controllers/set-task-approval";
 import taskRelation from "./task-relation";
 import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
@@ -60,6 +63,7 @@ import { authorizeAssetAccess } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
 import { migrateApiKeyReferenceId } from "./utils/migrate-apikey-reference-id";
 import { migrateNotificationPreferencesSchema } from "./utils/migrate-notification-preferences-schema";
+import { migratePublicShareTokens } from "./utils/migrate-public-share-tokens";
 import { migrateSessionColumn } from "./utils/migrate-session-column";
 import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import {
@@ -238,12 +242,32 @@ export function createApp() {
     },
   );
 
+  // `:id` here is the project's public share token, not its real id — see
+  // resolvePublicProject. Kept as `:id` in the URL for backward compatibility
+  // with links already shared before the token/id split existed.
   const publicProjectApi = api.get("/public-project/:id", async (c) => {
     const { id } = c.req.param();
     const project = await getPublicProject(id);
 
     return c.json(project);
   });
+
+  const publicProjectApprovalApi = api.put(
+    "/public-project/:projectId/task/:taskId/approval",
+    async (c) => {
+      const { projectId, taskId } = c.req.param();
+      const body = await c.req.json();
+      const task = await setTaskApproval({
+        token: projectId,
+        taskId,
+        status: body?.status,
+        clientName: body?.clientName,
+        note: body?.note,
+      });
+
+      return c.json(task);
+    },
+  );
 
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
@@ -560,6 +584,8 @@ export function createApp() {
   const commentApi = api.route("/comment", comment);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
+  const customFieldApi = api.route("/custom-field", customField);
+  const projectTemplateApi = api.route("/project-template", projectTemplate);
   const notificationApi = api.route("/notification", notification);
   const notificationPreferencesApi = api.route(
     "/notification-preferences",
@@ -741,10 +767,13 @@ export function createApp() {
     invitationApi,
     invitationPublicApi,
     labelApi,
+    customFieldApi,
+    projectTemplateApi,
     notificationApi,
     notificationPreferencesApi,
     projectApi,
     publicProjectApi,
+    publicProjectApprovalApi,
     searchApi,
     slackIntegrationApi,
     taskApi,
@@ -787,6 +816,7 @@ export async function runStartupTasks() {
   await migrateNotificationPreferencesSchema();
   await migrateGitHubIntegration();
   await migrateColumns();
+  await migratePublicShareTokens();
   await seedDefaultWorkspaceRoles();
 
   initializePlugins();
@@ -858,10 +888,13 @@ const {
   invitationApi,
   invitationPublicApi,
   labelApi,
+  customFieldApi,
+  projectTemplateApi,
   notificationApi,
   notificationPreferencesApi,
   projectApi,
   publicProjectApi,
+  publicProjectApprovalApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
@@ -893,6 +926,8 @@ export type AppType =
   | typeof commentApi
   | typeof timeEntryApi
   | typeof labelApi
+  | typeof customFieldApi
+  | typeof projectTemplateApi
   | typeof notificationApi
   | typeof notificationPreferencesApi
   | typeof searchApi
@@ -908,6 +943,7 @@ export type AppType =
   | typeof invitationApi
   | typeof workspaceApi
   | typeof publicProjectApi
+  | typeof publicProjectApprovalApi
   | typeof invitationPublicApi
   | typeof oauthApi;
 

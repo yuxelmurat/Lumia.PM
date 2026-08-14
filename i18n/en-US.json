@@ -72,6 +72,8 @@
 				"projectName": "Project name",
 				"keyLabel": "Key:",
 				"keyHint": "Used for ticket IDs (e.g., {{example}}-123)",
+				"templateLabel": "Start from template",
+				"blankProject": "Blank project",
 				"createButton": "Create Project",
 				"successToast": "Project created successfully",
 				"errorToast": "Failed to create project"
@@ -557,6 +559,26 @@
 			"descriptionLabel": "Description",
 			"descriptionHint": "A brief description of your workspace",
 			"descriptionPlaceholder": "Enter workspace description",
+			"companyProfileTitle": "Company Profile",
+			"companyProfileSubtitle": "Shown on client-facing pages (like shared project links) and used for invoicing.",
+			"logoLabel": "Logo URL",
+			"logoHint": "Shown next to your workspace name on shared project links",
+			"logoPlaceholder": "https://example.com/logo.png",
+			"legalNameLabel": "Legal / business name",
+			"legalNameHint": "Your company's registered name",
+			"legalNamePlaceholder": "Enter legal business name",
+			"taxIdLabel": "Tax ID",
+			"taxIdHint": "Your company's tax or VAT identification number",
+			"taxIdPlaceholder": "Enter tax ID",
+			"addressLabel": "Address",
+			"addressHint": "Your company's business address",
+			"addressPlaceholder": "Enter business address",
+			"phoneLabel": "Phone",
+			"phoneHint": "A phone number clients or invoices can reach you at",
+			"phonePlaceholder": "Enter phone number",
+			"contactEmailLabel": "Contact email",
+			"contactEmailHint": "An email address clients or invoices can reach you at",
+			"contactEmailPlaceholder": "Enter contact email",
 			"dangerZone": "Danger zone",
 			"dangerZoneSubtitle": "Irreversible and destructive actions.",
 			"deleteWorkspace": "Delete workspace",
@@ -570,7 +592,8 @@
 			"toastDeleteError": "Failed to delete workspace",
 			"validation": {
 				"nameRequired": "Workspace name is required",
-				"nameShort": "Workspace name must be at least 2 characters"
+				"nameShort": "Workspace name must be at least 2 characters",
+				"contactEmailInvalid": "Enter a valid email address"
 			},
 			"transferOwnership": {
 				"toastSuccess": "Ownership transferred",
@@ -750,6 +773,137 @@
 			"deleteError": "Failed to delete label",
 			"nameRequired": "Label name is required"
 		},
+		"workspaceCustomFields": {
+			"pageTitle": "Custom Field Settings",
+			"title": "Custom Fields",
+			"subtitle": "Create, edit, and delete workspace-level custom fields.",
+			"cardDescription": "Manage custom fields that can be set on tasks.",
+			"createField": "Create Field",
+			"editField": "Edit Field",
+			"deleteField": "Delete",
+			"saveField": "Save",
+			"nameLabel": "Field name",
+			"namePlaceholder": "Enter field name",
+			"typeLabel": "Field type",
+			"requiredLabel": "Required",
+			"optionsLabel": "Options",
+			"optionPlaceholder": "Enter option",
+			"addOption": "Add option",
+			"createDescription": "Create a new custom field that can be set on tasks in this workspace.",
+			"editDescription": "Update this custom field. The field type cannot be changed after creation.",
+			"deleteConfirmTitle": "Delete this custom field?",
+			"deleteConfirmDescription": "This will permanently remove this field and its values from all tasks. This action cannot be undone.",
+			"empty": "No custom fields yet. Create your first field to get started.",
+			"createSuccess": "Custom field created",
+			"updateSuccess": "Custom field updated",
+			"deleteSuccess": "Custom field deleted",
+			"createError": "Failed to create custom field",
+			"updateError": "Failed to update custom field",
+			"deleteError": "Failed to delete custom field",
+			"nameRequired": "Field name is required",
+			"optionsRequired": "At least one option is required for select fields",
+			"required": "Required",
+			"types": {
+				"text": "Text",
+				"number": "Number",
+				"date": "Date",
+				"select": "Select",
+				"checkbox": "Checkbox"
+			}
+		},
+		"workspaceProjectTemplates": {
+			"pageTitle": "Project Template Settings",
+			"title": "Project Templates",
+			"subtitle": "Create reusable project templates that anyone can start a new project from.",
+			"cardDescription": "Manage the templates available when creating a new project.",
+			"createTemplate": "Create Template",
+			"editTemplate": "Edit Template",
+			"deleteTemplate": "Delete",
+			"saveTemplate": "Save",
+			"nameLabel": "Template name",
+			"namePlaceholder": "Enter template name",
+			"descriptionLabel": "Description",
+			"descriptionPlaceholder": "What is this template for?",
+			"iconLabel": "Icon",
+			"iconPlaceholder": "Icon name (optional)",
+			"columnsLabel": "Columns",
+			"columnNamePlaceholder": "Column name",
+			"columnSlugPlaceholder": "slug",
+			"doneColumn": "Done",
+			"addColumn": "Add column",
+			"tasksLabel": "Starter tasks (optional)",
+			"taskTitlePlaceholder": "Task title",
+			"taskDescriptionPlaceholder": "Description (optional)",
+			"taskColumnPlaceholder": "Column",
+			"addTask": "Add starter task",
+			"createDescription": "Define the columns and optional starter tasks that new projects built from this template will start with.",
+			"editDescription": "Update this template's details, columns, and starter tasks.",
+			"deleteConfirmTitle": "Delete this project template?",
+			"deleteConfirmDescription": "This will permanently remove this template and its columns and starter tasks. Projects already created from it are not affected. This action cannot be undone.",
+			"empty": "No project templates yet. Create your first template to get started.",
+			"columnCount": "{{count}} columns",
+			"createSuccess": "Project template created",
+			"updateSuccess": "Project template updated",
+			"deleteSuccess": "Project template deleted",
+			"createError": "Failed to create project template",
+			"updateError": "Failed to update project template",
+			"deleteError": "Failed to delete project template",
+			"nameRequired": "Template name is required",
+			"columnsRequired": "At least one column is required",
+			"columnNameRequired": "Every column needs a name",
+			"columnSlugsUnique": "Column slugs must be unique",
+			"taskTitleRequired": "Every starter task needs a title",
+			"taskColumnRequired": "Every starter task needs a column"
+		},
+		"workspaceWatermark": {
+			"pageTitle": "Watermark Settings",
+			"title": "Watermark",
+			"subtitle": "Stamp a visible mark onto images uploaded to tasks in public projects.",
+			"scopeNotice": "Watermarking only applies to images uploaded to tasks in public projects, and only to new uploads going forward — turning this on (or changing settings) does not retroactively watermark or re-watermark images already uploaded.",
+			"enableLabel": "Enable watermarking",
+			"enableHint": "This is a branding/deterrent measure, not real protection — it discourages casual reuse, but anyone can still screenshot or crop it out.",
+			"styleTitle": "Style",
+			"styleSubtitle": "Choose how the watermark is applied to the image.",
+			"styleLabel": "Watermark style",
+			"styles": {
+				"corner": {
+					"label": "Corner",
+					"description": "A small badge tucked into one corner. Reads clearly, ~90% opacity."
+				},
+				"center": {
+					"label": "Center",
+					"description": "One large centered mark over the whole image, ~28% opacity so the render underneath stays visible."
+				},
+				"tile": {
+					"label": "Tile",
+					"description": "A repeating, rotated, low-opacity texture across the entire image."
+				}
+			},
+			"imageTitle": "Watermark image",
+			"imageSubtitle": "Provide the image used as the watermark, or fall back to your company logo.",
+			"imageUrlLabel": "Watermark image URL",
+			"imageUrlHint": "Optional. If left blank, the workspace's company logo (set in Company Profile) is used instead.",
+			"imageUrlPlaceholder": "https://example.com/watermark.png",
+			"positionTitle": "Position & size",
+			"positionSubtitle": "Fine-tune where and how large the watermark appears.",
+			"cornerLabel": "Corner position",
+			"cornerHint": "Only used when the style is Corner.",
+			"corners": {
+				"top-left": "Top left",
+				"top-right": "Top right",
+				"bottom-left": "Bottom left",
+				"bottom-right": "Bottom right"
+			},
+			"sizeLabel": "Size (% of shorter side)",
+			"sizeHint": "Watermark width as a percentage of the image's shorter side (5-80).",
+			"sizeCenterHint": "For the Center style, the size automatically floors at 50% regardless of this value.",
+			"toastUpdated": "Watermark settings updated",
+			"toastUpdateError": "Failed to update watermark settings",
+			"validation": {
+				"imageUrlInvalid": "Enter a valid URL",
+				"sizeRange": "Size must be between 5 and 80"
+			}
+		},
 		"projectGeneral": {
 			"pageTitle": "Project Settings",
 			"title": "General Settings",
@@ -819,7 +973,21 @@
 			"copy": "Copy",
 			"copiedToast": "Copied",
 			"toastUpdated": "Visibility updated",
-			"toastUpdateError": "Failed to update visibility"
+			"toastUpdateError": "Failed to update visibility",
+			"expiredNotice": "This link has expired and no longer works. Set a new expiry or regenerate the link.",
+			"expiryLabel": "Link expiry",
+			"expiryHint": "The public link stops working automatically after this date",
+			"expiryClear": "Remove expiry",
+			"expiryToastUpdated": "Link expiry updated",
+			"expiryToastUpdateError": "Failed to update link expiry",
+			"regenerateLabel": "Regenerate link",
+			"regenerateHint": "Get a new public URL and permanently invalidate the current one",
+			"regenerateButton": "Regenerate",
+			"regenerateModalTitle": "Regenerate the public link?",
+			"regenerateModalDescription": "The current public URL will stop working immediately for anyone who has it. You'll need to share the new link with your client.",
+			"regenerateModalConfirm": "Regenerate link",
+			"regenerateToastUpdated": "Link regenerated",
+			"regenerateToastUpdateError": "Failed to regenerate link"
 		},
 		"projectWorkflow": {
 			"pageTitle": "Workflow Settings",
@@ -1688,6 +1856,27 @@
 			"startDate": "Start date",
 			"noDate": "No date"
 		},
+		"customFields": {
+			"title": "Custom Fields",
+			"empty": "No custom fields",
+			"selectPlaceholder": "Select...",
+			"noValue": "No value",
+			"clear": "Clear value",
+			"updateSuccess": "Custom field updated",
+			"updateError": "Failed to update custom field"
+		},
+		"approval": {
+			"title": "Approval",
+			"statusApproved": "Approved",
+			"statusChangesRequested": "Changes requested",
+			"noResponse": "No client response yet",
+			"respondedBy": "Responded by {{name}}",
+			"respondedAt": "Responded {{date}}",
+			"note": "Note",
+			"reset": "Reset",
+			"resetSuccess": "Approval status reset",
+			"resetError": "Failed to reset approval status"
+		},
 		"move": {
 			"title": "Move task",
 			"projectLabel": "Destination project",
@@ -1819,6 +2008,17 @@
 			"resizeStart": "Resize start date",
 			"resizeDue": "Resize due date",
 			"taskAriaLabel": "{{title}}: open or drag to move"
+		},
+		"calendar": {
+			"pageTitle": "{{name}} – Calendar",
+			"title": "Calendar",
+			"searchPlaceholder": "Search tasks...",
+			"today": "Today",
+			"noTasks": "No scheduled tasks",
+			"noTasksSubtitle": "Add a due date or start date to tasks to place them on the calendar.",
+			"noTasksFound": "No tasks found",
+			"noTasksMatch": "No scheduled tasks match \"{{query}}\"",
+			"moreCount": "+{{count}} more"
 		},
 		"delete": {
 			"title": "Delete Task?",
@@ -2097,6 +2297,24 @@
 		},
 		"branding": {
 			"poweredBy": "Powered by"
+		},
+		"approval": {
+			"sectionTitle": "Approval",
+			"statusApproved": "Approved",
+			"statusChangesRequested": "Changes requested",
+			"respondedAs": "Responded as {{name}}",
+			"respondedOn": "Responded {{date}}",
+			"approveButton": "Approve",
+			"requestChangesButton": "Request changes",
+			"nameLabel": "Your name",
+			"namePlaceholder": "Enter your name",
+			"nameRequired": "Please enter your name",
+			"noteLabel": "Note (optional)",
+			"notePlaceholder": "Add a note about what needs to change...",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"submitSuccess": "Your response has been recorded",
+			"submitError": "Failed to submit your response"
 		}
 	}
 }

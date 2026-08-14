@@ -41,6 +41,7 @@ import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import useGetFullWorkspace from "@/hooks/queries/workspace/use-get-full-workspace";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { toast } from "@/lib/toast";
+import { getWorkspaceProfileField } from "@/lib/workspace-profile-fields";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/settings/workspace/general",
@@ -51,11 +52,23 @@ export const Route = createFileRoute(
 type WorkspaceFormValues = {
   name: string;
   description?: string;
+  logo?: string;
+  legalName?: string;
+  taxId?: string;
+  address?: string;
+  phone?: string;
+  contactEmail?: string;
 };
 
 type NormalizedWorkspaceValues = {
   name: string;
   description: string;
+  logo: string;
+  legalName: string;
+  taxId: string;
+  address: string;
+  phone: string;
+  contactEmail: string;
 };
 
 function normalizeWorkspaceValues(
@@ -64,30 +77,13 @@ function normalizeWorkspaceValues(
   return {
     name: data.name.trim(),
     description: (data.description ?? "").trim(),
+    logo: (data.logo ?? "").trim(),
+    legalName: (data.legalName ?? "").trim(),
+    taxId: (data.taxId ?? "").trim(),
+    address: (data.address ?? "").trim(),
+    phone: (data.phone ?? "").trim(),
+    contactEmail: (data.contactEmail ?? "").trim(),
   };
-}
-
-/** Better Auth persists description as an organization additional field (DB column), not only inside metadata. */
-function getWorkspaceDescription(
-  workspace:
-    | { description?: string | null; metadata?: unknown }
-    | null
-    | undefined,
-): string {
-  if (!workspace) return "";
-  if (typeof workspace.description === "string") {
-    return workspace.description;
-  }
-  if (
-    typeof workspace.metadata === "object" &&
-    workspace.metadata &&
-    "description" in workspace.metadata
-  ) {
-    return String(
-      (workspace.metadata as { description?: unknown }).description ?? "",
-    );
-  }
-  return "";
 }
 
 function RouteComponent() {
@@ -100,6 +96,18 @@ function RouteComponent() {
           .min(1, t("settings:workspaceGeneral.validation.nameRequired"))
           .min(2, t("settings:workspaceGeneral.validation.nameShort")),
         description: z.string().optional(),
+        logo: z.string().optional(),
+        legalName: z.string().optional(),
+        taxId: z.string().optional(),
+        address: z.string().optional(),
+        phone: z.string().optional(),
+        contactEmail: z
+          .string()
+          .optional()
+          .refine(
+            (value) => !value || z.email().safeParse(value).success,
+            t("settings:workspaceGeneral.validation.contactEmailInvalid"),
+          ),
       }),
     [t],
   );
@@ -128,7 +136,19 @@ function RouteComponent() {
     useWorkspacePermission();
   const canEdit = canManageWorkspace();
   const canDelete = canDeleteWorkspace();
-  const workspaceDescription = getWorkspaceDescription(workspace);
+  const workspaceDescription = getWorkspaceProfileField(
+    workspace,
+    "description",
+  );
+  const workspaceLogo = getWorkspaceProfileField(workspace, "logo");
+  const workspaceLegalName = getWorkspaceProfileField(workspace, "legalName");
+  const workspaceTaxId = getWorkspaceProfileField(workspace, "taxId");
+  const workspaceAddress = getWorkspaceProfileField(workspace, "address");
+  const workspacePhone = getWorkspaceProfileField(workspace, "phone");
+  const workspaceContactEmail = getWorkspaceProfileField(
+    workspace,
+    "contactEmail",
+  );
 
   // Ownership transfer is owner-only. Eligible recipients are any current
   // member who isn't the owner themselves.
@@ -147,6 +167,12 @@ function RouteComponent() {
     defaultValues: {
       name: workspace?.name || "",
       description: workspaceDescription,
+      logo: workspaceLogo,
+      legalName: workspaceLegalName,
+      taxId: workspaceTaxId,
+      address: workspaceAddress,
+      phone: workspacePhone,
+      contactEmail: workspaceContactEmail,
     },
   });
 
@@ -156,13 +182,29 @@ function RouteComponent() {
     const nextValues = {
       name: workspace.name || "",
       description: workspaceDescription,
+      logo: workspaceLogo,
+      legalName: workspaceLegalName,
+      taxId: workspaceTaxId,
+      address: workspaceAddress,
+      phone: workspacePhone,
+      contactEmail: workspaceContactEmail,
     };
     lastSavedRef.current = normalizeWorkspaceValues(nextValues);
 
     if (!workspaceForm.formState.isDirty) {
       workspaceForm.reset(nextValues);
     }
-  }, [workspace, workspaceDescription, workspaceForm]);
+  }, [
+    workspace,
+    workspaceDescription,
+    workspaceLogo,
+    workspaceLegalName,
+    workspaceTaxId,
+    workspaceAddress,
+    workspacePhone,
+    workspaceContactEmail,
+    workspaceForm,
+  ]);
 
   const saveWorkspace = useCallback(
     async (data: WorkspaceFormValues) => {
@@ -172,7 +214,24 @@ function RouteComponent() {
       const nameChanged = lastSavedRef.current?.name !== normalizedData.name;
       const descriptionChanged =
         lastSavedRef.current?.description !== normalizedData.description;
-      const hasChanges = nameChanged || descriptionChanged;
+      const logoChanged = lastSavedRef.current?.logo !== normalizedData.logo;
+      const legalNameChanged =
+        lastSavedRef.current?.legalName !== normalizedData.legalName;
+      const taxIdChanged = lastSavedRef.current?.taxId !== normalizedData.taxId;
+      const addressChanged =
+        lastSavedRef.current?.address !== normalizedData.address;
+      const phoneChanged = lastSavedRef.current?.phone !== normalizedData.phone;
+      const contactEmailChanged =
+        lastSavedRef.current?.contactEmail !== normalizedData.contactEmail;
+      const hasChanges =
+        nameChanged ||
+        descriptionChanged ||
+        logoChanged ||
+        legalNameChanged ||
+        taxIdChanged ||
+        addressChanged ||
+        phoneChanged ||
+        contactEmailChanged;
 
       if (!hasChanges) return;
 
@@ -188,6 +247,12 @@ function RouteComponent() {
           workspaceId: string;
           name?: string;
           description?: string;
+          logo?: string;
+          legalName?: string;
+          taxId?: string;
+          address?: string;
+          phone?: string;
+          contactEmail?: string;
         } = {
           workspaceId: workspace.id,
         };
@@ -198,6 +263,30 @@ function RouteComponent() {
 
         if (descriptionChanged) {
           updatePayload.description = normalizedData.description;
+        }
+
+        if (logoChanged) {
+          updatePayload.logo = normalizedData.logo;
+        }
+
+        if (legalNameChanged) {
+          updatePayload.legalName = normalizedData.legalName;
+        }
+
+        if (taxIdChanged) {
+          updatePayload.taxId = normalizedData.taxId;
+        }
+
+        if (addressChanged) {
+          updatePayload.address = normalizedData.address;
+        }
+
+        if (phoneChanged) {
+          updatePayload.phone = normalizedData.phone;
+        }
+
+        if (contactEmailChanged) {
+          updatePayload.contactEmail = normalizedData.contactEmail;
         }
 
         await updateWorkspace(updatePayload);
@@ -388,6 +477,213 @@ function RouteComponent() {
                             className="w-full sm:w-64"
                             placeholder={t(
                               "settings:workspaceGeneral.descriptionPlaceholder",
+                            )}
+                            disabled={!canEdit}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-md font-medium">
+              {t("settings:workspaceGeneral.companyProfileTitle")}
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              {t("settings:workspaceGeneral.companyProfileSubtitle")}
+            </p>
+          </div>
+
+          <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
+            <Form {...workspaceForm}>
+              <form className="space-y-4">
+                <FormField
+                  control={workspaceForm.control}
+                  name="logo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.logoLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.logoHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceGeneral.logoPlaceholder",
+                            )}
+                            disabled={!canEdit}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <FormField
+                  control={workspaceForm.control}
+                  name="legalName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.legalNameLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.legalNameHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceGeneral.legalNamePlaceholder",
+                            )}
+                            disabled={!canEdit}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <FormField
+                  control={workspaceForm.control}
+                  name="taxId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.taxIdLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.taxIdHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceGeneral.taxIdPlaceholder",
+                            )}
+                            disabled={!canEdit}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <FormField
+                  control={workspaceForm.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.addressLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.addressHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceGeneral.addressPlaceholder",
+                            )}
+                            disabled={!canEdit}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <FormField
+                  control={workspaceForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.phoneLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.phoneHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceGeneral.phonePlaceholder",
+                            )}
+                            disabled={!canEdit}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <FormField
+                  control={workspaceForm.control}
+                  name="contactEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.contactEmailLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.contactEmailHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceGeneral.contactEmailPlaceholder",
                             )}
                             disabled={!canEdit}
                             {...field}

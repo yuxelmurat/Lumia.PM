@@ -9,6 +9,94 @@ export const labelSchema = v.object({
   workspaceId: v.nullable(v.string()),
 });
 
+export const customFieldTypeSchema = v.picklist([
+  "text",
+  "number",
+  "date",
+  "select",
+  "checkbox",
+]);
+
+export const customFieldDefinitionSchema = v.object({
+  id: v.string(),
+  workspaceId: v.string(),
+  name: v.string(),
+  type: customFieldTypeSchema,
+  options: v.nullable(v.array(v.string())),
+  isRequired: v.boolean(),
+  position: v.number(),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const customFieldValueSchema = v.object({
+  id: v.string(),
+  fieldId: v.string(),
+  taskId: v.string(),
+  value: v.nullable(
+    v.union([v.string(), v.number(), v.boolean(), v.array(v.string())]),
+  ),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const projectTemplateColumnSchema = v.object({
+  id: v.string(),
+  templateId: v.string(),
+  name: v.string(),
+  slug: v.string(),
+  position: v.number(),
+  isFinal: v.boolean(),
+  icon: v.nullable(v.string()),
+  color: v.nullable(v.string()),
+});
+
+export const projectTemplateTaskSchema = v.object({
+  id: v.string(),
+  templateId: v.string(),
+  title: v.string(),
+  description: v.nullable(v.string()),
+  columnSlug: v.string(),
+  position: v.number(),
+});
+
+export const projectTemplateSchema = v.object({
+  id: v.string(),
+  workspaceId: v.string(),
+  name: v.string(),
+  description: v.nullable(v.string()),
+  icon: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const projectTemplateListItemSchema = v.object({
+  ...projectTemplateSchema.entries,
+  columnCount: v.number(),
+});
+
+export const projectTemplateDetailSchema = v.object({
+  ...projectTemplateSchema.entries,
+  columns: v.array(projectTemplateColumnSchema),
+  tasks: v.array(projectTemplateTaskSchema),
+});
+
+export const projectTemplateColumnInputSchema = v.object({
+  name: v.string(),
+  slug: v.string(),
+  position: v.number(),
+  isFinal: v.optional(v.boolean()),
+  icon: v.optional(v.nullable(v.string())),
+  color: v.optional(v.nullable(v.string())),
+});
+
+export const projectTemplateTaskInputSchema = v.object({
+  title: v.string(),
+  description: v.optional(v.nullable(v.string())),
+  columnSlug: v.string(),
+  position: v.number(),
+});
+
 export const projectSchema = v.object({
   id: v.string(),
   workspaceId: v.string(),
@@ -20,6 +108,8 @@ export const projectSchema = v.object({
   isPublic: v.nullable(v.boolean()),
   archivedAt: v.nullable(v.date()),
   position: v.number(),
+  publicShareToken: v.optional(v.nullable(v.string())),
+  publicLinkExpiresAt: v.optional(v.nullable(v.date())),
 });
 
 export const taskSchema = v.object({
@@ -41,6 +131,12 @@ export const taskSchema = v.object({
   startDate: v.optional(v.date()),
   dueDate: v.optional(v.date()),
   createdAt: v.date(),
+  approvalStatus: v.optional(
+    v.nullable(v.picklist(["approved", "changes_requested"] as const)),
+  ),
+  approvalNote: v.optional(v.nullable(v.string())),
+  approvalClientName: v.optional(v.nullable(v.string())),
+  approvalRespondedAt: v.optional(v.nullable(v.date())),
 });
 
 export const activitySchema = v.object({
@@ -57,6 +153,7 @@ export const activitySchema = v.object({
     "title_changed",
     "description_changed",
     "create",
+    "approval_updated",
   ] as const),
   createdAt: v.date(),
   userId: v.nullable(v.string()),
@@ -96,6 +193,7 @@ export const notificationSchema = v.object({
     "task_overdue",
     "task_mention",
     "task_comment",
+    "task_approval_updated",
   ] as const),
   eventData: v.nullable(v.record(v.string(), v.unknown())),
   isRead: v.optional(v.boolean()),

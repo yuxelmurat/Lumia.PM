@@ -28,6 +28,12 @@ describe("@kaneo/permissions statement surface", () => {
       "assign",
     ]);
     expect(statement.label).toEqual(["create", "read", "update", "delete"]);
+    expect(statement.custom_field).toEqual([
+      "create",
+      "read",
+      "update",
+      "delete",
+    ]);
     expect(statement.workspace).toEqual([
       "read",
       "update",
@@ -52,6 +58,7 @@ describe("built-in role privileges", () => {
     expect(viewer.statements.project).toEqual(["read"]);
     expect(viewer.statements.task).toEqual(["read"]);
     expect(viewer.statements.label).toEqual(["read"]);
+    expect(viewer.statements.custom_field).toEqual(["read"]);
     expect(viewer.statements.workspace).toEqual(["read"]);
   });
 
@@ -61,6 +68,8 @@ describe("built-in role privileges", () => {
     expect(member.statements.task).not.toContain("delete");
     expect(member.statements.project).toContain("create");
     expect(member.statements.project).not.toContain("delete");
+    expect(member.statements.custom_field).toEqual(["read"]);
+    expect(member.statements.custom_field).not.toContain("create");
     expect(member.statements.workspace).toEqual(["read"]);
   });
 
@@ -69,6 +78,12 @@ describe("built-in role privileges", () => {
     expect(admin.statements.task).toContain("assign");
     expect(admin.statements.project).toContain("delete");
     expect(admin.statements.project).toContain("share");
+    expect(admin.statements.custom_field).toEqual([
+      "create",
+      "read",
+      "update",
+      "delete",
+    ]);
     expect(admin.statements.workspace).toContain("manage_settings");
     expect(admin.statements.workspace).not.toContain("delete");
   });
@@ -79,6 +94,9 @@ describe("built-in role privileges", () => {
     );
     expect(owner.statements.project).toEqual(
       expect.arrayContaining(["create", "read", "update", "delete", "share"]),
+    );
+    expect(owner.statements.custom_field).toEqual(
+      expect.arrayContaining(["create", "read", "update", "delete"]),
     );
     expect(owner.statements.workspace).toEqual(
       expect.arrayContaining(["read", "update", "delete", "manage_settings"]),

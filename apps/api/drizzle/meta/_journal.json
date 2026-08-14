@@ -281,6 +281,48 @@
 			"when": 1786478671279,
 			"tag": "0039_gorgeous_jack_power",
 			"breakpoints": true
+		},
+		{
+			"idx": 40,
+			"version": "7",
+			"when": 1786700374944,
+			"tag": "0040_white_bulldozer",
+			"breakpoints": true
+		},
+		{
+			"idx": 41,
+			"version": "7",
+			"when": 1786705640045,
+			"tag": "0041_strong_nextwave",
+			"breakpoints": true
+		},
+		{
+			"idx": 42,
+			"version": "7",
+			"when": 1786716444019,
+			"tag": "0042_whole_runaways",
+			"breakpoints": true
+		},
+		{
+			"idx": 43,
+			"version": "7",
+			"when": 1786717803742,
+			"tag": "0043_round_annihilus",
+			"breakpoints": true
+		},
+		{
+			"idx": 44,
+			"version": "7",
+			"when": 1786734777182,
+			"tag": "0044_sparkling_purple_man",
+			"breakpoints": true
+		},
+		{
+			"idx": 45,
+			"version": "7",
+			"when": 1786735381731,
+			"tag": "0045_chemical_skrulls",
+			"breakpoints": true
 		}
 	]
 }

@@ -337,6 +337,62 @@ export const auth = betterAuth({
               input: true,
               required: false,
             },
+            // Company profile fields for invoicing / client-facing branding.
+            // legalName/taxId/address/phone/contactEmail are never exposed on
+            // public routes (see getPublicProject); only name+logo are.
+            legalName: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            taxId: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            address: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            phone: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            contactEmail: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            // Watermark settings for images uploaded to tasks in public
+            // projects. Branding/deterrent only, not DRM — see
+            // workspaceTable and apply-watermark.ts for details.
+            watermarkEnabled: {
+              type: "boolean",
+              input: true,
+              required: false,
+            },
+            watermarkStyle: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            watermarkImageUrl: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            watermarkCorner: {
+              type: "string",
+              input: true,
+              required: false,
+            },
+            watermarkSizePercent: {
+              type: "number",
+              input: true,
+              required: false,
+            },
           },
         },
         member: {

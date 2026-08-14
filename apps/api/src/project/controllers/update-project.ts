@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { projectTable } from "../../database/schema";
+import { generatePublicShareToken } from "../../utils/migrate-public-share-tokens";
 
 async function updateProject(
   id: string,
@@ -28,6 +29,12 @@ async function updateProject(
     });
   }
 
+  // First time this project ever goes public: mint its share token. Later
+  // off/on toggles reuse the same token — only an explicit "regenerate"
+  // rotates it, so flipping visibility off and back on doesn't silently
+  // change the link a client already has.
+  const needsToken = isPublic && !existingProject?.publicShareToken;
+
   const [updatedWorkspace] = await db
     .update(projectTable)
     .set({
@@ -36,6 +43,7 @@ async function updateProject(
       slug,
       description,
       isPublic,
+      ...(needsToken ? { publicShareToken: generatePublicShareToken() } : {}),
     })
     .where(eq(projectTable.id, id))
     .returning();

@@ -14,11 +14,13 @@ type WorkspaceIdSource =
         | "project"
         | "task"
         | "label"
+        | "customFieldDefinition"
         | "timeEntry"
         | "activity"
         | "comment"
         | "column"
-        | "workflowRule";
+        | "workflowRule"
+        | "projectTemplate";
       idKey: string;
     }
   | {
@@ -133,11 +135,13 @@ async function lookupWorkspaceId(
     | "project"
     | "task"
     | "label"
+    | "customFieldDefinition"
     | "timeEntry"
     | "activity"
     | "comment"
     | "column"
-    | "workflowRule",
+    | "workflowRule"
+    | "projectTemplate",
   id: string,
 ): Promise<string | null> {
   try {
@@ -173,6 +177,17 @@ async function lookupWorkspaceId(
           .where(eq(schema.labelTable.id, id))
           .limit(1);
         return label?.workspaceId || null;
+      }
+
+      case "customFieldDefinition": {
+        const [field] = await db
+          .select({
+            workspaceId: schema.customFieldDefinitionTable.workspaceId,
+          })
+          .from(schema.customFieldDefinitionTable)
+          .where(eq(schema.customFieldDefinitionTable.id, id))
+          .limit(1);
+        return field?.workspaceId || null;
       }
 
       case "timeEntry": {
@@ -267,6 +282,17 @@ async function lookupWorkspaceId(
         return workflowRule?.workspaceId || null;
       }
 
+      case "projectTemplate": {
+        const [template] = await db
+          .select({
+            workspaceId: schema.projectTemplateTable.workspaceId,
+          })
+          .from(schema.projectTemplateTable)
+          .where(eq(schema.projectTemplateTable.id, id))
+          .limit(1);
+        return template?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -320,6 +346,14 @@ export const workspaceAccess = {
       ],
     }),
 
+  fromCustomFieldDefinition: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "customFieldDefinition", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
   fromTimeEntry: (idKey = "id") =>
     workspaceAccessMiddleware({
       sources: [
@@ -356,6 +390,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "workflowRule", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromProjectTemplate: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "projectTemplate", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

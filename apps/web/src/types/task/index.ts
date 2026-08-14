@@ -35,6 +35,10 @@ type Task = {
   columnId?: string | null;
   labels?: TaskLabel[];
   externalLinks?: TaskExternalLink[];
+  approvalStatus?: string | null;
+  approvalNote?: string | null;
+  approvalClientName?: string | null;
+  approvalRespondedAt?: string | null;
 };
 
 export default Task;
