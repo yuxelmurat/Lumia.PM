@@ -650,6 +650,89 @@ export const customFieldDefinitionTable = pgTable(
   ],
 );
 
+export const projectTemplateTable = pgTable(
+  "project_template",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    description: text("description"),
+    icon: text("icon").default("Layout"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("project_template_workspace_id_idx").on(table.workspaceId),
+    unique("project_template_workspace_name_unique").on(
+      table.workspaceId,
+      table.name,
+    ),
+  ],
+);
+
+export const projectTemplateColumnTable = pgTable(
+  "project_template_column",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    templateId: text("template_id")
+      .notNull()
+      .references(() => projectTemplateTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    position: integer("position").notNull().default(0),
+    isFinal: boolean("is_final").notNull().default(false),
+    icon: text("icon"),
+    color: text("color"),
+  },
+  (table) => [
+    index("project_template_column_template_id_idx").on(table.templateId),
+    unique("project_template_column_template_slug_unique").on(
+      table.templateId,
+      table.slug,
+    ),
+  ],
+);
+
+export const projectTemplateTaskTable = pgTable(
+  "project_template_task",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    templateId: text("template_id")
+      .notNull()
+      .references(() => projectTemplateTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    title: text("title").notNull(),
+    description: text("description"),
+    // Must match one of the template's own column slugs. Not enforced at the
+    // DB level (Postgres can't easily express a composite reference here);
+    // validated in the controller instead.
+    columnSlug: text("column_slug").notNull(),
+    position: integer("position").notNull().default(0),
+  },
+  (table) => [
+    index("project_template_task_template_id_idx").on(table.templateId),
+  ],
+);
+
 export const customFieldValueTable = pgTable(
   "custom_field_value",
   {

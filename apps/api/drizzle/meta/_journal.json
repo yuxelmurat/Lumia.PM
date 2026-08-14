@@ -288,6 +288,13 @@
 			"when": 1786700374944,
 			"tag": "0040_white_bulldozer",
 			"breakpoints": true
+		},
+		{
+			"idx": 41,
+			"version": "7",
+			"when": 1786705640045,
+			"tag": "0041_strong_nextwave",
+			"breakpoints": true
 		}
 	]
 }

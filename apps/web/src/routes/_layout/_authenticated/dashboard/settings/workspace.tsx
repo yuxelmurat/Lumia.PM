@@ -5,7 +5,14 @@ import {
   redirect,
   useLocation,
 } from "@tanstack/react-router";
-import { CreditCard, ListChecks, Settings, Shield, Tag } from "lucide-react";
+import {
+  CreditCard,
+  LayoutTemplate,
+  ListChecks,
+  Settings,
+  Shield,
+  Tag,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SettingsSidebar from "@/components/SettingsSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -76,6 +83,13 @@ function RouteComponent() {
       }),
       url: "/dashboard/settings/workspace/custom-fields",
       icon: ListChecks,
+    },
+    {
+      title: t("settings:workspaceProjectTemplates.title", {
+        defaultValue: "Project Templates",
+      }),
+      url: "/dashboard/settings/workspace/project-templates",
+      icon: LayoutTemplate,
     },
     ...(config?.billingEnabled
       ? [

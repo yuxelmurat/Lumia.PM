@@ -22,6 +22,9 @@ const CAPABILITIES = {
   assignTasks: { task: ["assign"] },
   manageLabels: { label: ["create", "update", "delete"] },
   manageCustomFields: { custom_field: ["create", "update", "delete"] },
+  manageProjectTemplates: {
+    project_template: ["create", "update", "delete"],
+  },
   manageWorkspace: { workspace: ["update", "manage_settings"] },
   deleteWorkspace: { workspace: ["delete"] },
   inviteUsers: { invitation: ["create"] },
@@ -98,6 +101,7 @@ export function useWorkspacePermission() {
       canAssignTasks: () => can.assignTasks,
       canManageLabels: () => can.manageLabels,
       canManageCustomFields: () => can.manageCustomFields,
+      canManageProjectTemplates: () => can.manageProjectTemplates,
       canManageWorkspace: () => can.manageWorkspace,
       canDeleteWorkspace: () => can.deleteWorkspace,
       canInviteUsers: () => can.inviteUsers,

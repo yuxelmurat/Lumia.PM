@@ -15,6 +15,9 @@ import {
   labelTable,
   notificationTable,
   projectTable,
+  projectTemplateColumnTable,
+  projectTemplateTable,
+  projectTemplateTaskTable,
   sessionTable,
   taskRelationTable,
   taskReminderSentTable,
@@ -80,6 +83,39 @@ export const workspaceTableRelations = relations(
     invitations: many(invitationTable),
     notificationWorkspaceRules: many(userNotificationWorkspaceRuleTable),
     customFieldDefinitions: many(customFieldDefinitionTable),
+    projectTemplates: many(projectTemplateTable),
+  }),
+);
+
+export const projectTemplateTableRelations = relations(
+  projectTemplateTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [projectTemplateTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    columns: many(projectTemplateColumnTable),
+    tasks: many(projectTemplateTaskTable),
+  }),
+);
+
+export const projectTemplateColumnTableRelations = relations(
+  projectTemplateColumnTable,
+  ({ one }) => ({
+    template: one(projectTemplateTable, {
+      fields: [projectTemplateColumnTable.templateId],
+      references: [projectTemplateTable.id],
+    }),
+  }),
+);
+
+export const projectTemplateTaskTableRelations = relations(
+  projectTemplateTaskTable,
+  ({ one }) => ({
+    template: one(projectTemplateTable, {
+      fields: [projectTemplateTaskTable.templateId],
+      references: [projectTemplateTable.id],
+    }),
   }),
 );
 

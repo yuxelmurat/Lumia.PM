@@ -19,7 +19,8 @@ type WorkspaceIdSource =
         | "activity"
         | "comment"
         | "column"
-        | "workflowRule";
+        | "workflowRule"
+        | "projectTemplate";
       idKey: string;
     }
   | {
@@ -139,7 +140,8 @@ async function lookupWorkspaceId(
     | "activity"
     | "comment"
     | "column"
-    | "workflowRule",
+    | "workflowRule"
+    | "projectTemplate",
   id: string,
 ): Promise<string | null> {
   try {
@@ -280,6 +282,17 @@ async function lookupWorkspaceId(
         return workflowRule?.workspaceId || null;
       }
 
+      case "projectTemplate": {
+        const [template] = await db
+          .select({
+            workspaceId: schema.projectTemplateTable.workspaceId,
+          })
+          .from(schema.projectTemplateTable)
+          .where(eq(schema.projectTemplateTable.id, id))
+          .limit(1);
+        return template?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -377,6 +390,14 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "workflowRule", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromProjectTemplate: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "projectTemplate", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

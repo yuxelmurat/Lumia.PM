@@ -23,12 +23,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import icons from "@/constants/project-icons";
 import useCreateProject from "@/hooks/mutations/project/use-create-project";
+import useGetProjectTemplatesByWorkspace from "@/hooks/queries/project-template/use-get-project-templates-by-workspace";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { cn } from "@/lib/cn";
 import generateProjectSlug from "@/lib/generate-project-id";
 import { toast } from "@/lib/toast";
+
+const BLANK_TEMPLATE_VALUE = "__blank__";
 
 type CreateProjectModalProps = {
   open: boolean;
@@ -42,13 +52,18 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
   const [selectedIcon, setSelectedIcon] = useState("Layout");
   const [iconPopoverOpen, setIconPopoverOpen] = useState(false);
   const [iconSearch, setIconSearch] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const queryClient = useQueryClient();
   const { data: workspace } = useActiveWorkspace();
+  const { data: templates = [] } = useGetProjectTemplatesByWorkspace(
+    workspace?.id ?? "",
+  );
   const { mutateAsync } = useCreateProject({
     name,
     slug,
     workspaceId: workspace?.id ?? "",
     icon: selectedIcon,
+    templateId: selectedTemplateId || undefined,
   });
   const SelectedIcon =
     icons[selectedIcon as keyof typeof icons] || icons.Layout;
@@ -63,6 +78,7 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
     setSelectedIcon("Layout");
     setIconPopoverOpen(false);
     setIconSearch("");
+    setSelectedTemplateId("");
     onClose();
   };
 
@@ -217,6 +233,47 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
                 })}
               </div>
             </div>
+
+            {templates.length > 0 && (
+              <div className="space-y-1.5">
+                <span className="text-xs font-medium text-muted-foreground">
+                  {t("common:modals.createProject.templateLabel")}
+                </span>
+                <Select
+                  value={selectedTemplateId || BLANK_TEMPLATE_VALUE}
+                  onValueChange={(value) =>
+                    setSelectedTemplateId(
+                      !value || value === BLANK_TEMPLATE_VALUE ? "" : value,
+                    )
+                  }
+                >
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={BLANK_TEMPLATE_VALUE}>
+                      {t("common:modals.createProject.blankProject")}
+                    </SelectItem>
+                    {templates.map((template) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedTemplateId &&
+                  (() => {
+                    const selected = templates.find(
+                      (template) => template.id === selectedTemplateId,
+                    );
+                    return selected?.description ? (
+                      <p className="text-xs text-muted-foreground">
+                        {selected.description}
+                      </p>
+                    ) : null;
+                  })()}
+              </div>
+            )}
           </div>
 
           <DialogFooter>

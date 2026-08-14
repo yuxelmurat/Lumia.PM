@@ -48,6 +48,7 @@ import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
+import projectTemplate from "./project-template";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import slackIntegration from "./slack-integration";
@@ -562,6 +563,7 @@ export function createApp() {
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const customFieldApi = api.route("/custom-field", customField);
+  const projectTemplateApi = api.route("/project-template", projectTemplate);
   const notificationApi = api.route("/notification", notification);
   const notificationPreferencesApi = api.route(
     "/notification-preferences",
@@ -744,6 +746,7 @@ export function createApp() {
     invitationPublicApi,
     labelApi,
     customFieldApi,
+    projectTemplateApi,
     notificationApi,
     notificationPreferencesApi,
     projectApi,
@@ -862,6 +865,7 @@ const {
   invitationPublicApi,
   labelApi,
   customFieldApi,
+  projectTemplateApi,
   notificationApi,
   notificationPreferencesApi,
   projectApi,
@@ -898,6 +902,7 @@ export type AppType =
   | typeof timeEntryApi
   | typeof labelApi
   | typeof customFieldApi
+  | typeof projectTemplateApi
   | typeof notificationApi
   | typeof notificationPreferencesApi
   | typeof searchApi
