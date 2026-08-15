@@ -10,7 +10,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kaneo.app"),
+  metadataBase: new URL("https://lumiapm.com"),
   title: {
     default: "Lumia.PM - Projeleri aydınlatan yönetim.",
     template: "%s | Lumia.PM",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://kaneo.app",
+    url: "https://lumiapm.com",
     siteName: "Lumia.PM",
     title: "Lumia.PM - Projeleri aydınlatan yönetim.",
     description:
@@ -48,6 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@lumiapm",
+    creator: "@lumiapm",
     title: "Lumia.PM - Projeleri aydınlatan yönetim.",
     description:
       "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
@@ -67,20 +69,35 @@ export const metadata: Metadata = {
   publisher: "Lumia.PM",
 };
 
+const lumiaSocialProfiles = [
+  "https://x.com/lumiapm",
+  "https://instagram.com/lumiapm",
+  "https://linkedin.com/company/lumiapm",
+];
+
 const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Lumia.PM",
-    url: "https://kaneo.app",
+    url: "https://lumiapm.com",
     logo: "/logo-512.png",
-    sameAs: ["https://github.com/usekaneo/kaneo"],
+    email: "info@lumiapm.com",
+    sameAs: lumiaSocialProfiles,
+    brand: {
+      "@type": "Brand",
+      name: "Lumia.app",
+    },
+    founder: {
+      "@type": "Person",
+      name: "Murat Yüksel",
+    },
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Lumia.PM",
-    url: "https://kaneo.app",
+    url: "https://lumiapm.com",
     inLanguage: "en",
   },
   {
@@ -91,8 +108,8 @@ const jsonLd = [
     operatingSystem: "Web, Linux, macOS, Windows",
     description:
       "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
-    url: "https://kaneo.app",
-    image: "https://kaneo.app/images/hero.png",
+    url: "https://lumiapm.com",
+    image: "https://lumiapm.com/images/hero.png",
     license: "https://github.com/usekaneo/kaneo/blob/main/LICENSE",
   },
 ];

@@ -131,7 +131,7 @@
 			"anchors": [
 				{
 					"anchor": "Website",
-					"href": "https://kaneo.app",
+					"href": "https://lumiapm.com",
 					"icon": "globe"
 				},
 				{
@@ -151,8 +151,8 @@
 		],
 		"primary": {
 			"type": "button",
-			"label": "Open Kaneo",
-			"href": "https://kaneo.app"
+			"label": "Open Lumia.PM",
+			"href": "https://lumiapm.com"
 		}
 	},
 	"contextual": {
@@ -160,20 +160,22 @@
 	},
 	"footer": {
 		"socials": {
-			"website": "https://kaneo.app",
+			"website": "https://lumiapm.com",
 			"github": "https://github.com/usekaneo/kaneo",
-			"x": "https://x.com/usekaneo"
+			"x": "https://x.com/lumiapm",
+			"instagram": "https://instagram.com/lumiapm",
+			"linkedin": "https://linkedin.com/company/lumiapm"
 		}
 	},
 	"seo": {
 		"indexing": "all",
 		"metatags": {
-			"og:site_name": "Kaneo Docs",
+			"og:site_name": "Lumia.PM Docs",
 			"og:type": "website",
-			"og:image": "https://kaneo.app/images/hero.png",
+			"og:image": "https://lumiapm.com/images/hero.png",
 			"twitter:card": "summary_large_image",
-			"twitter:site": "@usekaneo",
-			"twitter:image": "https://kaneo.app/images/hero.png"
+			"twitter:site": "@lumiapm",
+			"twitter:image": "https://lumiapm.com/images/hero.png"
 		}
 	},
 	"integrations": {
