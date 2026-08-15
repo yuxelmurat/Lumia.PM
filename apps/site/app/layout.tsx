@@ -12,13 +12,13 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://kaneo.app"),
   title: {
-    default: "Kaneo - All you need. Nothing you don't.",
-    template: "%s | Kaneo",
+    default: "Lumia.PM - Projeleri aydınlatan yönetim.",
+    template: "%s | Lumia.PM",
   },
   description:
     "All you need. Nothing you don't. Open source project management that works for you, not against you.",
   keywords: [
-    "kaneo",
+    "lumia.pm",
     "project management",
     "open source",
     "kanban",
@@ -26,15 +26,15 @@ export const metadata: Metadata = {
     "self-hosted",
     "team collaboration",
   ],
-  applicationName: "Kaneo",
+  applicationName: "Lumia.PM",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     url: "https://kaneo.app",
-    siteName: "Kaneo",
-    title: "Kaneo - All you need. Nothing you don't.",
+    siteName: "Lumia.PM",
+    title: "Lumia.PM - Projeleri aydınlatan yönetim.",
     description:
       "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
     images: [
@@ -42,13 +42,13 @@ export const metadata: Metadata = {
         url: "/images/hero.png",
         width: 1200,
         height: 630,
-        alt: "Kaneo",
+        alt: "Lumia.PM",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kaneo - All you need. Nothing you don't.",
+    title: "Lumia.PM - Projeleri aydınlatan yönetim.",
     description:
       "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
     images: ["/images/hero.png"],
@@ -58,35 +58,35 @@ export const metadata: Metadata = {
     follow: true,
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
     apple: "/apple-touch-icon.png",
   },
   category: "productivity",
-  creator: "Kaneo",
-  publisher: "Kaneo",
+  creator: "Lumia.PM",
+  publisher: "Lumia.PM",
 };
 
 const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Kaneo",
+    name: "Lumia.PM",
     url: "https://kaneo.app",
-    logo: "https://kaneo.app/logo-512.png",
+    logo: "/logo-512.png",
     sameAs: ["https://github.com/usekaneo/kaneo"],
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Kaneo",
+    name: "Lumia.PM",
     url: "https://kaneo.app",
     inLanguage: "en",
   },
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Kaneo",
+    name: "Lumia.PM",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web, Linux, macOS, Windows",
     description:

@@ -4,18 +4,18 @@ export function Logo() {
   return (
     <span className="inline-flex items-center">
       <Image
-        src="/logo-dark.svg"
-        alt="Kaneo"
+        src="/logo-nav.png"
+        alt="Lumia.PM"
         className="h-6 w-auto dark:hidden"
-        width={24}
-        height={24}
+        width={181}
+        height={60}
       />
       <Image
-        src="/logo-light.svg"
-        alt="Kaneo"
+        src="/logo-nav-white.png"
+        alt="Lumia.PM"
         className="hidden h-6 w-auto dark:block"
-        width={24}
-        height={24}
+        width={181}
+        height={60}
       />
     </span>
   );
