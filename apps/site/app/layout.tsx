@@ -1,6 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import { Cinzel, Josefin_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+
+// Typography pairing per the ui-ux-pro-max-skill dataset, row 32 ("Real
+// Estate Luxury" — Best For explicitly lists "architecture, interior
+// design"): Cinzel for headings, Josefin Sans for body copy.
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-heading-cinzel",
+  display: "swap",
+});
+
+const josefinSans = Josefin_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans-josefin",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   themeColor: [
@@ -118,7 +136,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${cinzel.variable} ${josefinSans.variable}`}
+    >
       <body>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: This is necessary to apply the user's preferred color scheme before React hydration to prevent a flash of incorrect theme.
