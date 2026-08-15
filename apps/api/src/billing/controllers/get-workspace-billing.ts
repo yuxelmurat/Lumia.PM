@@ -135,7 +135,7 @@ async function getWorkspaceBilling(workspaceId: string) {
     seats: billing.seats,
     currentPeriodEnd: billing.currentPeriodEnd,
     canceledAt: billing.canceledAt,
-    hasCustomer: Boolean(billing.creemCustomerId),
+    hasStoredCard: Boolean(billing.paytrCardToken),
   };
 }
 

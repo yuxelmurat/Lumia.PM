@@ -185,15 +185,24 @@ export const workspaceBillingTable = pgTable(
       }),
     foundingFree: boolean("founding_free").notNull().default(false),
     trialEndsAt: timestamp("trial_ends_at", { mode: "date" }),
-    creemCustomerId: text("creem_customer_id"),
-    creemSubscriptionId: text("creem_subscription_id").unique(),
-    creemProductId: text("creem_product_id"),
+    // PayTR's reusable card token ("utoken") for server-initiated stored-card
+    // charges (renewals, seat top-ups). No external subscription/product
+    // object exists under PayTR, so the Creem-era subscription/product id
+    // columns were dropped rather than repurposed.
+    paytrCardToken: text("paytr_card_token"),
+    paytrCardTokenId: text("paytr_card_token_id"),
     plan: text("plan"),
     billingInterval: text("billing_interval"),
     status: text("status"),
     seats: integer("seats").notNull().default(1),
     currentPeriodEnd: timestamp("current_period_end", { mode: "date" }),
     canceledAt: timestamp("canceled_at", { mode: "date" }),
+    // Renewal-charge retry bookkeeping (PayTR has no native recurring
+    // billing; the scheduler owns retries directly against these columns).
+    renewalAttempts: integer("renewal_attempts").notNull().default(0),
+    renewalFirstFailedAt: timestamp("renewal_first_failed_at", {
+      mode: "date",
+    }),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" })
       .defaultNow()
@@ -209,6 +218,23 @@ export const billingEventTable = pgTable("billing_event", {
   processedAt: timestamp("processed_at", { mode: "date" })
     .defaultNow()
     .notNull(),
+});
+
+// Metadata for a PayTR charge attempt, keyed by the merchant_oid sent to
+// PayTR. PayTR's bildirim callback only carries merchant_oid/status/amount,
+// so this is how the webhook handler learns which workspace/plan/kind of
+// charge a given merchant_oid refers to.
+export const billingChargeTable = pgTable("billing_charge", {
+  id: text("id").primaryKey(), // merchant_oid
+  workspaceId: text("workspace_id")
+    .notNull()
+    .references(() => workspaceTable.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(), // "checkout" | "renewal" | "seat_topup"
+  plan: text("plan"),
+  billingInterval: text("billing_interval"),
+  seats: integer("seats"),
+  amountKurus: integer("amount_kurus").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
 export const teamTable = pgTable(

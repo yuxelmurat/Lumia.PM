@@ -10,8 +10,9 @@ import {
 
 const CLOUD_ENV = {
   KANEO_CLOUD: "true",
-  CREEM_API_KEY: "creem_test_dummy",
-  CREEM_WEBHOOK_SECRET: "whsec_dummy",
+  PAYTR_MERCHANT_ID: "123",
+  PAYTR_MERCHANT_KEY: "paytr_test_dummy",
+  PAYTR_MERCHANT_SALT: "paytr_salt_dummy",
 };
 const saved: Record<string, string | undefined> = {};
 
@@ -124,7 +125,7 @@ describe("API integration: billing enforcement", () => {
       trialEndsAt: new Date(Date.now() - 60_000),
       status: "active",
       plan: "personal",
-      creemSubscriptionId: `sub-${member.workspace.id}`,
+      paytrCardToken: `utoken-${member.workspace.id}`,
     });
 
     mockAuthenticatedSession(member.user);

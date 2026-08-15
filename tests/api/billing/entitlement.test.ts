@@ -9,22 +9,28 @@ function billing(overrides: Partial<Billing>): Billing {
     workspaceId: "w1",
     foundingFree: false,
     trialEndsAt: null,
-    creemCustomerId: null,
-    creemSubscriptionId: null,
-    creemProductId: null,
+    paytrCardToken: null,
+    paytrCardTokenId: null,
     plan: null,
     billingInterval: null,
     status: null,
     seats: 1,
     currentPeriodEnd: null,
     canceledAt: null,
+    renewalAttempts: 0,
+    renewalFirstFailedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
   } as Billing;
 }
 
-const CLOUD_KEYS = ["KANEO_CLOUD", "CREEM_API_KEY", "CREEM_WEBHOOK_SECRET"];
+const CLOUD_KEYS = [
+  "KANEO_CLOUD",
+  "PAYTR_MERCHANT_ID",
+  "PAYTR_MERCHANT_KEY",
+  "PAYTR_MERCHANT_SALT",
+];
 let saved: Record<string, string | undefined>;
 
 beforeEach(() => {
@@ -33,8 +39,9 @@ beforeEach(() => {
     saved[key] = process.env[key];
   }
   process.env.KANEO_CLOUD = "true";
-  process.env.CREEM_API_KEY = "key";
-  process.env.CREEM_WEBHOOK_SECRET = "secret";
+  process.env.PAYTR_MERCHANT_ID = "123";
+  process.env.PAYTR_MERCHANT_KEY = "key";
+  process.env.PAYTR_MERCHANT_SALT = "salt";
 });
 
 afterEach(() => {
@@ -49,7 +56,7 @@ afterEach(() => {
 
 describe("computeEntitlement", () => {
   it("grants access to everyone when billing is disabled", () => {
-    delete process.env.CREEM_API_KEY;
+    delete process.env.PAYTR_MERCHANT_ID;
     expect(computeEntitlement(billing({})).active).toBe(true);
     expect(computeEntitlement(billing({})).reason).toBe("billing_disabled");
   });

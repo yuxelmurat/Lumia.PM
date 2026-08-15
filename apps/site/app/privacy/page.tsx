@@ -70,11 +70,12 @@ export default function PrivacyPage() {
                 <strong className="font-medium text-foreground">
                   Payment data.
                 </strong>{" "}
-                Payments for Lumia.PM Cloud are processed by Creem (creem.io)
-                acting as merchant of record. Creem collects and processes your
-                payment details under its own privacy policy; we never see or
-                store your card number. We receive only what is needed to manage
-                your subscription (such as plan, status, and billing country).
+                Payments for Lumia.PM Cloud are processed by PayTR (paytr.com),
+                a licensed Turkish payment institution. Your card details are
+                sent directly to PayTR and processed under its own privacy
+                policy; we never see or store your card number. We receive only
+                what is needed to manage your subscription (such as plan,
+                status, and a token PayTR issues for renewal charges).
               </p>
               <p>
                 <strong className="font-medium text-foreground">

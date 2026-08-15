@@ -1,4 +1,3 @@
-import { constructWebhookEvent } from "creem/webhooks.js";
 import { and, eq, inArray } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -7,15 +6,11 @@ import * as v from "valibot";
 import db from "../database";
 import { workspaceUserTable } from "../database/schema";
 import { validateWorkspaceAccess } from "../utils/validate-workspace-access";
-import { creemWebhookSecret, isBillingEnabled } from "./config";
+import { isBillingEnabled } from "./config";
+import cancelSubscription from "./controllers/cancel-subscription";
 import createCheckout from "./controllers/create-checkout";
-import getWorkspaceBilling, {
-  getOrCreateWorkspaceBilling,
-} from "./controllers/get-workspace-billing";
-import handleWebhook, {
-  type BillingWebhookEvent,
-} from "./controllers/handle-webhook";
-import { createCustomerPortalLink } from "./creem-client";
+import getWorkspaceBilling from "./controllers/get-workspace-billing";
+import handleCallback from "./controllers/handle-webhook";
 
 type Variables = {
   userId: string;
@@ -49,26 +44,31 @@ const billing = new Hono<{ Variables: Variables }>()
       throw new HTTPException(404, { message: "Not found" });
     }
 
-    const rawBody = await c.req.text();
-    let event: BillingWebhookEvent;
-    try {
-      const parsed = await constructWebhookEvent(
-        rawBody,
-        c.req.header(),
-        creemWebhookSecret(),
-      );
-      event = {
-        id: parsed.id,
-        type: parsed.type,
-        data: parsed.data as BillingWebhookEvent["data"],
-      };
-    } catch (error) {
-      console.error("billing: webhook signature verification failed", error);
-      throw new HTTPException(400, { message: "Invalid signature" });
+    // PayTR's bildirim callback is form-encoded, not JSON, and requires the
+    // literal plain-text body "OK" on success or PayTR retries for up to 24h.
+    const rawBody = await c.req.parseBody();
+    const body: Record<string, string> = {};
+    for (const [key, value] of Object.entries(rawBody)) {
+      body[key] = String(value);
     }
 
-    const result = await handleWebhook(event);
-    return c.json(result);
+    if (
+      !body.merchant_oid ||
+      !body.status ||
+      !body.total_amount ||
+      !body.hash
+    ) {
+      console.error("billing: callback missing required fields");
+      throw new HTTPException(400, { message: "Invalid callback" });
+    }
+
+    const result = await handleCallback(body);
+
+    if (!result.ok) {
+      throw new HTTPException(400, { message: result.reason });
+    }
+
+    return c.text("OK");
   })
   .get(
     "/:workspaceId",
@@ -91,7 +91,7 @@ const billing = new Hono<{ Variables: Variables }>()
       operationId: "createBillingCheckout",
       tags: ["Billing"],
       description:
-        "Create a Creem checkout session for a workspace plan. Owner/admin only. Returns the checkout URL to redirect the browser to.",
+        "Create a PayTR Direct API checkout for a workspace plan. Owner/admin only. Returns a form the browser posts directly to PayTR (raw card data never transits our server) to charge the plan and store a reusable card for future renewals.",
     }),
     validator("param", v.object({ workspaceId: v.string() })),
     validator(
@@ -106,39 +106,34 @@ const billing = new Hono<{ Variables: Variables }>()
       const { plan, interval } = c.req.valid("json");
       await requireBillingManager(c.get("userId"), workspaceId);
 
+      const forwardedFor = c.req.header("x-forwarded-for");
+      const userIp = forwardedFor?.split(",")[0]?.trim() || "0.0.0.0";
+
       const result = await createCheckout({
         workspaceId,
         plan,
         interval,
         userEmail: c.get("userEmail") ?? "",
+        userIp,
       });
       return c.json(result);
     },
   )
   .post(
-    "/:workspaceId/portal",
+    "/:workspaceId/cancel",
     describeRoute({
-      operationId: "createBillingPortalSession",
+      operationId: "cancelBillingSubscription",
       tags: ["Billing"],
       description:
-        "Generate a Creem customer portal link for the workspace subscription. Owner/admin only.",
+        "Cancel the workspace's subscription. Access stays active until currentPeriodEnd; the renewal scheduler stops charging the stored card after that. Owner/admin only.",
     }),
     validator("param", v.object({ workspaceId: v.string() })),
     async (c) => {
       const { workspaceId } = c.req.valid("param");
       await requireBillingManager(c.get("userId"), workspaceId);
 
-      const billingRow = await getOrCreateWorkspaceBilling(workspaceId);
-      if (!billingRow.creemCustomerId) {
-        throw new HTTPException(400, {
-          message: "No billing customer exists for this workspace yet",
-        });
-      }
-
-      const { portalUrl } = await createCustomerPortalLink(
-        billingRow.creemCustomerId,
-      );
-      return c.json({ portalUrl });
+      await cancelSubscription(workspaceId);
+      return c.json({ ok: true });
     },
   );
 

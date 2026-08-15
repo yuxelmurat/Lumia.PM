@@ -1,39 +1,52 @@
+import { createHmac } from "node:crypto";
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const { planForProductId } = vi.hoisted(() => ({
-  planForProductId: vi.fn(() => ({
-    plan: "team" as const,
-    interval: "monthly" as const,
-  })),
-}));
-vi.mock("../../apps/api/src/billing/config", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("../../apps/api/src/billing/config")>();
-  return { ...actual, planForProductId };
-});
-
-import handleWebhook, {
-  type BillingWebhookEvent,
-} from "../../apps/api/src/billing/controllers/handle-webhook";
+import { beforeEach, describe, expect, it } from "vitest";
+import handleCallback from "../../apps/api/src/billing/controllers/handle-webhook";
 import db, { schema } from "../../apps/api/src/database";
 import { resetTestDatabase } from "./helpers/database";
 import { createWorkspaceMember } from "./helpers/fixtures";
 
-const PERIOD_END = new Date("2026-09-01T00:00:00.000Z");
+const MERCHANT_KEY = "paytr_test_dummy";
+const MERCHANT_SALT = "paytr_salt_dummy";
 
-async function seedBilling(
-  workspaceId: string,
-  overrides: Partial<typeof schema.workspaceBillingTable.$inferInsert> = {},
+process.env.PAYTR_MERCHANT_ID = "123";
+process.env.PAYTR_MERCHANT_KEY = MERCHANT_KEY;
+process.env.PAYTR_MERCHANT_SALT = MERCHANT_SALT;
+
+function sign(merchantOid: string, status: string, totalAmount: string) {
+  const payload = merchantOid + MERCHANT_SALT + status + totalAmount;
+  return createHmac("sha256", MERCHANT_KEY)
+    .update(payload, "utf8")
+    .digest("base64");
+}
+
+function callbackBody(
+  merchantOid: string,
+  status: "success" | "failed",
+  totalAmount = "4000",
+  extra: Record<string, string> = {},
 ) {
-  await db.insert(schema.workspaceBillingTable).values({
-    workspaceId,
+  return {
+    merchant_oid: merchantOid,
+    status,
+    total_amount: totalAmount,
+    hash: sign(merchantOid, status, totalAmount),
+    ...extra,
+  };
+}
+
+async function seedCharge(
+  overrides: Partial<typeof schema.billingChargeTable.$inferInsert> & {
+    id: string;
+    workspaceId: string;
+  },
+) {
+  await db.insert(schema.billingChargeTable).values({
+    kind: "checkout",
     plan: "team",
-    status: "active",
+    billingInterval: "monthly",
     seats: 1,
-    creemSubscriptionId: `sub-${workspaceId}`,
-    creemProductId: "prod_team_monthly",
-    currentPeriodEnd: PERIOD_END,
+    amountKurus: 4000,
     ...overrides,
   });
 }
@@ -46,113 +59,147 @@ async function readBilling(workspaceId: string) {
   return row;
 }
 
-function subscriptionEvent(
-  id: string,
-  workspaceId: string,
-  data: Record<string, unknown> = {},
-): BillingWebhookEvent {
-  return {
-    id,
-    type: "subscription.canceled",
-    data: {
-      id: `sub-${workspaceId}`,
-      status: "canceled",
-      product: { id: "prod_team_monthly" },
-      ...data,
-    },
-  };
-}
-
-describe("API integration: billing webhooks", () => {
+describe("API integration: PayTR billing callback", () => {
   beforeEach(async () => {
     await resetTestDatabase();
-    planForProductId.mockClear();
   });
 
-  it("applies a subscription event once and suppresses the replay", async () => {
+  it("rejects a callback with an invalid hash", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
-    await seedBilling(owner.workspace.id);
-    const event = subscriptionEvent("evt-dup", owner.workspace.id);
+    await seedCharge({ id: "oid-1", workspaceId: owner.workspace.id });
 
-    expect(await handleWebhook(event)).toEqual({
+    const result = await handleCallback({
+      merchant_oid: "oid-1",
+      status: "success",
+      total_amount: "4000",
+      hash: "tampered",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(await db.select().from(schema.billingEventTable)).toHaveLength(0);
+  });
+
+  it("activates billing and stores the card token on a successful checkout", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    await db.insert(schema.workspaceBillingTable).values({
+      workspaceId: owner.workspace.id,
+    });
+    await seedCharge({
+      id: "oid-checkout",
+      workspaceId: owner.workspace.id,
+      plan: "team",
+      billingInterval: "monthly",
+      seats: 2,
+    });
+
+    const result = await handleCallback(
+      callbackBody("oid-checkout", "success", "4000", { utoken: "utoken-abc" }),
+    );
+
+    expect(result).toEqual({ ok: true, processed: true, duplicate: false });
+    const billing = await readBilling(owner.workspace.id);
+    expect(billing.status).toBe("active");
+    expect(billing.plan).toBe("team");
+    expect(billing.seats).toBe(2);
+    expect(billing.paytrCardToken).toBe("utoken-abc");
+    expect(billing.currentPeriodEnd).not.toBeNull();
+  });
+
+  it("does not activate billing on a failed checkout", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    await db.insert(schema.workspaceBillingTable).values({
+      workspaceId: owner.workspace.id,
+    });
+    await seedCharge({ id: "oid-fail", workspaceId: owner.workspace.id });
+
+    await handleCallback(callbackBody("oid-fail", "failed"));
+
+    const billing = await readBilling(owner.workspace.id);
+    expect(billing.status).toBeNull();
+  });
+
+  it("applies a merchant_oid once and suppresses the replay", async () => {
+    const owner = await createWorkspaceMember({ role: "owner" });
+    await db.insert(schema.workspaceBillingTable).values({
+      workspaceId: owner.workspace.id,
+      status: "active",
+      plan: "team",
+      seats: 1,
+    });
+    await seedCharge({ id: "oid-dup", workspaceId: owner.workspace.id });
+    const body = callbackBody("oid-dup", "success");
+
+    expect(await handleCallback(body)).toEqual({
+      ok: true,
       processed: true,
       duplicate: false,
     });
-    expect(await handleWebhook(event)).toEqual({
+    expect(await handleCallback(body)).toEqual({
+      ok: true,
       processed: false,
       duplicate: true,
     });
 
-    expect((await readBilling(owner.workspace.id)).status).toBe("canceled");
+    expect(await db.select().from(schema.billingEventTable)).toHaveLength(1);
   });
 
-  it("leaves the event replayable when applying it fails", async () => {
+  it("advances the period end on a successful renewal", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
-    await seedBilling(owner.workspace.id);
-    const event = subscriptionEvent("evt-fail", owner.workspace.id);
-
-    planForProductId.mockImplementationOnce(() => {
-      throw new Error("apply failed");
+    const periodEnd = new Date("2026-08-01T00:00:00.000Z");
+    await db.insert(schema.workspaceBillingTable).values({
+      workspaceId: owner.workspace.id,
+      status: "past_due",
+      plan: "personal",
+      billingInterval: "monthly",
+      seats: 1,
+      currentPeriodEnd: periodEnd,
+      renewalAttempts: 2,
+      renewalFirstFailedAt: new Date("2026-07-28T00:00:00.000Z"),
     });
-    await expect(handleWebhook(event)).rejects.toThrow("apply failed");
-
-    expect(await db.select().from(schema.billingEventTable)).toHaveLength(0);
-    expect((await readBilling(owner.workspace.id)).status).toBe("active");
-
-    expect(await handleWebhook(event)).toEqual({
-      processed: true,
-      duplicate: false,
-    });
-    expect((await readBilling(owner.workspace.id)).status).toBe("canceled");
-  });
-
-  it("keeps a known period end when a later event omits it", async () => {
-    const owner = await createWorkspaceMember({ role: "owner" });
-    await seedBilling(owner.workspace.id);
-
-    await handleWebhook({
-      id: "evt-paid",
-      type: "subscription.paid",
-      data: { id: `sub-${owner.workspace.id}`, status: "active" },
+    await seedCharge({
+      id: "oid-renew",
+      workspaceId: owner.workspace.id,
+      kind: "renewal",
+      plan: "personal",
+      billingInterval: "monthly",
     });
 
-    expect((await readBilling(owner.workspace.id)).currentPeriodEnd).toEqual(
-      PERIOD_END,
+    await handleCallback(callbackBody("oid-renew", "success"));
+
+    const billing = await readBilling(owner.workspace.id);
+    expect(billing.status).toBe("active");
+    expect(billing.currentPeriodEnd?.toISOString()).toBe(
+      "2026-09-01T00:00:00.000Z",
     );
+    expect(billing.renewalAttempts).toBe(0);
+    expect(billing.renewalFirstFailedAt).toBeNull();
   });
 
-  it("keeps a recorded cancellation when a later event omits it", async () => {
+  it("leaves past_due state untouched on a failed renewal callback (scheduler owns retries)", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
-    const canceledAt = new Date("2026-08-20T00:00:00.000Z");
-    await seedBilling(owner.workspace.id, { canceledAt });
-
-    await handleWebhook({
-      id: "evt-active",
-      type: "subscription.active",
-      data: { id: `sub-${owner.workspace.id}`, status: "active" },
+    await db.insert(schema.workspaceBillingTable).values({
+      workspaceId: owner.workspace.id,
+      status: "past_due",
+      plan: "personal",
+      billingInterval: "monthly",
+      seats: 1,
+      renewalAttempts: 1,
+    });
+    await seedCharge({
+      id: "oid-renew-fail",
+      workspaceId: owner.workspace.id,
+      kind: "renewal",
     });
 
-    expect((await readBilling(owner.workspace.id)).canceledAt).toEqual(
-      canceledAt,
-    );
+    await handleCallback(callbackBody("oid-renew-fail", "failed"));
+
+    const billing = await readBilling(owner.workspace.id);
+    expect(billing.status).toBe("past_due");
+    expect(billing.renewalAttempts).toBe(1);
   });
 
-  it("clears the cancellation when the provider sends an explicit null", async () => {
-    const owner = await createWorkspaceMember({ role: "owner" });
-    await seedBilling(owner.workspace.id, {
-      canceledAt: new Date("2026-08-20T00:00:00.000Z"),
-    });
-
-    await handleWebhook({
-      id: "evt-resumed",
-      type: "subscription.active",
-      data: {
-        id: `sub-${owner.workspace.id}`,
-        status: "active",
-        canceled_at: null,
-      },
-    });
-
-    expect((await readBilling(owner.workspace.id)).canceledAt).toBeNull();
+  it("ignores a callback for an unknown merchant_oid instead of throwing", async () => {
+    const result = await handleCallback(callbackBody("no-such-oid", "success"));
+    expect(result).toEqual({ ok: true, processed: false, duplicate: false });
   });
 });

@@ -2,14 +2,14 @@ import { createId } from "@paralleldrive/cuid2";
 import { count, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { workspaceUserTable } from "../../database/schema";
+import { billingChargeTable, workspaceUserTable } from "../../database/schema";
 import {
   type BillingInterval,
   isBillingEnabled,
   type Plan,
-  productIdFor,
+  priceFor,
 } from "../config";
-import { createCheckoutSession } from "../creem-client";
+import { buildCardStorageCheckoutForm } from "../paytr-client";
 import { getOrCreateWorkspaceBilling } from "./get-workspace-billing";
 
 async function createCheckout({
@@ -17,18 +17,20 @@ async function createCheckout({
   plan,
   interval,
   userEmail,
+  userIp,
 }: {
   workspaceId: string;
   plan: Plan;
   interval: BillingInterval;
   userEmail: string;
+  userIp: string;
 }) {
   if (!isBillingEnabled()) {
     throw new HTTPException(400, { message: "Billing is not enabled" });
   }
 
-  const productId = productIdFor(plan, interval);
-  if (!productId) {
+  const unitPriceKurus = priceFor(plan, interval);
+  if (!unitPriceKurus) {
     throw new HTTPException(400, { message: "Unknown plan" });
   }
 
@@ -39,26 +41,44 @@ async function createCheckout({
     });
   }
 
-  let units = 1;
+  let seats = 1;
   if (plan === "team") {
     const [members] = await db
       .select({ value: count() })
       .from(workspaceUserTable)
       .where(eq(workspaceUserTable.workspaceId, workspaceId));
-    units = Math.max(1, members?.value ?? 1);
+    seats = Math.max(1, members?.value ?? 1);
   }
 
-  const clientUrl = process.env.KANEO_CLIENT_URL ?? "";
-  const { checkoutUrl } = await createCheckoutSession({
-    productId,
-    units,
-    successUrl: `${clientUrl}/dashboard/settings/workspace/billing?checkout=success`,
-    requestId: createId(),
-    customerEmail: userEmail,
-    metadata: { workspaceId, plan, interval },
+  const amountKurus = unitPriceKurus * seats;
+  const merchantOid = createId();
+
+  await db.insert(billingChargeTable).values({
+    id: merchantOid,
+    workspaceId,
+    kind: "checkout",
+    plan,
+    billingInterval: interval,
+    seats,
+    amountKurus,
   });
 
-  return { checkoutUrl };
+  const clientUrl = process.env.KANEO_CLIENT_URL ?? "";
+  const returnUrl = `${clientUrl}/dashboard/settings/workspace/billing?checkout=success`;
+
+  const { actionUrl, fields } = buildCardStorageCheckoutForm({
+    merchantOid,
+    userIp,
+    email: userEmail,
+    amountKurus,
+    description: `Lumia.PM Cloud ${plan} (${interval})`,
+    okUrl: returnUrl,
+    failUrl: `${clientUrl}/dashboard/settings/workspace/billing?checkout=failed`,
+    storeCard: true,
+    utoken: billing.paytrCardToken,
+  });
+
+  return { actionUrl, fields };
 }
 
 export default createCheckout;

@@ -18,8 +18,7 @@ async function findDriftedWorkspaces() {
       and(
         eq(workspaceBillingTable.plan, "team"),
         inArray(workspaceBillingTable.status, ["active", "trialing"]),
-        isNotNull(workspaceBillingTable.creemSubscriptionId),
-        isNotNull(workspaceBillingTable.creemProductId),
+        isNotNull(workspaceBillingTable.paytrCardToken),
       ),
     )
     .groupBy(workspaceBillingTable.workspaceId, workspaceBillingTable.seats)

@@ -9,13 +9,13 @@ import {
   vi,
 } from "vitest";
 
-const { updateSubscriptionSeats } = vi.hoisted(() => ({
-  updateSubscriptionSeats: vi.fn(async () => ({ ok: true as const })),
+const { chargeStoredCard } = vi.hoisted(() => ({
+  chargeStoredCard: vi.fn(async () => ({ ok: true as const })),
 }));
-vi.mock("../../apps/api/src/billing/creem-client", () => ({
-  updateSubscriptionSeats,
-  createCheckoutSession: vi.fn(),
-  createCustomerPortalLink: vi.fn(),
+vi.mock("../../apps/api/src/billing/paytr-client", () => ({
+  chargeStoredCard,
+  buildCardStorageCheckoutForm: vi.fn(),
+  verifyCallbackHash: vi.fn(),
 }));
 
 import db, { schema } from "../../apps/api/src/database";
@@ -25,10 +25,14 @@ import { createWorkspaceMember } from "./helpers/fixtures";
 
 const CLOUD_ENV = {
   KANEO_CLOUD: "true",
-  CREEM_API_KEY: "creem_test_dummy",
-  CREEM_WEBHOOK_SECRET: "whsec_dummy",
+  PAYTR_MERCHANT_ID: "123",
+  PAYTR_MERCHANT_KEY: "paytr_test_dummy",
+  PAYTR_MERCHANT_SALT: "paytr_salt_dummy",
+  PAYTR_PRICE_TEAM_MONTHLY: "50000",
 };
 const saved: Record<string, string | undefined> = {};
+
+const FAR_FUTURE = new Date(Date.now() + 20 * 24 * 60 * 60 * 1000);
 
 async function addMember(workspaceId: string) {
   const member = await createWorkspaceMember();
@@ -47,10 +51,11 @@ async function billing(
   await db.insert(schema.workspaceBillingTable).values({
     workspaceId,
     plan: "team",
+    billingInterval: "monthly",
     status: "active",
     seats: 1,
-    creemSubscriptionId: `sub-${workspaceId}`,
-    creemProductId: "prod_team_monthly",
+    paytrCardToken: `utoken-${workspaceId}`,
+    currentPeriodEnd: FAR_FUTURE,
     ...overrides,
   });
 }
@@ -78,13 +83,11 @@ describe("API integration: seat reconciliation", () => {
   });
   beforeEach(async () => {
     await resetTestDatabase();
-    updateSubscriptionSeats.mockClear();
-    updateSubscriptionSeats.mockImplementation(async () => ({
-      ok: true as const,
-    }));
+    chargeStoredCard.mockClear();
+    chargeStoredCard.mockImplementation(async () => ({ ok: true as const }));
   });
 
-  it("repairs a workspace whose seat count drifted from its membership", async () => {
+  it("charges a top-up for a workspace whose seat count drifted upward", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
     await billing(owner.workspace.id, { seats: 1 });
     await addMember(owner.workspace.id);
@@ -92,23 +95,20 @@ describe("API integration: seat reconciliation", () => {
 
     await reconcileWorkspaceSeats();
 
-    expect(updateSubscriptionSeats).toHaveBeenCalledWith({
-      subscriptionId: `sub-${owner.workspace.id}`,
-      productId: "prod_team_monthly",
-      units: 3,
-    });
-    expect(await seatsOf(owner.workspace.id)).toBe(3);
+    expect(chargeStoredCard).toHaveBeenCalledWith(
+      expect.objectContaining({ utoken: `utoken-${owner.workspace.id}` }),
+    );
+    // seats are only bumped once the callback confirms the charge
+    expect(await seatsOf(owner.workspace.id)).toBe(1);
   });
 
-  it("repairs drift downwards after members leave", async () => {
+  it("repairs drift downwards after members leave, without charging", async () => {
     const owner = await createWorkspaceMember({ role: "owner" });
     await billing(owner.workspace.id, { seats: 5 });
 
     await reconcileWorkspaceSeats();
 
-    expect(updateSubscriptionSeats).toHaveBeenCalledWith(
-      expect.objectContaining({ units: 1 }),
-    );
+    expect(chargeStoredCard).not.toHaveBeenCalled();
     expect(await seatsOf(owner.workspace.id)).toBe(1);
   });
 
@@ -118,7 +118,7 @@ describe("API integration: seat reconciliation", () => {
 
     await reconcileWorkspaceSeats();
 
-    expect(updateSubscriptionSeats).not.toHaveBeenCalled();
+    expect(chargeStoredCard).not.toHaveBeenCalled();
   });
 
   it("ignores personal plans and inactive subscriptions", async () => {
@@ -130,26 +130,23 @@ describe("API integration: seat reconciliation", () => {
 
     await reconcileWorkspaceSeats();
 
-    expect(updateSubscriptionSeats).not.toHaveBeenCalled();
+    expect(chargeStoredCard).not.toHaveBeenCalled();
   });
 
   it("keeps going when one workspace fails to sync", async () => {
     const first = await createWorkspaceMember({ role: "owner" });
-    await billing(first.workspace.id, { seats: 4 });
+    await billing(first.workspace.id, { seats: 4 }); // will decrease, no charge
     const second = await createWorkspaceMember({ role: "owner" });
-    await billing(second.workspace.id, { seats: 4 });
+    await billing(second.workspace.id, { seats: 1 });
+    await addMember(second.workspace.id);
+    await addMember(second.workspace.id); // will increase, charges
 
-    updateSubscriptionSeats.mockImplementationOnce(async () => {
+    chargeStoredCard.mockImplementationOnce(async () => {
       throw new Error("provider unavailable");
     });
 
     await expect(reconcileWorkspaceSeats()).resolves.toBeUndefined();
 
-    expect(updateSubscriptionSeats).toHaveBeenCalledTimes(2);
-    const seats = [
-      await seatsOf(first.workspace.id),
-      await seatsOf(second.workspace.id),
-    ].sort();
-    expect(seats).toEqual([1, 4]);
+    expect(await seatsOf(first.workspace.id)).toBe(1);
   });
 });

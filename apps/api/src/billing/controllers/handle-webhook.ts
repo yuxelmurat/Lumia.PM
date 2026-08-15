@@ -1,166 +1,117 @@
 import { eq } from "drizzle-orm";
 import db from "../../database";
 import {
+  billingChargeTable,
   billingEventTable,
   workspaceBillingTable,
 } from "../../database/schema";
-import { planForProductId } from "../config";
+import type { BillingInterval, Plan } from "../config";
+import { verifyCallbackHash } from "../paytr-client";
+import { advancePeriodEnd } from "./renewal-helpers";
 
-type WebhookObject = {
-  id?: string;
-  status?: string;
-  metadata?: Record<string, string>;
-  product?: { id?: string };
-  customer?: { id?: string };
-  subscription?: {
-    id?: string;
-    status?: string;
-    metadata?: Record<string, string>;
-    product?: { id?: string };
-    customer?: { id?: string };
-  };
-  current_period_end_date?: string;
-  currentPeriodEndDate?: string;
-  canceled_at?: string | null;
-  canceledAt?: string | null;
-  items?: Array<{ units?: number }>;
-};
-
-export type BillingWebhookEvent = {
-  id?: string;
-  type: string;
-  data: WebhookObject;
-};
+export type PaytrCallbackBody = Record<string, string>;
 
 type DbOrTx = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-function parseDate(value: string | null | undefined) {
-  if (!value) {
-    return null;
-  }
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
+async function applyCharge(
+  body: PaytrCallbackBody,
+  charge: typeof billingChargeTable.$inferSelect,
+  tx: DbOrTx,
+) {
+  const succeeded = body.status === "success";
+  const plan = charge.plan as Plan | null;
+  const interval = charge.billingInterval as BillingInterval | null;
 
-const SUBSCRIPTION_EVENT_STATUS: Record<string, string> = {
-  "subscription.active": "active",
-  "subscription.trialing": "trialing",
-  "subscription.paid": "active",
-  "subscription.scheduled_cancel": "scheduled_cancel",
-  "subscription.canceled": "canceled",
-  "subscription.past_due": "past_due",
-  "subscription.expired": "expired",
-  "subscription.paused": "paused",
-};
-
-export function buildSubscriptionUpdates(event: BillingWebhookEvent) {
-  const object = event.data;
-  const productId = object.product?.id;
-  const mapped = productId ? planForProductId(productId) : null;
-  const units = object.items?.[0]?.units;
-
-  const updates: Partial<typeof workspaceBillingTable.$inferInsert> = {
-    status: object.status ?? SUBSCRIPTION_EVENT_STATUS[event.type] ?? undefined,
-  };
-
-  const periodEnd =
-    object.current_period_end_date !== undefined
-      ? object.current_period_end_date
-      : object.currentPeriodEndDate;
-  if (periodEnd !== undefined) {
-    updates.currentPeriodEnd = parseDate(periodEnd);
-  }
-
-  const canceledAt =
-    object.canceled_at !== undefined ? object.canceled_at : object.canceledAt;
-  if (canceledAt !== undefined) {
-    updates.canceledAt = parseDate(canceledAt);
-  }
-
-  if (productId) {
-    updates.creemProductId = productId;
-    updates.plan = mapped?.plan ?? null;
-    updates.billingInterval = mapped?.interval ?? null;
-  }
-  if (typeof units === "number" && units > 0) {
-    updates.seats = units;
-  }
-  if (object.customer?.id) {
-    updates.creemCustomerId = object.customer.id;
-  }
-
-  return updates;
-}
-
-async function applyEvent(event: BillingWebhookEvent, tx: DbOrTx) {
-  const object = event.data;
-
-  if (event.type === "checkout.completed") {
-    const workspaceId =
-      object.metadata?.workspaceId ??
-      object.subscription?.metadata?.workspaceId;
-    if (!workspaceId) {
-      console.error("billing: checkout.completed without workspaceId");
-      return { processed: false, duplicate: false };
+  if (charge.kind === "checkout") {
+    if (!succeeded) {
+      return;
     }
-
-    const productId = object.product?.id ?? object.subscription?.product?.id;
-    const mapped = productId ? planForProductId(productId) : null;
-
     await tx
       .update(workspaceBillingTable)
       .set({
-        creemCustomerId:
-          object.customer?.id ?? object.subscription?.customer?.id ?? null,
-        creemSubscriptionId: object.subscription?.id ?? null,
-        creemProductId: productId ?? null,
-        plan: mapped?.plan ?? null,
-        billingInterval: mapped?.interval ?? null,
-        status: object.subscription?.status ?? "active",
+        status: "active",
+        plan,
+        billingInterval: interval,
+        seats: charge.seats ?? 1,
+        paytrCardToken: body.utoken || undefined,
+        paytrCardTokenId: body.ctoken || undefined,
+        currentPeriodEnd: advancePeriodEnd(new Date(), interval ?? "monthly"),
+        canceledAt: null,
+        renewalAttempts: 0,
+        renewalFirstFailedAt: null,
       })
-      .where(eq(workspaceBillingTable.workspaceId, workspaceId));
-    return { processed: true, duplicate: false };
+      .where(eq(workspaceBillingTable.workspaceId, charge.workspaceId));
+    return;
   }
 
-  if (event.type.startsWith("subscription.")) {
-    const subscriptionId = object.id;
-    if (!subscriptionId) {
-      return { processed: false, duplicate: false };
+  if (charge.kind === "renewal") {
+    const [billing] = await tx
+      .select()
+      .from(workspaceBillingTable)
+      .where(eq(workspaceBillingTable.workspaceId, charge.workspaceId));
+    if (!billing) {
+      return;
     }
 
-    const updates = buildSubscriptionUpdates(event);
-
-    const updated = await tx
-      .update(workspaceBillingTable)
-      .set(updates)
-      .where(eq(workspaceBillingTable.creemSubscriptionId, subscriptionId))
-      .returning({ id: workspaceBillingTable.id });
-
-    if (updated.length === 0 && object.metadata?.workspaceId) {
+    if (succeeded) {
       await tx
         .update(workspaceBillingTable)
-        .set({ ...updates, creemSubscriptionId: subscriptionId })
-        .where(
-          eq(workspaceBillingTable.workspaceId, object.metadata.workspaceId),
-        );
+        .set({
+          status: "active",
+          currentPeriodEnd: advancePeriodEnd(
+            billing.currentPeriodEnd ?? new Date(),
+            (billing.billingInterval as BillingInterval) ?? "monthly",
+          ),
+          renewalAttempts: 0,
+          renewalFirstFailedAt: null,
+        })
+        .where(eq(workspaceBillingTable.workspaceId, charge.workspaceId));
     }
-    return { processed: true, duplicate: false };
+    // Failure is handled by the renewal scheduler itself (it owns the
+    // retry/grace-window bookkeeping and re-checks status on its next run),
+    // so a failed callback here is intentionally a no-op.
+    return;
   }
 
-  return { processed: true, duplicate: false };
+  if (charge.kind === "seat_topup") {
+    if (!succeeded) {
+      // Keep the previous seat count; the caller already avoided persisting
+      // the increase until this callback confirms the top-up charge.
+      return;
+    }
+    await tx
+      .update(workspaceBillingTable)
+      .set({ seats: charge.seats ?? undefined })
+      .where(eq(workspaceBillingTable.workspaceId, charge.workspaceId));
+  }
 }
 
-async function handleWebhook(event: BillingWebhookEvent) {
-  const eventId = event.id;
-  if (!eventId) {
-    return applyEvent(event, db);
+async function handleCallback(body: PaytrCallbackBody) {
+  const merchantOid = body.merchant_oid ?? "";
+  const status = body.status ?? "";
+  const totalAmount = body.total_amount ?? "";
+  const hash = body.hash ?? "";
+
+  if (
+    !verifyCallbackHash({
+      merchantOid,
+      status,
+      totalAmount,
+      hash,
+    })
+  ) {
+    console.error("billing: callback hash verification failed", {
+      merchantOid,
+    });
+    return { ok: false as const, reason: "Invalid signature" };
   }
 
-  // A claim that outlives a failed apply makes the retry look like a duplicate.
-  return db.transaction(async (tx) => {
+  // A claim that outlives a failed apply makes the retry look like a
+  // duplicate, so the insert and the apply share a transaction.
+  const result = await db.transaction(async (tx) => {
     const [claimed] = await tx
       .insert(billingEventTable)
-      .values({ id: eventId, eventType: event.type })
+      .values({ id: merchantOid, eventType: `paytr.${status}` })
       .onConflictDoNothing({ target: billingEventTable.id })
       .returning();
 
@@ -168,8 +119,23 @@ async function handleWebhook(event: BillingWebhookEvent) {
       return { processed: false, duplicate: true };
     }
 
-    return applyEvent(event, tx);
+    const [charge] = await tx
+      .select()
+      .from(billingChargeTable)
+      .where(eq(billingChargeTable.id, merchantOid));
+
+    if (!charge) {
+      console.error("billing: callback for unknown merchant_oid", {
+        merchantOid,
+      });
+      return { processed: false, duplicate: false };
+    }
+
+    await applyCharge(body, charge, tx);
+    return { processed: true, duplicate: false };
   });
+
+  return { ok: true as const, ...result };
 }
 
-export default handleWebhook;
+export default handleCallback;

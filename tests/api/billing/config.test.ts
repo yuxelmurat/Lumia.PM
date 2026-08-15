@@ -2,19 +2,20 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   foundingCutoff,
   isBillingEnabled,
-  planForProductId,
-  productIdFor,
+  perSeatPriceFor,
+  priceFor,
   trialDays,
 } from "../../../apps/api/src/billing/config";
 
 const KEYS = [
   "KANEO_CLOUD",
-  "CREEM_API_KEY",
-  "CREEM_WEBHOOK_SECRET",
-  "CREEM_PRODUCT_PERSONAL_MONTHLY",
-  "CREEM_PRODUCT_PERSONAL_ANNUAL",
-  "CREEM_PRODUCT_TEAM_MONTHLY",
-  "CREEM_PRODUCT_TEAM_ANNUAL",
+  "PAYTR_MERCHANT_ID",
+  "PAYTR_MERCHANT_KEY",
+  "PAYTR_MERCHANT_SALT",
+  "PAYTR_PRICE_PERSONAL_MONTHLY",
+  "PAYTR_PRICE_PERSONAL_ANNUAL",
+  "PAYTR_PRICE_TEAM_MONTHLY",
+  "PAYTR_PRICE_TEAM_ANNUAL",
   "BILLING_TRIAL_DAYS",
   "BILLING_FOUNDING_CUTOFF",
 ];
@@ -40,42 +41,48 @@ afterEach(() => {
 });
 
 describe("billing config", () => {
-  it("is disabled unless cloud + both keys are set", () => {
+  it("is disabled unless cloud + merchant credentials are set", () => {
     expect(isBillingEnabled()).toBe(false);
 
     process.env.KANEO_CLOUD = "true";
     expect(isBillingEnabled()).toBe(false);
 
-    process.env.CREEM_API_KEY = "key";
+    process.env.PAYTR_MERCHANT_ID = "123";
     expect(isBillingEnabled()).toBe(false);
 
-    process.env.CREEM_WEBHOOK_SECRET = "secret";
+    process.env.PAYTR_MERCHANT_KEY = "key";
+    expect(isBillingEnabled()).toBe(false);
+
+    process.env.PAYTR_MERCHANT_SALT = "salt";
     expect(isBillingEnabled()).toBe(true);
   });
 
-  it("stays disabled for self-hosted even with keys present", () => {
-    process.env.CREEM_API_KEY = "key";
-    process.env.CREEM_WEBHOOK_SECRET = "secret";
+  it("stays disabled for self-hosted even with credentials present", () => {
+    process.env.PAYTR_MERCHANT_ID = "123";
+    process.env.PAYTR_MERCHANT_KEY = "key";
+    process.env.PAYTR_MERCHANT_SALT = "salt";
     expect(isBillingEnabled()).toBe(false);
   });
 
-  it("maps plan+interval to product id and back", () => {
-    process.env.CREEM_PRODUCT_PERSONAL_MONTHLY = "prod_pm";
-    process.env.CREEM_PRODUCT_TEAM_ANNUAL = "prod_ta";
+  it("reads plan+interval prices in kurus", () => {
+    process.env.PAYTR_PRICE_PERSONAL_MONTHLY = "40000";
+    process.env.PAYTR_PRICE_TEAM_ANNUAL = "500000";
 
-    expect(productIdFor("personal", "monthly")).toBe("prod_pm");
-    expect(productIdFor("team", "annual")).toBe("prod_ta");
-    expect(productIdFor("personal", "annual")).toBeNull();
+    expect(priceFor("personal", "monthly")).toBe(40000);
+    expect(priceFor("team", "annual")).toBe(500000);
+    expect(priceFor("personal", "annual")).toBeNull();
+  });
 
-    expect(planForProductId("prod_pm")).toEqual({
-      plan: "personal",
-      interval: "monthly",
-    });
-    expect(planForProductId("prod_ta")).toEqual({
-      plan: "team",
-      interval: "annual",
-    });
-    expect(planForProductId("prod_unknown")).toBeNull();
+  it("rejects unset or non-positive prices", () => {
+    process.env.PAYTR_PRICE_TEAM_MONTHLY = "0";
+    expect(priceFor("team", "monthly")).toBeNull();
+    process.env.PAYTR_PRICE_TEAM_MONTHLY = "not-a-number";
+    expect(priceFor("team", "monthly")).toBeNull();
+  });
+
+  it("uses the team plan price as the per-seat price", () => {
+    process.env.PAYTR_PRICE_TEAM_MONTHLY = "50000";
+    expect(perSeatPriceFor("monthly")).toBe(50000);
   });
 
   it("defaults trial to 14 days and reads override", () => {

@@ -104,7 +104,7 @@ async function getWorkspacesNeedingReminder(type: ReminderType, now: Date) {
         isNull(billingReminderSentTable.id),
         eq(workspaceBillingTable.foundingFree, false),
         isNotNull(workspaceBillingTable.trialEndsAt),
-        isNull(workspaceBillingTable.creemSubscriptionId),
+        isNull(workspaceBillingTable.plan),
         trialWindow,
         eq(userTable.banned, false),
       ),

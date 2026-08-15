@@ -21,7 +21,7 @@ const notes = [
   },
   {
     title: "Fair billing",
-    body: "Payments are processed by Creem as merchant of record; applicable taxes are handled where required. Cancel anytime; your plan stays active until the end of the billing period.",
+    body: "Payments are processed securely by PayTR. Cancel anytime; your plan stays active until the end of the billing period.",
   },
   {
     title: "Questions?",

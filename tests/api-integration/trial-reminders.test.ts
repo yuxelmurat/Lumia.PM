@@ -29,8 +29,9 @@ const DAY = 24 * 60 * 60 * 1000;
 
 const CLOUD_ENV = {
   KANEO_CLOUD: "true",
-  CREEM_API_KEY: "creem_test_dummy",
-  CREEM_WEBHOOK_SECRET: "whsec_dummy",
+  PAYTR_MERCHANT_ID: "123",
+  PAYTR_MERCHANT_KEY: "paytr_test_dummy",
+  PAYTR_MERCHANT_SALT: "paytr_salt_dummy",
   SMTP_HOST: "smtp.example.com",
   SMTP_FROM: "kaneo@example.com",
   BILLING_REMINDER_MAX_PER_RUN: "2",
@@ -156,7 +157,7 @@ describe("trial reminder emails", () => {
   it("skips founding-free workspaces and paying subscribers", async () => {
     await seedTrial(null, { foundingFree: true });
     await seedTrial(new Date(Date.now() - DAY), {
-      creemSubscriptionId: `sub_${randomUUID()}`,
+      plan: "personal",
       status: "active",
     });
 

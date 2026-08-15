@@ -1,23 +1,42 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, Check, Sparkles, TriangleAlert } from "lucide-react";
+import { Check, Sparkles, TriangleAlert } from "lucide-react";
+import type { FormEvent } from "react";
 import { useState } from "react";
+import { z } from "zod";
 import PageTitle from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import {
+  submitDirectApiForm,
+  useCancelSubscription,
   useCreateCheckout,
-  useOpenBillingPortal,
 } from "@/hooks/mutations/billing/use-billing-actions";
 import { useGetBilling } from "@/hooks/queries/billing/use-get-billing";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { cn } from "@/lib/cn";
 
+const searchSchema = z.object({
+  openPlan: z.enum(["personal", "team"]).optional(),
+  openInterval: z.enum(["monthly", "annual"]).optional(),
+});
+
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/settings/workspace/billing",
 )({
   component: RouteComponent,
+  validateSearch: searchSchema,
 });
 
 type Interval = "monthly" | "annual";
@@ -113,15 +132,146 @@ function SectionHeader({
   );
 }
 
+/**
+ * Collects the card PayTR will store for auto-renewal. The card fields are
+ * merged into the signed field set our server returned and the whole form
+ * is POSTed straight to PayTR's domain — this dialog's <form> never sends
+ * card data through our own backend.
+ */
+function CardCheckoutDialog({
+  open,
+  onOpenChange,
+  planName,
+  workspaceId,
+  plan,
+  interval,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  planName: string;
+  workspaceId: string | undefined;
+  plan: PlanKey;
+  interval: Interval;
+}) {
+  const checkout = useCreateCheckout(workspaceId);
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryMonth, setExpiryMonth] = useState("");
+  const [expiryYear, setExpiryYear] = useState("");
+  const [cvv, setCvv] = useState("");
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    const { actionUrl, fields } = await checkout.mutateAsync({
+      plan,
+      interval,
+    });
+    submitDirectApiForm(actionUrl, {
+      ...fields,
+      cc_owner: cardName,
+      card_number: cardNumber.replace(/\s+/g, ""),
+      expiry_month: expiryMonth,
+      expiry_year: expiryYear,
+      cvv,
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Subscribe to {planName}</DialogTitle>
+            <DialogDescription>
+              Payments are securely processed by PayTR. Your card is saved for
+              automatic renewal; cancel anytime from this page.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="cc_owner">Name on card</Label>
+              <Input
+                id="cc_owner"
+                required
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="card_number">Card number</Label>
+              <Input
+                id="card_number"
+                required
+                inputMode="numeric"
+                autoComplete="cc-number"
+                maxLength={19}
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="expiry_month">Month</Label>
+                <Input
+                  id="expiry_month"
+                  required
+                  placeholder="MM"
+                  inputMode="numeric"
+                  maxLength={2}
+                  value={expiryMonth}
+                  onChange={(e) => setExpiryMonth(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="expiry_year">Year</Label>
+                <Input
+                  id="expiry_year"
+                  required
+                  placeholder="YY"
+                  inputMode="numeric"
+                  maxLength={2}
+                  value={expiryYear}
+                  onChange={(e) => setExpiryYear(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cvv">CVV</Label>
+                <Input
+                  id="cvv"
+                  required
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={cvv}
+                  onChange={(e) => setCvv(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" disabled={checkout.isPending}>
+              {checkout.isPending ? "Preparing…" : "Subscribe"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function RouteComponent() {
   const { workspace, isAdmin } = useWorkspacePermission();
   const workspaceId = workspace?.id;
   const canManage = isAdmin;
+  const search = Route.useSearch();
 
   const { data: billing, isLoading } = useGetBilling(workspaceId);
-  const checkout = useCreateCheckout(workspaceId);
-  const portal = useOpenBillingPortal(workspaceId);
-  const [interval, setInterval] = useState<Interval>("annual");
+  const cancelSubscription = useCancelSubscription(workspaceId);
+  const [interval, setInterval] = useState<Interval>(
+    search.openInterval ?? "annual",
+  );
+  const [checkoutPlan, setCheckoutPlan] = useState<PlanKey | null>(
+    search.openPlan ?? null,
+  );
 
   if (isLoading) {
     return (
@@ -234,17 +384,20 @@ function RouteComponent() {
               <Separator />
               <div className="flex flex-col items-start gap-3 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-muted-foreground text-xs">
-                  Update payment method, view invoices, or cancel anytime.
+                  {billing.canceledAt
+                    ? "This subscription is canceled and won't renew."
+                    : "Cancel anytime; access continues until the end of the billing period."}
                 </p>
-                {billing.hasCustomer ? (
+                {!billing.canceledAt ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={!canManage || portal.isPending}
-                    onClick={() => portal.mutate()}
+                    disabled={!canManage || cancelSubscription.isPending}
+                    onClick={() => cancelSubscription.mutate()}
                   >
-                    {portal.isPending ? "Opening…" : "Manage billing"}
-                    <ArrowUpRight className="size-4" />
+                    {cancelSubscription.isPending
+                      ? "Canceling…"
+                      : "Cancel subscription"}
                   </Button>
                 ) : null}
               </div>
@@ -377,12 +530,10 @@ function RouteComponent() {
                       <Button
                         variant={p.highlighted ? "default" : "outline"}
                         className="mt-8 w-full"
-                        disabled={!canManage || checkout.isPending}
-                        onClick={() =>
-                          checkout.mutate({ plan: p.plan, interval })
-                        }
+                        disabled={!canManage}
+                        onClick={() => setCheckoutPlan(p.plan)}
                       >
-                        {checkout.isPending ? "Starting…" : `Choose ${p.name}`}
+                        {`Choose ${p.name}`}
                       </Button>
                     </div>
                   );
@@ -392,12 +543,26 @@ function RouteComponent() {
 
             <p className="text-muted-foreground text-xs">
               {canManage
-                ? "Payments are securely processed by Creem. Prices exclude tax where applicable."
+                ? "Payments are securely processed by PayTR. Prices exclude tax where applicable."
                 : "Only workspace owners and admins can manage billing."}
             </p>
           </div>
         ) : null}
       </div>
+      {checkoutPlan ? (
+        <CardCheckoutDialog
+          open={Boolean(checkoutPlan)}
+          onOpenChange={(next) => {
+            if (!next) setCheckoutPlan(null);
+          }}
+          planName={
+            PLANS.find((p) => p.plan === checkoutPlan)?.name ?? checkoutPlan
+          }
+          workspaceId={workspaceId}
+          plan={checkoutPlan}
+          interval={interval}
+        />
+      ) : null}
     </>
   );
 }

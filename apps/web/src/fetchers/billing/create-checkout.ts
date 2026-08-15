@@ -21,8 +21,8 @@ export async function createBillingCheckout(input: {
   return response.json();
 }
 
-export async function createBillingPortal(workspaceId: string) {
-  const response = await client.billing[":workspaceId"].portal.$post({
+export async function cancelBillingSubscription(workspaceId: string) {
+  const response = await client.billing[":workspaceId"].cancel.$post({
     param: { workspaceId },
   });
 

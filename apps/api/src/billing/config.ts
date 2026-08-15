@@ -3,35 +3,46 @@ import { isCloud } from "../utils/is-cloud";
 export type Plan = "personal" | "team";
 export type BillingInterval = "monthly" | "annual";
 
-const PRODUCT_ENV_KEYS: Record<Plan, Record<BillingInterval, string>> = {
+// PayTR has no product catalog: prices live in env vars, expressed in kurus
+// (TRY x100) since that's the smallest unit PayTR's payment_amount expects.
+const PRICE_ENV_KEYS: Record<Plan, Record<BillingInterval, string>> = {
   personal: {
-    monthly: "CREEM_PRODUCT_PERSONAL_MONTHLY",
-    annual: "CREEM_PRODUCT_PERSONAL_ANNUAL",
+    monthly: "PAYTR_PRICE_PERSONAL_MONTHLY",
+    annual: "PAYTR_PRICE_PERSONAL_ANNUAL",
   },
   team: {
-    monthly: "CREEM_PRODUCT_TEAM_MONTHLY",
-    annual: "CREEM_PRODUCT_TEAM_ANNUAL",
+    monthly: "PAYTR_PRICE_TEAM_MONTHLY",
+    annual: "PAYTR_PRICE_TEAM_ANNUAL",
   },
 };
 
 export function isBillingEnabled() {
   return Boolean(
-    isCloud() && process.env.CREEM_API_KEY && process.env.CREEM_WEBHOOK_SECRET,
+    isCloud() &&
+      process.env.PAYTR_MERCHANT_ID &&
+      process.env.PAYTR_MERCHANT_KEY &&
+      process.env.PAYTR_MERCHANT_SALT,
   );
 }
 
-export function creemApiBaseUrl() {
-  return process.env.CREEM_TEST_MODE === "true"
-    ? "https://test-api.creem.io"
-    : "https://api.creem.io";
+export function paytrTestMode() {
+  return process.env.PAYTR_TEST_MODE === "true";
 }
 
-export function creemApiKey() {
-  return process.env.CREEM_API_KEY ?? "";
+export function paytrMerchantId() {
+  return process.env.PAYTR_MERCHANT_ID ?? "";
 }
 
-export function creemWebhookSecret() {
-  return process.env.CREEM_WEBHOOK_SECRET ?? "";
+export function paytrMerchantKey() {
+  return process.env.PAYTR_MERCHANT_KEY ?? "";
+}
+
+export function paytrMerchantSalt() {
+  return process.env.PAYTR_MERCHANT_SALT ?? "";
+}
+
+export function paytrCurrency() {
+  return process.env.PAYTR_CURRENCY ?? "TL";
 }
 
 export function trialDays() {
@@ -48,22 +59,21 @@ export function foundingCutoff(): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-export function productIdFor(
-  plan: Plan,
-  interval: BillingInterval,
-): string | null {
-  return process.env[PRODUCT_ENV_KEYS[plan][interval]] ?? null;
+/** Price for a plan/interval in kurus (TRY x100), or null when unconfigured. */
+export function priceFor(plan: Plan, interval: BillingInterval): number | null {
+  const raw = process.env[PRICE_ENV_KEYS[plan][interval]];
+  if (!raw) {
+    return null;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
 }
 
-export function planForProductId(
-  productId: string,
-): { plan: Plan; interval: BillingInterval } | null {
-  for (const plan of ["personal", "team"] as const) {
-    for (const interval of ["monthly", "annual"] as const) {
-      if (process.env[PRODUCT_ENV_KEYS[plan][interval]] === productId) {
-        return { plan, interval };
-      }
-    }
-  }
-  return null;
+/**
+ * Per-seat price in kurus for the team plan. The team price env vars are
+ * already defined per-seat (matching how the old Creem `units` line item
+ * priced each seat individually), so this is just `priceFor("team", ...)`.
+ */
+export function perSeatPriceFor(interval: BillingInterval): number | null {
+  return priceFor("team", interval);
 }
