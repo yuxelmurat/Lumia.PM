@@ -6,45 +6,43 @@ export function FounderStatement() {
       <div className="mx-auto w-full max-w-6xl">
         <FadeIn>
           <h2 className="text-3xl font-semibold md:text-4xl">
-            Why Kaneo exists
+            Why Lumia.PM exists
           </h2>
         </FadeIn>
         <FadeIn delay={80}>
           <div className="mt-6 space-y-6 text-lg leading-relaxed text-muted-foreground">
             <p>
               I&apos;m{" "}
-              <strong className="font-medium text-foreground">Andrej</strong>,
-              and I created Kaneo because I was tired of project management
-              tools that got in the way more than they helped. After years of
-              using bloated, overcomplicated platforms that
               <strong className="font-medium text-foreground">
-                {" "}
-                distracted from actual work
+                Murat Yüksel
               </strong>
-              , I knew there had to be a better way.
+              , and I built Lumia.PM after watching how much of an interior
+              architecture studio&apos;s work happens{" "}
+              <strong className="font-medium text-foreground">
+                outside any tool
+              </strong>{" "}
+              — a render gets emailed over, a client replies "looks good" in a
+              WhatsApp message three days later, and nobody has a clean record
+              of what was actually approved.
             </p>
             <p>
-              The problem wasn&apos;t that these tools lacked features - it was
-              that they had
-              <strong className="font-medium text-foreground"> too many</strong>
-              . Every notification, every unnecessary button, every complex
-              workflow was pulling my team away from what mattered:{" "}
+              Generic project management software wasn&apos;t built for that
+              moment. It assumes your client has an account, wants a login, and
+              cares about your internal workflow. They don&apos;t —{" "}
               <strong className="font-medium text-foreground">
-                building great products
+                they just want to see the render and say yes or no
               </strong>
               .
             </p>
             <p>
-              I believe the best tools are{" "}
-              <strong className="font-medium text-foreground">invisible</strong>
-              . They should amplify your team&apos;s natural workflow, not force
-              you to adapt to theirs. Kaneo is built on the principle that
+              Lumia.PM is built around that one moment: your team plans and
+              executes the work, and your client gets a single branded link —
+              your studio&apos;s name and mark, not ours — where they review and
+              approve, with{" "}
               <strong className="font-medium text-foreground">
-                {" "}
-                less is more
-              </strong>{" "}
-              - every feature exists because it solves a real problem, not
-              because it looks impressive in a demo.
+                a record of who decided what, and when
+              </strong>
+              .
             </p>
           </div>
         </FadeIn>

@@ -1,4 +1,5 @@
 import { Logo } from "@/components/landing/logo";
+import { appUrl } from "@/lib/app-url";
 
 export function Footer() {
   return (
@@ -40,14 +41,14 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="md:col-span-5 grid gap-6 sm:grid-cols-5">
+          <div className="md:col-span-5 grid gap-6 sm:grid-cols-3">
             <div className="space-y-3 text-sm">
               <p className="font-medium">Product</p>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://cloud.kaneo.app"
+                href={appUrl("/auth/sign-in")}
               >
-                Open Cloud
+                Sign in
               </a>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"
@@ -66,78 +67,6 @@ export function Footer() {
                 href="/pricing"
               >
                 Pricing
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/jira-alternative"
-              >
-                vs Jira
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/trello-alternative"
-              >
-                vs Trello
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/linear-alternative"
-              >
-                vs Linear
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="/planka-alternative"
-              >
-                vs PLANKA
-              </a>
-            </div>
-
-            <div className="space-y-3 text-sm">
-              <p className="font-medium">Resources</p>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/usekaneo/kaneo"
-                target="_blank"
-                rel="noreferrer"
-              >
-                GitHub
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/usekaneo/kaneo/blob/main/LICENSE"
-                target="_blank"
-                rel="noreferrer"
-              >
-                License
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/usekaneo/kaneo/blob/main/CONTRIBUTING.md"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Contributing
-              </a>
-            </div>
-
-            <div className="space-y-3 text-sm">
-              <p className="font-medium">Community</p>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://discord.com/invite/rU4tSyhXXU"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Discord
-              </a>
-              <a
-                className="block text-muted-foreground transition-colors hover:text-foreground"
-                href="https://github.com/sponsors/andrejsshell"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Sponsor
               </a>
               <a
                 className="block text-muted-foreground transition-colors hover:text-foreground"

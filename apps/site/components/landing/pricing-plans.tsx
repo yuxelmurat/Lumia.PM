@@ -2,8 +2,7 @@
 
 import { Check } from "lucide-react";
 import { useState } from "react";
-
-const APP_URL = "https://cloud.kaneo.app";
+import { appUrl } from "@/lib/app-url";
 
 type Interval = "monthly" | "annual";
 
@@ -48,7 +47,7 @@ const plans: Plan[] = [
       "Automatic backups and updates",
       "Email support",
     ],
-    cta: { href: APP_URL, label: "Start 14-day free trial" },
+    cta: { href: appUrl(), label: "Start 14-day free trial" },
   },
   {
     name: "Cloud Team",
@@ -67,7 +66,7 @@ const plans: Plan[] = [
       "Automatic backups and updates",
       "Priority email support",
     ],
-    cta: { href: APP_URL, label: "Start 14-day free trial" },
+    cta: { href: appUrl(), label: "Start 14-day free trial" },
     highlighted: true,
   },
 ];
@@ -106,7 +105,7 @@ export function PricingPlans() {
           {plans.map((plan) => {
             const price = interval === "monthly" ? plan.monthly : plan.annual;
             const href = plan.checkout
-              ? `${APP_URL}/auth/sign-up?checkout=${plan.checkout}-${interval}`
+              ? appUrl(`/auth/sign-up?checkout=${plan.checkout}-${interval}`)
               : plan.cta.href;
             return (
               <article

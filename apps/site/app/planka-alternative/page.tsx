@@ -5,7 +5,7 @@ import { comparisons } from "@/lib/comparisons";
 export const metadata: Metadata = {
   title: "PLANKA alternative with free SSO",
   description:
-    "PLANKA moved SSO to its paid Pro tier. Kaneo is an MIT-licensed, self-hostable project management tool with SSO included for free, and a one-command importer for your PLANKA boards.",
+    "PLANKA moved SSO to its paid Pro tier. Lumia.PM is an MIT-licensed, self-hostable project management tool with SSO included for free, and a one-command importer for your PLANKA boards.",
   alternates: { canonical: "/planka-alternative" },
 };
 

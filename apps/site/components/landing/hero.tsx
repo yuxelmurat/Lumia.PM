@@ -1,10 +1,9 @@
 "use client";
 
-import {} from "lucide-react";
-import { GithubIcon } from "@/components/icons/github-icon";
 import { AppPreview } from "@/components/landing/app-preview";
 import { FadeIn } from "@/components/landing/fade-in";
 import { Button } from "@/components/ui/button";
+import { appUrl } from "@/lib/app-url";
 
 export function Hero() {
   return (
@@ -14,14 +13,15 @@ export function Hero() {
         <div className="mb-10 max-w-2xl">
           <FadeIn delay={0}>
             <h1 className="text-balance text-4xl font-medium leading-[1.06] md:text-5xl lg:text-6xl">
-              All you <span className="text-primary">need</span>. Nothing you
-              don&apos;t.
+              Send a render. Get a{" "}
+              <span className="text-primary">decision</span>.
             </h1>
           </FadeIn>
           <FadeIn delay={80}>
             <p className="mt-5 text-balance text-lg text-muted-foreground leading-relaxed md:text-xl">
-              Kaneo gives you clean planning, focused execution, and full
-              ownership of your workflow from backlog to release.
+              Lumia.PM is project management for interior architecture studios:
+              plan the work, and send clients a branded link where they approve
+              renders without ever seeing your workspace.
             </p>
           </FadeIn>
 
@@ -31,31 +31,10 @@ export function Hero() {
                 size="lg"
                 className="gap-2"
                 onClick={() => {
-                  window.location.href = "https://cloud.kaneo.app";
+                  window.location.href = appUrl("/auth/sign-up");
                 }}
               >
-                Cloud
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2"
-                onClick={() => {
-                  window.location.href = "/docs/core";
-                }}
-              >
-                Get Started
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="gap-2"
-                onClick={() => {
-                  window.location.href = "https://github.com/usekaneo/kaneo";
-                }}
-              >
-                <GithubIcon className="h-4 w-4" />
-                GitHub
+                Start free trial
               </Button>
               <Button
                 variant="outline"
@@ -67,11 +46,21 @@ export function Hero() {
               >
                 Pricing
               </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="gap-2"
+                onClick={() => {
+                  window.location.href = "/about";
+                }}
+              >
+                About Lumia.PM
+              </Button>
             </div>
           </FadeIn>
         </div>
 
-        {/* ── App preview: interactive mock of the real Kaneo UI ── */}
+        {/* ── App preview: interactive mock of the real Lumia.PM UI ── */}
         <FadeIn delay={240} distance={32}>
           <AppPreview />
         </FadeIn>

@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { appUrl } from "@/lib/app-url";
 import { cn } from "@/lib/utils";
 
 type LinkItem = {
@@ -89,15 +90,7 @@ const navigationLinks: NavigationLink[] = [
     items: [
       { href: "#why", label: "Why Lumia.PM" },
       { href: "/about", label: "Company" },
-      { href: "https://github.com/usekaneo/kaneo", label: "Open Source" },
-      {
-        href: "https://cloud.kaneo.app/public-project/vlu4ak2w8rs9rn1r4lirj2u1",
-        label: "Roadmap",
-      },
-      {
-        href: "https://github.com/usekaneo/kaneo/blob/main/CONTRIBUTING.md",
-        label: "Contributing",
-      },
+      { href: "mailto:sale@lumiapm.com", label: "Contact sales" },
     ],
     label: "About",
     submenu: true,
@@ -258,21 +251,11 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Button
-            className="text-sm max-sm:hidden"
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              window.location.href = "https://github.com/sponsors/andrejsshell";
-            }}
-          >
-            Sponsor
-          </Button>
-          <Button
             className="text-sm"
             size="sm"
             variant="ghost"
             onClick={() => {
-              window.location.href = "https://cloud.kaneo.app/auth/sign-in";
+              window.location.href = appUrl("/auth/sign-in");
             }}
           >
             Sign In
@@ -281,7 +264,7 @@ export function Navbar() {
             className="text-sm"
             size="sm"
             onClick={() => {
-              window.location.href = "https://cloud.kaneo.app";
+              window.location.href = appUrl("/auth/sign-up");
             }}
           >
             Get Started
