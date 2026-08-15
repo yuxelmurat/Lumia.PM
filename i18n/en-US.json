@@ -860,6 +860,9 @@
 			"title": "Watermark",
 			"subtitle": "Stamp a visible mark onto images uploaded to tasks in public projects.",
 			"scopeNotice": "Watermarking only applies to images uploaded to tasks in public projects, and only to new uploads going forward — turning this on (or changing settings) does not retroactively watermark or re-watermark images already uploaded.",
+			"readOnlyNotice": "You have view-only access to watermark settings. Ask a workspace admin to make changes.",
+			"noPermissionHint": "You don't have permission to change this.",
+			"enableToEditHint": "Enable watermarking above to edit this.",
 			"enableLabel": "Enable watermarking",
 			"enableHint": "This is a branding/deterrent measure, not real protection — it discourages casual reuse, but anyone can still screenshot or crop it out.",
 			"styleTitle": "Style",
@@ -2277,6 +2280,7 @@
 		"taskCard": {
 			"viewDetailsAria": "View details for task {{title}}"
 		},
+		"emptyColumn": "No tasks in {{column}}",
 		"taskDetail": {
 			"labels": "Labels",
 			"externalLinks": "External Links",

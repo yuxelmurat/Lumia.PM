@@ -65,7 +65,7 @@ function RouteComponent() {
   return (
     <>
       <PageTitle title={t("publicProject:pageTitle")} />
-      <div className="min-h-screen bg-background flex flex-col w-full">
+      <div className="h-svh bg-background flex flex-col w-full">
         <header className="border-b border-border sticky top-0 z-10 bg-background">
           {project.workspaceName || project.workspaceLogo ? (
             <div className="px-6 py-2 border-b border-border/60 bg-muted/30">

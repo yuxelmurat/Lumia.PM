@@ -109,16 +109,7 @@ export function PublicTaskCard({
       )}
 
       <div className="mb-3">
-        <h3
-          className="font-medium text-foreground text-sm leading-relaxed overflow-hidden break-words"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            wordBreak: "break-word",
-            hyphens: "auto",
-          }}
-        >
+        <h3 className="font-medium text-foreground text-sm leading-relaxed line-clamp-3 break-words [hyphens:auto]">
           {task.title}
         </h3>
       </div>

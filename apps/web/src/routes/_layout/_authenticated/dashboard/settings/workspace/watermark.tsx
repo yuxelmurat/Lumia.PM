@@ -6,6 +6,19 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import PageTitle from "@/components/page-title";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionPanel,
+} from "@/components/ui/accordion";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -327,6 +340,12 @@ function RouteComponent() {
           {t("settings:workspaceWatermark.scopeNotice")}
         </div>
 
+        {!canEdit && (
+          <div className="rounded-md border border-border bg-sidebar p-4 text-xs text-muted-foreground">
+            {t("settings:workspaceWatermark.readOnlyNotice")}
+          </div>
+        )}
+
         <div className="space-y-6">
           <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
             <div className="flex items-center justify-between">
@@ -395,6 +414,15 @@ function RouteComponent() {
               <p className="text-xs text-muted-foreground">
                 {t(`settings:workspaceWatermark.styles.${style}.description`)}
               </p>
+              {!canEdit ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("settings:workspaceWatermark.noPermissionHint")}
+                </p>
+              ) : !enabled ? (
+                <p className="text-xs text-muted-foreground">
+                  {t("settings:workspaceWatermark.enableToEditHint")}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -410,122 +438,177 @@ function RouteComponent() {
           </div>
 
           <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-              <div className="space-y-0.5">
-                <Label className="text-sm font-medium">
-                  {t("settings:workspaceWatermark.imageUrlLabel")}
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  {t("settings:workspaceWatermark.imageUrlHint")}
-                </p>
-              </div>
-              <Input
-                className="w-full sm:w-64"
-                placeholder={t(
-                  "settings:workspaceWatermark.imageUrlPlaceholder",
-                )}
-                disabled={!canEdit || !enabled}
-                {...watermarkForm.register("watermarkImageUrl")}
-              />
-            </div>
-            {watermarkForm.formState.errors.watermarkImageUrl ? (
-              <p className="text-xs text-destructive">
-                {watermarkForm.formState.errors.watermarkImageUrl.message}
-              </p>
-            ) : null}
+            <Form {...watermarkForm}>
+              <form>
+                <FormField
+                  control={watermarkForm.control}
+                  name="watermarkImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceWatermark.imageUrlLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceWatermark.imageUrlHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <Input
+                            className="w-full sm:w-64"
+                            placeholder={t(
+                              "settings:workspaceWatermark.imageUrlPlaceholder",
+                            )}
+                            disabled={!canEdit || !enabled}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      {!canEdit ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("settings:workspaceWatermark.noPermissionHint")}
+                        </p>
+                      ) : !enabled ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("settings:workspaceWatermark.enableToEditHint")}
+                        </p>
+                      ) : null}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
           </div>
         </div>
 
-        {(showCornerFields || showSizeField) && (
-          <div className="space-y-6">
-            <div className="space-y-1">
-              <h2 className="text-md font-medium">
-                {t("settings:workspaceWatermark.positionTitle")}
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                {t("settings:workspaceWatermark.positionSubtitle")}
-              </p>
-            </div>
-
-            <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
-              {showCornerFields ? (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">
-                    {t("settings:workspaceWatermark.cornerLabel")}
-                  </Label>
-                  <Select
-                    value={watermarkForm.watch("watermarkCorner")}
-                    disabled={!canEdit}
-                    onValueChange={(value) => {
-                      if (!value || !isWatermarkCorner(value)) return;
-                      watermarkForm.setValue("watermarkCorner", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      });
-                    }}
-                  >
-                    <SelectTrigger className="w-full sm:w-64">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {WATERMARK_CORNERS.map((corner) => (
-                        <SelectItem key={corner} value={corner}>
-                          {t(`settings:workspaceWatermark.corners.${corner}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+        {/* Position & size is the one place a state change reflows the
+            persistent page layout instead of a modal row. Drive an
+            Accordion panel off the derived visibility instead of a bare
+            conditional so it animates open/closed like every other
+            expand/collapse in the settings area (see roles.tsx). There is
+            no user-facing trigger here — visibility is entirely derived
+            from form state — so only the panel is rendered, without
+            AccordionTrigger. */}
+        <Accordion
+          value={showCornerFields || showSizeField ? ["position"] : []}
+        >
+          <AccordionItem value="position" className="border-none">
+            <AccordionPanel className="px-0 pt-0 pb-0">
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <h2 className="text-md font-medium">
+                    {t("settings:workspaceWatermark.positionTitle")}
+                  </h2>
                   <p className="text-xs text-muted-foreground">
-                    {t("settings:workspaceWatermark.cornerHint")}
+                    {t("settings:workspaceWatermark.positionSubtitle")}
                   </p>
                 </div>
-              ) : null}
 
-              {showCornerFields && showSizeField ? <Separator /> : null}
-
-              {showSizeField ? (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">
-                    {t("settings:workspaceWatermark.sizeLabel")}
-                  </Label>
-                  <Input
-                    type="number"
-                    min={5}
-                    max={80}
-                    step={1}
-                    className="w-full sm:w-32"
-                    disabled={!canEdit}
-                    value={watermarkForm.watch("watermarkSizePercent")}
-                    onChange={(event) => {
-                      const value = Number(event.target.value);
-                      watermarkForm.setValue(
-                        "watermarkSizePercent",
-                        Number.isFinite(value) ? value : 0,
-                        { shouldDirty: true, shouldValidate: true },
-                      );
-                    }}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {t("settings:workspaceWatermark.sizeHint")}
-                  </p>
-                  {style === "center" ? (
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings:workspaceWatermark.sizeCenterHint")}
-                    </p>
+                <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
+                  {showCornerFields ? (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        {t("settings:workspaceWatermark.cornerLabel")}
+                      </Label>
+                      <Select
+                        value={watermarkForm.watch("watermarkCorner")}
+                        disabled={!canEdit}
+                        onValueChange={(value) => {
+                          if (!value || !isWatermarkCorner(value)) return;
+                          watermarkForm.setValue("watermarkCorner", value, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
+                      >
+                        <SelectTrigger className="w-full sm:w-64">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {WATERMARK_CORNERS.map((corner) => (
+                            <SelectItem key={corner} value={corner}>
+                              {t(
+                                `settings:workspaceWatermark.corners.${corner}`,
+                              )}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        {t("settings:workspaceWatermark.cornerHint")}
+                      </p>
+                      {!canEdit ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("settings:workspaceWatermark.noPermissionHint")}
+                        </p>
+                      ) : null}
+                    </div>
                   ) : null}
-                  {watermarkForm.formState.errors.watermarkSizePercent ? (
-                    <p className="text-xs text-destructive">
-                      {
-                        watermarkForm.formState.errors.watermarkSizePercent
-                          .message
-                      }
-                    </p>
+
+                  {showCornerFields && showSizeField ? <Separator /> : null}
+
+                  {showSizeField ? (
+                    <Form {...watermarkForm}>
+                      <form>
+                        <FormField
+                          control={watermarkForm.control}
+                          name="watermarkSizePercent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm font-medium">
+                                {t("settings:workspaceWatermark.sizeLabel")}
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min={5}
+                                  max={80}
+                                  step={1}
+                                  className="w-full sm:w-32"
+                                  disabled={!canEdit}
+                                  value={field.value}
+                                  onChange={(event) => {
+                                    const value = Number(event.target.value);
+                                    field.onChange(
+                                      Number.isFinite(value) ? value : 0,
+                                    );
+                                  }}
+                                  onBlur={field.onBlur}
+                                  name={field.name}
+                                  ref={field.ref}
+                                />
+                              </FormControl>
+                              <p className="text-xs text-muted-foreground">
+                                {t("settings:workspaceWatermark.sizeHint")}
+                              </p>
+                              {style === "center" ? (
+                                <p className="text-xs text-muted-foreground">
+                                  {t(
+                                    "settings:workspaceWatermark.sizeCenterHint",
+                                  )}
+                                </p>
+                              ) : null}
+                              {!canEdit ? (
+                                <p className="text-xs text-muted-foreground">
+                                  {t(
+                                    "settings:workspaceWatermark.noPermissionHint",
+                                  )}
+                                </p>
+                              ) : null}
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </form>
+                    </Form>
                   ) : null}
                 </div>
-              ) : null}
-            </div>
-          </div>
-        )}
+              </div>
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
       </div>
     </>
   );

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { getColumnIcon } from "@/lib/column";
 import type { ProjectWithTasks } from "@/types/project";
 import type Task from "@/types/task";
@@ -9,6 +10,7 @@ type PublicListViewProps = {
 };
 
 export function PublicListView({ project, onTaskClick }: PublicListViewProps) {
+  const { t } = useTranslation();
   const columns = project.columns ?? [];
 
   return (
@@ -45,7 +47,9 @@ export function PublicListView({ project, onTaskClick }: PublicListViewProps) {
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center mx-auto mb-2">
                       {getColumnIcon(column.id, column.isFinal, column.icon)}
                     </div>
-                    No tasks in {column.name.toLowerCase()}
+                    {t("publicProject:emptyColumn", {
+                      column: column.name.toLowerCase(),
+                    })}
                   </div>
                 )}
               </div>

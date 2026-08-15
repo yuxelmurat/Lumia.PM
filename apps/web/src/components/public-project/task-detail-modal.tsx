@@ -69,6 +69,7 @@ export function PublicTaskDetailModal({
   const [clientName, setClientName] = useState("");
   const [note, setNote] = useState("");
   const [nameError, setNameError] = useState(false);
+  const [approvalPanelVisible, setApprovalPanelVisible] = useState(false);
 
   const setApproval = useSetPublicTaskApproval();
 
@@ -81,6 +82,20 @@ export function PublicTaskDetailModal({
     setNote("");
     setNameError(false);
   }, [task?.id, open]);
+
+  // Fade+slide the status panel in whenever it (re)appears, so the
+  // approve/request-changes action reads as a confirmed state change
+  // rather than the form silently vanishing.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-trigger on the values that make the panel (re)appear
+  useEffect(() => {
+    if (!task?.approvalStatus) {
+      setApprovalPanelVisible(false);
+      return;
+    }
+    setApprovalPanelVisible(false);
+    const frame = requestAnimationFrame(() => setApprovalPanelVisible(true));
+    return () => cancelAnimationFrame(frame);
+  }, [task?.id, task?.approvalStatus, task?.approvalRespondedAt]);
 
   const closeApprovalForm = () => {
     setPendingAction(null);
@@ -385,10 +400,13 @@ export function PublicTaskDetailModal({
               {task.approvalStatus && (
                 <div
                   className={cn(
-                    "flex flex-col gap-1.5 p-3 rounded-md border",
+                    "flex flex-col gap-1.5 p-3 rounded-md border transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-[opacity]",
                     task.approvalStatus === "approved"
                       ? "bg-success/8 border-success/16"
                       : "bg-warning/8 border-warning/16",
+                    approvalPanelVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-1",
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -440,6 +458,7 @@ export function PublicTaskDetailModal({
                       className="text-xs font-medium text-muted-foreground"
                     >
                       {t("publicProject:approval.nameLabel")}
+                      <span className="text-destructive"> *</span>
                     </label>
                     <Input
                       id="approval-client-name"

@@ -291,7 +291,8 @@ function RouteComponent() {
               </div>
               <Button
                 size="sm"
-                variant="outline"
+                variant="ghost"
+                className="text-destructive hover:text-destructive transition-colors"
                 disabled={!canShare || isRegenerating}
                 onClick={() => setIsRegenerateModalOpen(true)}
               >
