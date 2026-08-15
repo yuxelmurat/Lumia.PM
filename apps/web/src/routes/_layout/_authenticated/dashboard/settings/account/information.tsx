@@ -134,24 +134,32 @@ function RouteComponent() {
     [t, updateProfile, queryClient, profileForm],
   );
 
-  const debouncedSave = useCallback(
-    (data: ProfileFormValues) => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
+  const debouncedSave = useCallback(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
 
-      debounceTimeoutRef.current = setTimeout(() => {
-        saveProfile(data);
-      }, 1000);
-    },
-    [saveProfile],
-  );
+    // `formState.isValid` is a stale snapshot when read synchronously right
+    // after a change — Zod validation runs asynchronously, so it still
+    // reflects the *previous* value for at least this tick. Re-validating
+    // with `trigger()` once the debounce has elapsed reads the real,
+    // settled result instead of silently skipping the save.
+    debounceTimeoutRef.current = setTimeout(async () => {
+      // Both `isDirty` and `isValid` are stale Proxy snapshots when read
+      // synchronously inside a `watch()` callback — they only reflect
+      // reality after React has re-rendered with the change, which hasn't
+      // happened yet at the moment `watch()` fires. Re-checking both here,
+      // a full tick (and a render) later, reads the settled values instead.
+      if (!profileForm.formState.isDirty) return;
+      const isValid = await profileForm.trigger();
+      if (!isValid) return;
+      saveProfile(profileForm.getValues());
+    }, 1000);
+  }, [saveProfile, profileForm]);
 
   useEffect(() => {
     const subscription = profileForm.watch(() => {
-      if (profileForm.formState.isDirty && profileForm.formState.isValid) {
-        debouncedSave(profileForm.getValues());
-      }
+      debouncedSave();
     });
 
     return () => subscription.unsubscribe();

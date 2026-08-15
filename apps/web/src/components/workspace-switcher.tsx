@@ -28,6 +28,7 @@ import {
 } from "@/hooks/use-keyboard-shortcuts";
 import { useUserWebSocket } from "@/hooks/use-user-websocket";
 import { authClient } from "@/lib/auth-client";
+import { getWorkspaceProfileField } from "@/lib/workspace-profile-fields";
 import type { Workspace } from "@/types/workspace";
 import CreateWorkspaceModal from "./shared/modals/create-workspace-modal";
 
@@ -110,6 +111,8 @@ export function WorkspaceSwitcher() {
     return null;
   }
 
+  const workspaceLogo = getWorkspaceProfileField(workspace, "logo");
+
   return (
     <>
       <div className="flex items-center justify-between w-full gap-2">
@@ -124,7 +127,14 @@ export function WorkspaceSwitcher() {
                   />
                 }
               >
-                <div className="flex items-center min-w-0 w-full">
+                <div className="flex items-center min-w-0 w-full gap-2">
+                  {workspaceLogo ? (
+                    <img
+                      src={workspaceLogo}
+                      alt=""
+                      className={`h-5 w-5 shrink-0 rounded-sm object-contain ${isSwitching ? "opacity-50" : ""}`}
+                    />
+                  ) : null}
                   <span
                     className={`truncate text-sm font-medium text-foreground ${isSwitching ? "opacity-50" : ""}`}
                   >

@@ -1,6 +1,15 @@
 {
 	"common": {
 		"appName": "Lumia.PM",
+		"imageUpload": {
+			"clickToUpload": "Click to upload",
+			"orDragImage": "or drag an image here",
+			"pasteUrlInstead": "Already have it hosted somewhere? Paste a URL instead",
+			"removeImage": "Remove image",
+			"errorInvalidType": "Choose an image file (PNG, JPG, SVG, or WebP).",
+			"errorTooLarge": "That image is too large — please use one under 5MB.",
+			"errorProcessing": "Couldn't process that image."
+		},
 		"actions": {
 			"cancel": "Cancel",
 			"close": "Close",
@@ -561,9 +570,8 @@
 			"descriptionPlaceholder": "Enter workspace description",
 			"companyProfileTitle": "Company Profile",
 			"companyProfileSubtitle": "Shown on client-facing pages (like shared project links) and used for invoicing.",
-			"logoLabel": "Logo URL",
-			"logoHint": "Shown next to your workspace name on shared project links",
-			"logoPlaceholder": "https://example.com/logo.png",
+			"logoLabel": "Logo",
+			"logoHint": "Shown in your sidebar and on shared project links your clients see",
 			"legalNameLabel": "Legal / business name",
 			"legalNameHint": "Your company's registered name",
 			"legalNamePlaceholder": "Enter legal business name",
@@ -884,9 +892,8 @@
 			},
 			"imageTitle": "Watermark image",
 			"imageSubtitle": "Provide the image used as the watermark, or fall back to your company logo.",
-			"imageUrlLabel": "Watermark image URL",
+			"imageUrlLabel": "Watermark image",
 			"imageUrlHint": "Optional. If left blank, the workspace's company logo (set in Company Profile) is used instead.",
-			"imageUrlPlaceholder": "https://example.com/watermark.png",
 			"positionTitle": "Position & size",
 			"positionSubtitle": "Fine-tune where and how large the watermark appears.",
 			"cornerLabel": "Corner position",

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import { ImageUploadField } from "@/components/common/image-upload-field";
 import PageTitle from "@/components/page-title";
 import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
 import {
@@ -368,25 +369,33 @@ function RouteComponent() {
     }
   }, [workspace?.id, deleteWorkspace, queryClient, navigate, t]);
 
-  const debouncedSave = useCallback(
-    (data: WorkspaceFormValues) => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
+  const debouncedSave = useCallback(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
 
-      debounceTimeoutRef.current = setTimeout(() => {
-        saveWorkspace(data);
-      }, 1000);
-    },
-    [saveWorkspace],
-  );
+    // `formState.isValid` is a stale snapshot when read synchronously right
+    // after a change — Zod validation runs asynchronously, so it still
+    // reflects the *previous* value for at least this tick. Re-validating
+    // with `trigger()` once the debounce has elapsed reads the real,
+    // settled result instead of silently skipping the save.
+    debounceTimeoutRef.current = setTimeout(async () => {
+      // Both `isDirty` and `isValid` are stale Proxy snapshots when read
+      // synchronously inside a `watch()` callback — they only reflect
+      // reality after React has re-rendered with the change, which hasn't
+      // happened yet at the moment `watch()` fires. Re-checking both here,
+      // a full tick (and a render) later, reads the settled values instead.
+      if (!workspaceForm.formState.isDirty) return;
+      const isValid = await workspaceForm.trigger();
+      if (!isValid) return;
+      saveWorkspace(workspaceForm.getValues());
+    }, 1000);
+  }, [saveWorkspace, workspaceForm]);
 
   useEffect(() => {
     if (!canEdit) return;
     const subscription = workspaceForm.watch(() => {
-      if (workspaceForm.formState.isDirty && workspaceForm.formState.isValid) {
-        debouncedSave(workspaceForm.getValues());
-      }
+      debouncedSave();
     });
 
     return () => subscription.unsubscribe();
@@ -510,26 +519,22 @@ function RouteComponent() {
                   name="logo"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-sm font-medium">
-                            {t("settings:workspaceGeneral.logoLabel")}
-                          </FormLabel>
-                          <p className="text-xs text-muted-foreground">
-                            {t("settings:workspaceGeneral.logoHint")}
-                          </p>
-                        </div>
-                        <FormControl>
-                          <Input
-                            className="w-full sm:w-64"
-                            placeholder={t(
-                              "settings:workspaceGeneral.logoPlaceholder",
-                            )}
-                            disabled={!canEdit}
-                            {...field}
-                          />
-                        </FormControl>
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-sm font-medium">
+                          {t("settings:workspaceGeneral.logoLabel")}
+                        </FormLabel>
+                        <p className="text-xs text-muted-foreground">
+                          {t("settings:workspaceGeneral.logoHint")}
+                        </p>
                       </div>
+                      <FormControl>
+                        <ImageUploadField
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          disabled={!canEdit}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
