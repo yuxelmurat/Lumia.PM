@@ -1,17 +1,17 @@
 import { isSmtpConfigured, sendNotificationEmail } from "@kaneo/email";
 import { createId } from "@paralleldrive/cuid2";
-import { and, eq, inArray, isNotNull, isNull, lte, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lte } from "drizzle-orm";
 import {
   type BillingInterval,
   isBillingEnabled,
   priceFor,
 } from "../billing/config";
+import { hasPendingCharge } from "../billing/controllers/renewal-helpers";
 import { getWorkspaceOwnerEmail } from "../billing/controllers/workspace-owner";
 import { chargeStoredCard } from "../billing/paytr-client";
 import db from "../database";
 import {
   billingChargeTable,
-  billingEventTable,
   workspaceBillingTable,
   workspaceTable,
 } from "../database/schema";
@@ -19,10 +19,13 @@ import {
 const BATCH_SIZE = 100;
 const MAX_RENEWAL_ATTEMPTS = 3;
 const GRACE_WINDOW_MS = 5 * 24 * 60 * 60 * 1000;
-// Skip a workspace whose most recent renewal charge is still awaiting its
-// bildirim callback, so an in-flight charge from this tick (or a slow
-// callback) can't be double-charged by the next one.
-const PENDING_CHARGE_WINDOW_MS = 55 * 60 * 1000;
+// PayTR's callback can be delayed well past a single hourly tick (it
+// retries server-side for up to 24h on its own). This window only needs to
+// be wider than "how long a callback can realistically take to land" — it
+// does not need to be shorter than the cron cadence, since a workspace that
+// looks "pending" for one extra tick just gets picked up on the next one
+// instead of being double-charged.
+const PENDING_CHARGE_WINDOW_MS = 3 * 60 * 60 * 1000;
 
 function clientUrl() {
   return (process.env.KANEO_CLIENT_URL ?? "https://cloud.kaneo.app").replace(
@@ -60,27 +63,6 @@ async function findDueWorkspaces() {
       ),
     )
     .limit(BATCH_SIZE);
-}
-
-async function hasPendingCharge(workspaceId: string) {
-  const cutoff = new Date(Date.now() - PENDING_CHARGE_WINDOW_MS);
-  const [pending] = await db
-    .select({ id: billingChargeTable.id })
-    .from(billingChargeTable)
-    .leftJoin(
-      billingEventTable,
-      eq(billingEventTable.id, billingChargeTable.id),
-    )
-    .where(
-      and(
-        eq(billingChargeTable.workspaceId, workspaceId),
-        eq(billingChargeTable.kind, "renewal"),
-        sql`${billingChargeTable.createdAt} >= ${cutoff}`,
-        isNull(billingEventTable.id),
-      ),
-    )
-    .limit(1);
-  return Boolean(pending);
 }
 
 async function notifyOwner(
@@ -124,7 +106,9 @@ async function notifyOwner(
 async function processWorkspace(
   row: Awaited<ReturnType<typeof findDueWorkspaces>>[number],
 ) {
-  if (await hasPendingCharge(row.workspaceId)) {
+  if (
+    await hasPendingCharge(row.workspaceId, "renewal", PENDING_CHARGE_WINDOW_MS)
+  ) {
     return;
   }
 

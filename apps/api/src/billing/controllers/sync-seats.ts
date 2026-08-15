@@ -12,6 +12,7 @@ import {
   perSeatPriceFor,
 } from "../config";
 import { chargeStoredCard } from "../paytr-client";
+import { hasPendingCharge } from "./renewal-helpers";
 import { getWorkspaceOwnerEmail } from "./workspace-owner";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -19,6 +20,11 @@ const PERIOD_DAYS: Record<BillingInterval, number> = {
   monthly: 30,
   annual: 365,
 };
+// A member added right after another (before the first top-up's bildirim
+// callback lands) must not be charged for the same seat twice — skip
+// issuing a new top-up while one is still unconfirmed. The next member-add
+// trigger, or the hourly seat-reconciliation sweep, retries once it clears.
+const PENDING_TOPUP_WINDOW_MS = 2 * 60 * 60 * 1000;
 
 /**
  * Prorated cost, in kurus, for adding `extraSeats` for the remaining days of
@@ -84,6 +90,12 @@ export async function syncWorkspaceSeats(workspaceId: string) {
       .update(workspaceBillingTable)
       .set({ seats })
       .where(eq(workspaceBillingTable.workspaceId, workspaceId));
+    return;
+  }
+
+  if (
+    await hasPendingCharge(workspaceId, "seat_topup", PENDING_TOPUP_WINDOW_MS)
+  ) {
     return;
   }
 
