@@ -109,25 +109,14 @@ export default function PrivacyPage() {
 
             <Section title="Where data lives">
               <p>
-                Lumia.PM Cloud runs on servers in the European Union (Hetzner,
-                Germany and Finland). Encrypted backups are stored with
-                Cloudflare (R2). The following subprocessors help us run the
-                service:
+                Lumia.PM Cloud runs on infrastructure we choose to keep the
+                service reliable and secure; we are finalizing our hosting,
+                storage, email, and payment providers and will list each one
+                here by name, with its role and location, before the service
+                processes customer data at scale. If you sign in with GitHub,
+                Google, or Discord, that provider is involved only because you
+                chose it.
               </p>
-              <ul className="list-disc space-y-1.5 pl-5">
-                <li>Hetzner Online GmbH: hosting (EU)</li>
-                <li>Cloudflare, Inc.: content delivery and backup storage</li>
-                <li>Creem: payment processing (merchant of record)</li>
-                <li>Resend: transactional email delivery</li>
-                <li>
-                  Functional Software, Inc. (Sentry): error monitoring (EU
-                  region)
-                </li>
-                <li>
-                  GitHub, Google, Discord: only if you choose to sign in with
-                  them
-                </li>
-              </ul>
             </Section>
 
             <Section title="Your rights">
