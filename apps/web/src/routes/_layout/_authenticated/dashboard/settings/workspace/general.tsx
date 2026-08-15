@@ -863,14 +863,12 @@ function RouteComponent() {
               >
                 {t("common:actions.cancel")}
               </AlertDialogClose>
-              <AlertDialogClose
-                render={
-                  <Button
-                    size="sm"
-                    disabled={isTransferring}
-                    onClick={handleTransferOwnership}
-                  />
-                }
+              <Button
+                size="sm"
+                disabled={isTransferring}
+                onClick={async () => {
+                  await handleTransferOwnership();
+                }}
               >
                 {isTransferring
                   ? t(
@@ -880,7 +878,7 @@ function RouteComponent() {
                   : t("settings:workspaceGeneral.transferOwnership.confirm", {
                       defaultValue: "Transfer ownership",
                     })}
-              </AlertDialogClose>
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -904,20 +902,18 @@ function RouteComponent() {
               <AlertDialogClose render={<Button variant="outline" size="sm" />}>
                 {t("common:actions.cancel")}
               </AlertDialogClose>
-              <AlertDialogClose
-                render={
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={isDeleting}
-                    onClick={handleDeleteWorkspace}
-                  />
-                }
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={isDeleting}
+                onClick={async () => {
+                  await handleDeleteWorkspace();
+                }}
               >
                 {isDeleting
                   ? t("common:actions.deleting")
                   : t("settings:workspaceGeneral.deleteModalConfirm")}
-              </AlertDialogClose>
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

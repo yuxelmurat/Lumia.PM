@@ -13,16 +13,26 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ProjectLayout from "@/components/common/project-layout";
+import TaskFilterToolbar from "@/components/common/task-filter-toolbar";
 import PageTitle from "@/components/page-title";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import useGetLabelsByWorkspace from "@/hooks/queries/label/use-get-labels-by-workspace";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
+import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
+import { useHeaderSearch } from "@/hooks/use-header-search";
+import { useTaskFilterState } from "@/hooks/use-task-filter-state";
 import { cn } from "@/lib/cn";
+import {
+  dueDateStatusBarColors,
+  getDueDateStatus,
+  isTaskCompleted,
+} from "@/lib/due-date-status";
+import { getPriorityIcon } from "@/lib/priority";
+import { taskMatchesFilters } from "@/lib/task-filter-predicate";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
 const MAX_VISIBLE_TASKS_PER_DAY = 3;
@@ -52,9 +62,22 @@ function RouteComponent() {
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
   const { data: project } = useGetTasks(projectId);
+  const { data: users } = useGetActiveWorkspaceUsers(workspaceId);
+  const { data: workspaceLabels = [] } = useGetLabelsByWorkspace(workspaceId);
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { query: searchQuery, searchNode: calendarHeaderSearch } =
+    useHeaderSearch(t("tasks:calendar.searchPlaceholder"));
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
+
+  const {
+    filters,
+    updateFilter,
+    updateLabelFilter,
+    hasActiveFilters,
+    clearFilters,
+  } = useTaskFilterState(
+    projectId ? `kaneo:calendar-filters:${projectId}` : null,
+  );
 
   const allTasks = useMemo(
     () => [
@@ -80,19 +103,14 @@ function RouteComponent() {
   }, [allTasks]);
 
   const visibleTasks = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-    if (!normalizedQuery) return datedTasks;
-
-    return datedTasks.filter((task) => {
-      return (
-        task.title.toLowerCase().includes(normalizedQuery) ||
-        `${project?.slug ?? ""}-${task.number ?? ""}`
-          .toLowerCase()
-          .includes(normalizedQuery) ||
-        task.status.toLowerCase().includes(normalizedQuery)
-      );
-    });
-  }, [datedTasks, project?.slug, searchQuery]);
+    return datedTasks.filter((task) =>
+      taskMatchesFilters(task, filters, {
+        weekStartsOn,
+        textQuery: searchQuery,
+        projectSlug: project?.slug,
+      }),
+    );
+  }, [datedTasks, filters, weekStartsOn, searchQuery, project?.slug]);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -135,67 +153,59 @@ function RouteComponent() {
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="calendar"
+      headerActions={calendarHeaderSearch}
     >
       <PageTitle
         title={t("tasks:calendar.pageTitle", { name: project?.name })}
         hideAppName
       />
       <div className="flex h-full min-h-0 flex-col bg-background">
-        <div className="border-b border-border/80 px-3 py-3 sm:px-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-2">
-              <h1 className="text-sm font-semibold text-foreground">
-                {t("tasks:calendar.title")}
-              </h1>
-              <span className="text-sm text-muted-foreground">
+        <TaskFilterToolbar
+          subjects={["status", "priority", "assignee", "dueDate", "labels"]}
+          project={project}
+          filters={filters}
+          updateFilter={updateFilter}
+          updateLabelFilter={updateLabelFilter}
+          clearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+          users={users}
+          workspaceLabels={workspaceLabels}
+          trailingActions={
+            <>
+              <span className="px-1 text-xs text-muted-foreground">
                 {format(currentMonth, "MMMM yyyy")}
               </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="relative w-full max-w-sm">
-                <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder={t("tasks:calendar.searchPlaceholder")}
-                  className="h-9 min-h-11 touch-manipulation sm:h-8 sm:min-h-0 [&_[data-slot=input]]:pl-8 [&_[data-slot=input]]:text-xs"
-                />
-              </div>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="xs"
-                  className="h-8"
-                  onClick={() =>
-                    setCurrentMonth((current) => subMonths(current, 1))
-                  }
-                >
-                  {"<"}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  className="h-8"
-                  onClick={() => setCurrentMonth(new Date())}
-                >
-                  {t("tasks:calendar.today")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  className="h-8"
-                  onClick={() =>
-                    setCurrentMonth((current) => addMonths(current, 1))
-                  }
-                >
-                  {">"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+              <Button
+                variant="outline"
+                size="xs"
+                className="h-7"
+                onClick={() =>
+                  setCurrentMonth((current) => subMonths(current, 1))
+                }
+              >
+                {"<"}
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                className="h-7"
+                onClick={() => setCurrentMonth(new Date())}
+              >
+                {t("tasks:calendar.today")}
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                className="h-7"
+                onClick={() =>
+                  setCurrentMonth((current) => addMonths(current, 1))
+                }
+              >
+                {">"}
+              </Button>
+            </>
+          }
+        />
 
         {datedTasks.length === 0 ? (
           <div className="flex flex-1 items-center justify-center px-6">
@@ -261,21 +271,38 @@ function RouteComponent() {
                     </div>
 
                     <div className="flex flex-1 flex-col gap-1 overflow-hidden">
-                      {visibleDayTasks.map((task) => (
-                        <button
-                          key={task.id}
-                          type="button"
-                          onClick={() => openTask(task.id)}
-                          className={cn(
-                            "truncate rounded-md border border-primary/25 bg-primary/12 px-1.5 py-0.5 text-left text-[11px] font-medium leading-tight text-foreground transition-colors hover:bg-primary/18",
-                            isSameDay(task.calendarDate, day) &&
-                              !isSameMonth(day, currentMonth) &&
-                              "opacity-70",
-                          )}
-                        >
-                          {task.title}
-                        </button>
-                      ))}
+                      {visibleDayTasks.map((task) => {
+                        const isCompleted = isTaskCompleted(
+                          task.status,
+                          project?.columns,
+                        );
+                        const dueDateStatus = getDueDateStatus(
+                          task.dueDate,
+                          isCompleted,
+                        );
+                        const tint = dueDateStatusBarColors[dueDateStatus];
+
+                        return (
+                          <button
+                            key={task.id}
+                            type="button"
+                            onClick={() => openTask(task.id)}
+                            className={cn(
+                              "flex items-center gap-1 truncate rounded-md border px-1.5 py-0.5 text-left text-[11px] font-medium leading-tight text-foreground transition-colors hover:brightness-95",
+                              tint.border,
+                              tint.overlay,
+                              isSameDay(task.calendarDate, day) &&
+                                !isSameMonth(day, currentMonth) &&
+                                "opacity-70",
+                            )}
+                          >
+                            <span className="shrink-0 [&>svg]:h-2.5 [&>svg]:w-2.5">
+                              {getPriorityIcon(task.priority ?? "")}
+                            </span>
+                            <span className="truncate">{task.title}</span>
+                          </button>
+                        );
+                      })}
 
                       {hiddenCount > 0 ? (
                         <button

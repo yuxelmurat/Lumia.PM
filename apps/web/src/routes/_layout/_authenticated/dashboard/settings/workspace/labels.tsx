@@ -13,20 +13,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFrame,
-  CardHeader,
-  CardPanel,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogPanel,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -229,112 +221,106 @@ function RouteComponent() {
           </p>
         </div>
 
-        <CardFrame>
-          <Card className="!rounded-none !border-t-0">
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2 text-base">
-                <Tag className="size-4" />
+        <div className="space-y-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <h2 className="text-md font-medium">
                 {t("settings:workspaceLabels.title", {
                   defaultValue: "Labels",
                 })}
-              </CardTitle>
-              <CardDescription>
+              </h2>
+              <p className="text-xs text-muted-foreground">
                 {t("settings:workspaceLabels.cardDescription", {
                   defaultValue: "Manage labels that can be assigned to tasks.",
                 })}
-              </CardDescription>
-              {canEdit && (
-                <CardAction>
-                  <Button onClick={openCreate} className="gap-2">
-                    <Plus className="size-4" />
-                    {t("settings:workspaceLabels.createLabel", {
-                      defaultValue: "Create Label",
-                    })}
-                  </Button>
-                </CardAction>
-              )}
-            </CardHeader>
-          </Card>
+              </p>
+            </div>
+            {canEdit && (
+              <Button onClick={openCreate} className="gap-2">
+                <Plus className="size-4" />
+                {t("settings:workspaceLabels.createLabel", {
+                  defaultValue: "Create Label",
+                })}
+              </Button>
+            )}
+          </div>
 
-          <Card className="!rounded-none">
-            <CardPanel className="p-4">
-              {workspaceLabels.length === 0 ? (
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia>
-                      <Tag className="size-8 text-muted-foreground" />
-                    </EmptyMedia>
-                    <EmptyTitle>
-                      {t("settings:workspaceLabels.empty", {
-                        defaultValue:
-                          "No labels yet. Create your first label to get started.",
-                      })}
-                    </EmptyTitle>
-                    <EmptyDescription />
-                  </EmptyHeader>
-                </Empty>
-              ) : (
-                <div className="divide-y divide-border">
-                  {workspaceLabels.map((label) => (
-                    <div
-                      key={label.id}
-                      className="flex items-center justify-between py-2.5 px-1"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span
-                          className="w-3 h-3 rounded-full flex-shrink-0"
-                          style={{
-                            backgroundColor: getColorVar(label.color),
-                          }}
-                        />
-                        <span className="text-sm truncate">{label.name}</span>
-                      </div>
-                      {canEdit && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t(
-                              "settings:workspaceLabels.editLabel",
-                              { defaultValue: "Edit Label" },
-                            )}
-                            className="h-8 w-8"
-                            onClick={() =>
-                              openEdit({
-                                id: label.id,
-                                name: label.name,
-                                color: label.color,
-                              })
-                            }
-                          >
-                            <Pencil className="size-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t(
-                              "settings:workspaceLabels.deleteLabel",
-                              { defaultValue: "Delete" },
-                            )}
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() =>
-                              openDelete({
-                                id: label.id,
-                                name: label.name,
-                              })
-                            }
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        </div>
-                      )}
+          <div className="border border-border rounded-md bg-sidebar">
+            {workspaceLabels.length === 0 ? (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia>
+                    <Tag className="size-8 text-muted-foreground" />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    {t("settings:workspaceLabels.empty", {
+                      defaultValue:
+                        "No labels yet. Create your first label to get started.",
+                    })}
+                  </EmptyTitle>
+                  <EmptyDescription />
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <div className="divide-y divide-border">
+                {workspaceLabels.map((label) => (
+                  <div
+                    key={label.id}
+                    className="flex items-center justify-between py-2.5 px-1"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{
+                          backgroundColor: getColorVar(label.color),
+                        }}
+                      />
+                      <span className="text-sm truncate">{label.name}</span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardPanel>
-          </Card>
-        </CardFrame>
+                    {canEdit && (
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t("settings:workspaceLabels.editLabel", {
+                            defaultValue: "Edit Label",
+                          })}
+                          className="h-8 w-8"
+                          onClick={() =>
+                            openEdit({
+                              id: label.id,
+                              name: label.name,
+                              color: label.color,
+                            })
+                          }
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t(
+                            "settings:workspaceLabels.deleteLabel",
+                            { defaultValue: "Delete" },
+                          )}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() =>
+                            openDelete({
+                              id: label.id,
+                              name: label.name,
+                            })
+                          }
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Create Dialog */}
@@ -357,7 +343,7 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 pt-1 space-y-4">
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-label-name">
                 {t("settings:workspaceLabels.nameLabel", {
@@ -408,7 +394,7 @@ function RouteComponent() {
                 ))}
               </div>
             </div>
-          </div>
+          </DialogPanel>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
@@ -447,7 +433,7 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 pt-1 space-y-4">
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="edit-label-name">
                 {t("settings:workspaceLabels.nameLabel", {
@@ -497,7 +483,7 @@ function RouteComponent() {
                 ))}
               </div>
             </div>
-          </div>
+          </DialogPanel>
 
           <DialogFooter>
             <Button

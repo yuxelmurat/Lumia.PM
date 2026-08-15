@@ -21,15 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFrame,
-  CardHeader,
-  CardPanel,
-  CardTitle,
-} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -37,6 +28,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogPanel,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -692,114 +684,107 @@ function RouteComponent() {
           </p>
         </div>
 
-        <CardFrame>
-          <Card className="!rounded-none !border-t-0">
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2 text-base">
-                <LayoutTemplate className="size-4" />
+        <div className="space-y-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <h2 className="text-md font-medium">
                 {t("settings:workspaceProjectTemplates.title", {
                   defaultValue: "Project Templates",
                 })}
-              </CardTitle>
-              <CardDescription>
+              </h2>
+              <p className="text-xs text-muted-foreground">
                 {t("settings:workspaceProjectTemplates.cardDescription", {
                   defaultValue:
                     "Manage the templates available when creating a new project.",
                 })}
-              </CardDescription>
-              {canEdit && (
-                <CardAction>
-                  <Button onClick={openCreate} className="gap-2">
-                    <Plus className="size-4" />
-                    {t("settings:workspaceProjectTemplates.createTemplate", {
-                      defaultValue: "Create Template",
-                    })}
-                  </Button>
-                </CardAction>
-              )}
-            </CardHeader>
-          </Card>
+              </p>
+            </div>
+            {canEdit && (
+              <Button onClick={openCreate} className="gap-2">
+                <Plus className="size-4" />
+                {t("settings:workspaceProjectTemplates.createTemplate", {
+                  defaultValue: "Create Template",
+                })}
+              </Button>
+            )}
+          </div>
 
-          <Card className="!rounded-none">
-            <CardPanel className="p-4">
-              {templates.length === 0 ? (
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia>
-                      <LayoutTemplate className="size-8 text-muted-foreground" />
-                    </EmptyMedia>
-                    <EmptyTitle>
-                      {t("settings:workspaceProjectTemplates.empty", {
-                        defaultValue:
-                          "No project templates yet. Create your first template to get started.",
-                      })}
-                    </EmptyTitle>
-                    <EmptyDescription />
-                  </EmptyHeader>
-                </Empty>
-              ) : (
-                <div className="divide-y divide-border">
-                  {templates.map((template) => (
-                    <div
-                      key={template.id}
-                      className="flex items-center justify-between py-2.5 px-1 gap-3"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="text-sm truncate">
-                          {template.name}
+          <div className="border border-border rounded-md bg-sidebar">
+            {templates.length === 0 ? (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia>
+                    <LayoutTemplate className="size-8 text-muted-foreground" />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    {t("settings:workspaceProjectTemplates.empty", {
+                      defaultValue:
+                        "No project templates yet. Create your first template to get started.",
+                    })}
+                  </EmptyTitle>
+                  <EmptyDescription />
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <div className="divide-y divide-border">
+                {templates.map((template) => (
+                  <div
+                    key={template.id}
+                    className="flex items-center justify-between py-2.5 px-1 gap-3"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-sm truncate">{template.name}</span>
+                      {template.description && (
+                        <span className="text-xs text-muted-foreground truncate max-w-[240px]">
+                          {template.description}
                         </span>
-                        {template.description && (
-                          <span className="text-xs text-muted-foreground truncate max-w-[240px]">
-                            {template.description}
-                          </span>
-                        )}
-                        <Badge variant="outline" className="text-[10px]">
-                          {t("settings:workspaceProjectTemplates.columnCount", {
-                            defaultValue: "{{count}} columns",
-                            count: template.columnCount,
-                          })}
-                        </Badge>
-                      </div>
-                      {canEdit && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t(
-                              "settings:workspaceProjectTemplates.editTemplate",
-                              { defaultValue: "Edit Template" },
-                            )}
-                            className="h-8 w-8"
-                            onClick={() => openEdit(template.id)}
-                          >
-                            <Pencil className="size-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t(
-                              "settings:workspaceProjectTemplates.deleteTemplate",
-                              { defaultValue: "Delete" },
-                            )}
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() =>
-                              openDelete({
-                                id: template.id,
-                                name: template.name,
-                              })
-                            }
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        </div>
                       )}
+                      <Badge variant="outline" className="text-[10px]">
+                        {t("settings:workspaceProjectTemplates.columnCount", {
+                          defaultValue: "{{count}} columns",
+                          count: template.columnCount,
+                        })}
+                      </Badge>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardPanel>
-          </Card>
-        </CardFrame>
+                    {canEdit && (
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t(
+                            "settings:workspaceProjectTemplates.editTemplate",
+                            { defaultValue: "Edit Template" },
+                          )}
+                          className="h-8 w-8"
+                          onClick={() => openEdit(template.id)}
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t(
+                            "settings:workspaceProjectTemplates.deleteTemplate",
+                            { defaultValue: "Delete" },
+                          )}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() =>
+                            openDelete({
+                              id: template.id,
+                              name: template.name,
+                            })
+                          }
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Create Dialog */}
@@ -807,7 +792,7 @@ function RouteComponent() {
         open={createOpen}
         onOpenChange={(open) => !open && setCreateOpen(false)}
       >
-        <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>
               {t("settings:workspaceProjectTemplates.createTemplate", {
@@ -822,7 +807,7 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 pt-1 space-y-4">
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-template-name">
                 {t("settings:workspaceProjectTemplates.nameLabel", {
@@ -891,7 +876,7 @@ function RouteComponent() {
             {createError && (
               <p className="text-sm text-destructive">{createError}</p>
             )}
-          </div>
+          </DialogPanel>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
@@ -919,7 +904,7 @@ function RouteComponent() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>
               {t("settings:workspaceProjectTemplates.editTemplate", {
@@ -934,7 +919,7 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 pt-1 space-y-4">
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="edit-template-name">
                 {t("settings:workspaceProjectTemplates.nameLabel", {
@@ -1003,7 +988,7 @@ function RouteComponent() {
             {editError && (
               <p className="text-sm text-destructive">{editError}</p>
             )}
-          </div>
+          </DialogPanel>
 
           <DialogFooter>
             <Button

@@ -151,14 +151,13 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
         userId: memberToDelete.user.email,
       });
       toast.success(t("team:membersTable.removeSuccess"));
+      setMemberToDelete(null);
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
           : t("team:membersTable.removeError"),
       );
-    } finally {
-      setMemberToDelete(null);
     }
   };
 
@@ -170,14 +169,13 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
         workspaceId,
       });
       toast.success(t("team:membersTable.cancelInviteSuccess"));
+      setInvitationToCancel(null);
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
           : t("team:membersTable.cancelInviteError"),
       );
-    } finally {
-      setInvitationToCancel(null);
     }
   };
 
@@ -441,19 +439,17 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
             >
               {t("common:actions.cancel")}
             </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={isDeleting}
-                  onClick={handleDeleteMember}
-                />
-              }
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isDeleting}
+              onClick={async () => {
+                await handleDeleteMember();
+              }}
             >
               <TrashIcon className="mr-2 size-4" />
               {t("team:membersTable.removeMember")}
-            </AlertDialogClose>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -481,19 +477,17 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
             >
               {t("common:actions.cancel")}
             </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={isCancelling}
-                  onClick={handleCancelInvitation}
-                />
-              }
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isCancelling}
+              onClick={async () => {
+                await handleCancelInvitation();
+              }}
             >
               <TrashIcon className="mr-2 size-4" />
               {t("team:membersTable.cancelInvitation")}
-            </AlertDialogClose>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -144,6 +144,7 @@ function RouteComponent() {
       await regeneratePublicLink({ id: project.id });
       await refreshProjectQueries(project.id);
       toast.success(t("settings:projectVisibility.regenerateToastUpdated"));
+      setIsRegenerateModalOpen(false);
     } catch (e) {
       toast.error(
         e instanceof Error
@@ -318,18 +319,16 @@ function RouteComponent() {
             <AlertDialogClose render={<Button variant="outline" size="sm" />}>
               {t("common:actions.cancel")}
             </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={isRegenerating}
-                  onClick={handleRegenerateLink}
-                />
-              }
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isRegenerating}
+              onClick={async () => {
+                await handleRegenerateLink();
+              }}
             >
               {t("settings:projectVisibility.regenerateModalConfirm")}
-            </AlertDialogClose>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

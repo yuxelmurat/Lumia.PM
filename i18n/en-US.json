@@ -1701,6 +1701,9 @@
 			"board": "Board",
 			"list": "List"
 		},
+		"board": {
+			"columnEmpty": "No tasks in {{name}}"
+		},
 		"common": {
 			"selectTask": "Select task",
 			"loadingTask": "Loading task...",
@@ -1942,6 +1945,7 @@
 			"moveAll": "Move All",
 			"addTask": "Add task",
 			"filter": "Filter",
+			"searchPlaceholder": "Search backlog...",
 			"addFilter": "Add filter...",
 			"sections": {
 				"planned": "Planned",

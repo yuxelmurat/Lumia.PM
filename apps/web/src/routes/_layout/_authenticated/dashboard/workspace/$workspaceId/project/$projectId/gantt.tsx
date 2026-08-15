@@ -11,19 +11,26 @@ import {
   startOfWeek,
   subDays,
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ProjectLayout from "@/components/common/project-layout";
+import TaskFilterToolbar from "@/components/common/task-filter-toolbar";
 import { GanttTaskBar } from "@/components/gantt/gantt-task-bar";
 import PageTitle from "@/components/page-title";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import useGetLabelsByWorkspace from "@/hooks/queries/label/use-get-labels-by-workspace";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
+import { useGetActiveWorkspaceUsers } from "@/hooks/queries/workspace-users/use-get-active-workspace-users";
+import { useHeaderSearch } from "@/hooks/use-header-search";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTaskFilterState } from "@/hooks/use-task-filter-state";
 import { cn } from "@/lib/cn";
-import { getStatusLabel } from "@/lib/i18n/domain";
+import { getColumnIcon } from "@/lib/column";
+import { isTaskCompleted } from "@/lib/due-date-status";
+import { getStatusDisplayLabel } from "@/lib/i18n/domain";
+import { taskMatchesFilters } from "@/lib/task-filter-predicate";
 import { useUserPreferencesStore } from "@/store/user-preferences";
 
 type GanttSearchParams = {
@@ -51,10 +58,22 @@ function RouteComponent() {
   const { taskId } = Route.useSearch();
   const navigate = useNavigate();
   const { data: project } = useGetTasks(projectId);
+  const { data: users } = useGetActiveWorkspaceUsers(workspaceId);
+  const { data: workspaceLabels = [] } = useGetLabelsByWorkspace(workspaceId);
   const weekStartsOn = useUserPreferencesStore((state) => state.weekStartsOn);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { query: searchQuery, searchNode: ganttHeaderSearch } = useHeaderSearch(
+    t("tasks:gantt.searchPlaceholder"),
+  );
   const isMobile = useIsMobile();
   const [isTaskRailOpen, setIsTaskRailOpen] = useState(false);
+
+  const {
+    filters,
+    updateFilter,
+    updateLabelFilter,
+    hasActiveFilters,
+    clearFilters,
+  } = useTaskFilterState(projectId ? `kaneo:gantt-filters:${projectId}` : null);
 
   // Wider day columns on small screens so dragging and reading dates is easier.
   const dayColumnWidthRem = isMobile ? 3.125 : 2.75;
@@ -107,19 +126,14 @@ function RouteComponent() {
   }, [allTasks]);
 
   const scheduledTasks = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-    if (!normalizedQuery) return parsedTasks;
-
-    return parsedTasks.filter((task) => {
-      return (
-        task.title.toLowerCase().includes(normalizedQuery) ||
-        `${project?.slug ?? ""}-${task.number ?? ""}`
-          .toLowerCase()
-          .includes(normalizedQuery) ||
-        task.status.toLowerCase().includes(normalizedQuery)
-      );
-    });
-  }, [parsedTasks, project?.slug, searchQuery]);
+    return parsedTasks.filter((task) =>
+      taskMatchesFilters(task, filters, {
+        weekStartsOn,
+        textQuery: searchQuery,
+        projectSlug: project?.slug,
+      }),
+    );
+  }, [parsedTasks, filters, weekStartsOn, searchQuery, project?.slug]);
 
   const timeline = useMemo(() => {
     if (parsedTasks.length === 0) return null;
@@ -173,30 +187,24 @@ function RouteComponent() {
       projectId={projectId}
       workspaceId={workspaceId}
       activeView="gantt"
+      headerActions={ganttHeaderSearch}
     >
       <PageTitle
         title={t("tasks:gantt.pageTitle", { name: project?.name })}
         hideAppName
       />
       <div className="flex h-full min-h-0 flex-col bg-background">
-        <div className="border-b border-border/80 px-3 py-3 sm:px-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-1">
-              <h1 className="text-sm font-semibold text-foreground">
-                {t("tasks:gantt.title")}
-              </h1>
-            </div>
-
-            <div className="relative w-full max-w-sm">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={t("tasks:gantt.searchPlaceholder")}
-                className="h-9 min-h-11 touch-manipulation sm:h-8 sm:min-h-0 [&_[data-slot=input]]:pl-8 [&_[data-slot=input]]:text-xs"
-              />
-            </div>
-
+        <TaskFilterToolbar
+          subjects={["status", "priority", "assignee", "dueDate", "labels"]}
+          project={project}
+          filters={filters}
+          updateFilter={updateFilter}
+          updateLabelFilter={updateLabelFilter}
+          clearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+          users={users}
+          workspaceLabels={workspaceLabels}
+          trailingActions={
             <Button
               variant="outline"
               size="xs"
@@ -212,8 +220,8 @@ function RouteComponent() {
                 ? t("tasks:gantt.hideTasks")
                 : t("tasks:gantt.showTasks")}
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         {!timeline || parsedTasks.length === 0 ? (
           <div className="flex flex-1 items-center justify-center px-6">
@@ -318,6 +326,18 @@ function RouteComponent() {
 
                 <div className="relative z-10 flex flex-col">
                   {scheduledTasks.map((task) => {
+                    const statusColumn = project?.columns?.find(
+                      (column) => column.id === task.status,
+                    );
+                    const statusLabel = getStatusDisplayLabel(
+                      task.status,
+                      statusColumn?.name,
+                    );
+                    const isCompleted = isTaskCompleted(
+                      task.status,
+                      project?.columns,
+                    );
+
                     return (
                       <div
                         key={task.id}
@@ -344,8 +364,17 @@ function RouteComponent() {
                               }
                             >
                               <div className="flex w-full items-center gap-1.5">
-                                <span className="max-w-[7rem] truncate rounded-full bg-secondary px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-secondary-foreground sm:max-w-none">
-                                  {getStatusLabel(task.status)}
+                                <span className="inline-flex max-w-[7rem] items-center gap-1 truncate text-[10px] font-medium text-muted-foreground sm:max-w-none">
+                                  <span className="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5">
+                                    {getColumnIcon(
+                                      task.status,
+                                      statusColumn?.isFinal,
+                                      statusColumn?.icon,
+                                    )}
+                                  </span>
+                                  <span className="truncate uppercase tracking-wide">
+                                    {statusLabel}
+                                  </span>
                                 </span>
                                 <span className="truncate text-[10px] text-muted-foreground">
                                   {project?.slug}-{task.number}
@@ -376,6 +405,7 @@ function RouteComponent() {
                             timeline={timeline}
                             pixelsPerDay={pixelsPerDay}
                             isMobile={isMobile}
+                            isCompleted={isCompleted}
                             onOpenTask={() =>
                               navigate({
                                 to: ".",

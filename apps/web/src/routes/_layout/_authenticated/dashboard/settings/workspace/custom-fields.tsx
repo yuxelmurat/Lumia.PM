@@ -13,15 +13,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFrame,
-  CardHeader,
-  CardPanel,
-  CardTitle,
-} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -29,6 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogPanel,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -348,116 +340,111 @@ function RouteComponent() {
           </p>
         </div>
 
-        <CardFrame>
-          <Card className="!rounded-none !border-t-0">
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2 text-base">
-                <ListChecks className="size-4" />
+        <div className="space-y-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <h2 className="text-md font-medium">
                 {t("settings:workspaceCustomFields.title", {
                   defaultValue: "Custom Fields",
                 })}
-              </CardTitle>
-              <CardDescription>
+              </h2>
+              <p className="text-xs text-muted-foreground">
                 {t("settings:workspaceCustomFields.cardDescription", {
                   defaultValue:
                     "Manage custom fields that can be set on tasks.",
                 })}
-              </CardDescription>
-              {canEdit && (
-                <CardAction>
-                  <Button onClick={openCreate} className="gap-2">
-                    <Plus className="size-4" />
-                    {t("settings:workspaceCustomFields.createField", {
-                      defaultValue: "Create Field",
-                    })}
-                  </Button>
-                </CardAction>
-              )}
-            </CardHeader>
-          </Card>
+              </p>
+            </div>
+            {canEdit && (
+              <Button onClick={openCreate} className="gap-2">
+                <Plus className="size-4" />
+                {t("settings:workspaceCustomFields.createField", {
+                  defaultValue: "Create Field",
+                })}
+              </Button>
+            )}
+          </div>
 
-          <Card className="!rounded-none">
-            <CardPanel className="p-4">
-              {fields.length === 0 ? (
-                <Empty>
-                  <EmptyHeader>
-                    <EmptyMedia>
-                      <ListChecks className="size-8 text-muted-foreground" />
-                    </EmptyMedia>
-                    <EmptyTitle>
-                      {t("settings:workspaceCustomFields.empty", {
-                        defaultValue:
-                          "No custom fields yet. Create your first field to get started.",
-                      })}
-                    </EmptyTitle>
-                    <EmptyDescription />
-                  </EmptyHeader>
-                </Empty>
-              ) : (
-                <div className="divide-y divide-border">
-                  {fields.map((field) => (
-                    <div
-                      key={field.id}
-                      className="flex items-center justify-between py-2.5 px-1"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="text-sm truncate">{field.name}</span>
+          <div className="border border-border rounded-md bg-sidebar">
+            {fields.length === 0 ? (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia>
+                    <ListChecks className="size-8 text-muted-foreground" />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    {t("settings:workspaceCustomFields.empty", {
+                      defaultValue:
+                        "No custom fields yet. Create your first field to get started.",
+                    })}
+                  </EmptyTitle>
+                  <EmptyDescription />
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <div className="divide-y divide-border">
+                {fields.map((field) => (
+                  <div
+                    key={field.id}
+                    className="flex items-center justify-between py-2.5 px-1"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-sm truncate">{field.name}</span>
+                      <Badge variant="outline" className="text-[10px]">
+                        {typeLabel(field.type as CustomFieldType)}
+                      </Badge>
+                      {field.isRequired && (
                         <Badge variant="outline" className="text-[10px]">
-                          {typeLabel(field.type as CustomFieldType)}
+                          {t("settings:workspaceCustomFields.required", {
+                            defaultValue: "Required",
+                          })}
                         </Badge>
-                        {field.isRequired && (
-                          <Badge variant="outline" className="text-[10px]">
-                            {t("settings:workspaceCustomFields.required", {
-                              defaultValue: "Required",
-                            })}
-                          </Badge>
-                        )}
-                      </div>
-                      {canEdit && (
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t(
-                              "settings:workspaceCustomFields.editField",
-                              { defaultValue: "Edit Field" },
-                            )}
-                            className="h-8 w-8"
-                            onClick={() =>
-                              openEdit({
-                                id: field.id,
-                                name: field.name,
-                                type: field.type as CustomFieldType,
-                                options: field.options as string[] | null,
-                                isRequired: field.isRequired,
-                              })
-                            }
-                          >
-                            <Pencil className="size-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t(
-                              "settings:workspaceCustomFields.deleteField",
-                              { defaultValue: "Delete" },
-                            )}
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() =>
-                              openDelete({ id: field.id, name: field.name })
-                            }
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        </div>
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardPanel>
-          </Card>
-        </CardFrame>
+                    {canEdit && (
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t(
+                            "settings:workspaceCustomFields.editField",
+                            { defaultValue: "Edit Field" },
+                          )}
+                          className="h-8 w-8"
+                          onClick={() =>
+                            openEdit({
+                              id: field.id,
+                              name: field.name,
+                              type: field.type as CustomFieldType,
+                              options: field.options as string[] | null,
+                              isRequired: field.isRequired,
+                            })
+                          }
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={t(
+                            "settings:workspaceCustomFields.deleteField",
+                            { defaultValue: "Delete" },
+                          )}
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() =>
+                            openDelete({ id: field.id, name: field.name })
+                          }
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Create Dialog */}
@@ -480,7 +467,7 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 pt-1 space-y-4">
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-field-name">
                 {t("settings:workspaceCustomFields.nameLabel", {
@@ -559,7 +546,7 @@ function RouteComponent() {
             {createError && (
               <p className="text-sm text-destructive">{createError}</p>
             )}
-          </div>
+          </DialogPanel>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
@@ -602,7 +589,7 @@ function RouteComponent() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 pt-1 space-y-4">
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="edit-field-name">
                 {t("settings:workspaceCustomFields.nameLabel", {
@@ -673,7 +660,7 @@ function RouteComponent() {
             {editError && (
               <p className="text-sm text-destructive">{editError}</p>
             )}
-          </div>
+          </DialogPanel>
 
           <DialogFooter>
             <Button

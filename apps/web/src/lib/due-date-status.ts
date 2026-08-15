@@ -51,3 +51,16 @@ export const dueDateStatusIcons = {
   "far-future": "calendar",
   "no-due-date": "calendar",
 } as const;
+
+// Same due-date vocabulary as `dueDateStatusColors`, reshaped as a
+// border/overlay pair for bar-like surfaces (Gantt bars, Calendar chips)
+// instead of the badge-shaped bg+text pair above.
+export const dueDateStatusBarColors: Record<
+  DueDateStatus,
+  { border: string; overlay: string }
+> = {
+  overdue: { border: "border-destructive/35", overlay: "bg-destructive/12" },
+  "due-soon": { border: "border-warning/35", overlay: "bg-warning/12" },
+  "far-future": { border: "border-primary/25", overlay: "bg-primary/12" },
+  "no-due-date": { border: "border-primary/25", overlay: "bg-primary/12" },
+};

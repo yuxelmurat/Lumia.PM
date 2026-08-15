@@ -1,7 +1,6 @@
-import { Filter, PanelsTopLeft, Rows3, X } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import SortControl from "@/components/common/sort-control";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -24,8 +23,14 @@ import { getColumnIcon } from "@/lib/column";
 import { getInitials } from "@/lib/get-initials";
 import { getPriorityLabel } from "@/lib/i18n/domain";
 import { getPriorityIcon } from "@/lib/priority";
-import type { SortConfig } from "@/lib/sort-tasks";
 import type { ProjectWithTasks } from "@/types/project";
+
+export type TaskFilterSubject =
+  | "status"
+  | "priority"
+  | "assignee"
+  | "dueDate"
+  | "labels";
 
 type WorkspaceLabel = {
   id: string;
@@ -43,7 +48,9 @@ type ActiveUsers = {
   }>;
 };
 
-type BoardToolbarProps = {
+type TaskFilterToolbarProps = {
+  /** Which filter subjects this view has data for. Order is fixed by the component. */
+  subjects: TaskFilterSubject[];
   project?: ProjectWithTasks | null;
   filters: BoardFilters;
   updateFilter: (
@@ -54,11 +61,13 @@ type BoardToolbarProps = {
   clearFilters: () => void;
   hasActiveFilters: boolean;
   users?: ActiveUsers;
-  workspaceLabels: WorkspaceLabel[];
-  viewMode: "board" | "list";
-  setViewMode: (mode: "board" | "list") => void;
-  sort: SortConfig;
-  onSortChange: (sort: SortConfig) => void;
+  workspaceLabels?: WorkspaceLabel[];
+  /** View-specific action buttons rendered before the filter dropdown (e.g. Backlog's Plan/Move All). */
+  leadingActions?: ReactNode;
+  /** Sort control, rendered after the filter dropdown and before the active-filter chips. */
+  sortSlot?: ReactNode;
+  /** View-specific controls right-aligned on the toolbar (e.g. Board's view-mode toggle). */
+  trailingActions?: ReactNode;
 };
 
 function CheckSlot({ checked }: { checked: boolean }) {
@@ -130,7 +139,15 @@ function StackedIcons({
   );
 }
 
-export default function BoardToolbar({
+/**
+ * The filter dropdown (status/priority/assignee/due-date/label) + active
+ * filter chips shared by Board, Backlog, Gantt, and Calendar. Each view opts
+ * into only the subjects it has data for via `subjects`; view-specific extras
+ * (Backlog's Plan/Move All, Board's view-mode toggle) are passed in as slots
+ * rather than baked in here, so this component stays about filtering only.
+ */
+export default function TaskFilterToolbar({
+  subjects,
   project,
   filters,
   updateFilter,
@@ -138,17 +155,22 @@ export default function BoardToolbar({
   clearFilters,
   hasActiveFilters,
   users,
-  workspaceLabels,
-  viewMode,
-  setViewMode,
-  sort,
-  onSortChange,
-}: BoardToolbarProps) {
+  workspaceLabels = [],
+  leadingActions,
+  sortSlot,
+  trailingActions,
+}: TaskFilterToolbarProps) {
   const { t } = useTranslation();
   const selectedStatusIds = filters.status ?? [];
   const selectedPriorityIds = filters.priority ?? [];
   const selectedAssigneeIds = filters.assignee ?? [];
   const selectedDueDateFilters = filters.dueDate ?? [];
+
+  const showStatus = subjects.includes("status");
+  const showPriority = subjects.includes("priority");
+  const showAssignee = subjects.includes("assignee");
+  const showDueDate = subjects.includes("dueDate");
+  const showLabels = subjects.includes("labels");
 
   const getStatusDisplayName = (statusId: string) => {
     const column = project?.columns?.find((col) => col.id === statusId);
@@ -256,6 +278,8 @@ export default function BoardToolbar({
       <div className="flex min-h-10 items-center px-2 py-1.5 md:px-3">
         <div className="flex w-full flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
+            {leadingActions}
+
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -276,243 +300,261 @@ export default function BoardToolbar({
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
 
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
-                    {t("tasks:boardFilters.subjects.status")}
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-72">
-                    <div className="grid grid-cols-1 gap-1 p-1">
-                      <button
-                        className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                          selectedStatusIds.length === 0
-                            ? "bg-accent text-accent-foreground"
-                            : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
-                        }`}
-                        onClick={() => updateFilter("status", null)}
-                        type="button"
-                      >
-                        <CheckSlot checked={selectedStatusIds.length === 0} />
-                        {t("tasks:boardFilters.allStatuses")}
-                      </button>
-                      {project?.columns?.map((column) => (
+                {showStatus && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
+                      {t("tasks:boardFilters.subjects.status")}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-72">
+                      <div className="grid grid-cols-1 gap-1 p-1">
                         <button
-                          key={column.id}
                           className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                            selectedStatusIds.includes(column.id)
+                            selectedStatusIds.length === 0
                               ? "bg-accent text-accent-foreground"
                               : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
                           }`}
-                          onClick={() => toggleStatusFilter(column.id)}
+                          onClick={() => updateFilter("status", null)}
                           type="button"
                         >
-                          <CheckSlot
-                            checked={selectedStatusIds.includes(column.id)}
-                          />
-                          <span className="inline-flex h-4 w-4 items-center justify-center">
-                            {getStatusIcon(column.id)}
-                          </span>
-                          <span className="truncate">{column.name}</span>
+                          <CheckSlot checked={selectedStatusIds.length === 0} />
+                          {t("tasks:boardFilters.allStatuses")}
                         </button>
-                      ))}
-                    </div>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                        {project?.columns?.map((column) => (
+                          <button
+                            key={column.id}
+                            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                              selectedStatusIds.includes(column.id)
+                                ? "bg-accent text-accent-foreground"
+                                : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                            }`}
+                            onClick={() => toggleStatusFilter(column.id)}
+                            type="button"
+                          >
+                            <CheckSlot
+                              checked={selectedStatusIds.includes(column.id)}
+                            />
+                            <span className="inline-flex h-4 w-4 items-center justify-center">
+                              {getStatusIcon(column.id)}
+                            </span>
+                            <span className="truncate">{column.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
 
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
-                    {t("tasks:boardFilters.subjects.priority")}
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-72">
-                    <div className="grid grid-cols-1 gap-1 p-1">
-                      <button
-                        className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                          selectedPriorityIds.length === 0
-                            ? "bg-accent text-accent-foreground"
-                            : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
-                        }`}
-                        onClick={() => updateFilter("priority", null)}
-                        type="button"
-                      >
-                        <CheckSlot checked={selectedPriorityIds.length === 0} />
-                        {t("tasks:boardFilters.allPriorities")}
-                      </button>
-                      {["urgent", "high", "medium", "low"].map((priority) => (
+                {showPriority && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
+                      {t("tasks:boardFilters.subjects.priority")}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-72">
+                      <div className="grid grid-cols-1 gap-1 p-1">
                         <button
-                          key={priority}
                           className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                            selectedPriorityIds.includes(priority)
+                            selectedPriorityIds.length === 0
                               ? "bg-accent text-accent-foreground"
                               : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
                           }`}
-                          onClick={() => togglePriorityFilter(priority)}
+                          onClick={() => updateFilter("priority", null)}
                           type="button"
                         >
                           <CheckSlot
-                            checked={selectedPriorityIds.includes(priority)}
+                            checked={selectedPriorityIds.length === 0}
                           />
-                          <span className="inline-flex h-4 w-4 items-center justify-center [&>svg]:h-4 [&>svg]:w-4">
-                            {getPriorityIcon(priority)}
-                          </span>
-                          <span className="truncate capitalize">
-                            {getPriorityDisplayName(priority)}
-                          </span>
+                          {t("tasks:boardFilters.allPriorities")}
                         </button>
-                      ))}
-                    </div>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                        {["urgent", "high", "medium", "low"].map((priority) => (
+                          <button
+                            key={priority}
+                            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                              selectedPriorityIds.includes(priority)
+                                ? "bg-accent text-accent-foreground"
+                                : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                            }`}
+                            onClick={() => togglePriorityFilter(priority)}
+                            type="button"
+                          >
+                            <CheckSlot
+                              checked={selectedPriorityIds.includes(priority)}
+                            />
+                            <span className="inline-flex h-4 w-4 items-center justify-center [&>svg]:h-4 [&>svg]:w-4">
+                              {getPriorityIcon(priority)}
+                            </span>
+                            <span className="truncate capitalize">
+                              {getPriorityDisplayName(priority)}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
 
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
-                    {t("tasks:boardFilters.subjects.assignee")}
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-64">
-                    <div className="grid grid-cols-1 gap-1 p-1">
-                      <button
-                        className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                          selectedAssigneeIds.length === 0
-                            ? "bg-accent text-accent-foreground"
-                            : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
-                        }`}
-                        onClick={() => updateFilter("assignee", null)}
-                        type="button"
-                      >
-                        <CheckSlot checked={selectedAssigneeIds.length === 0} />
-                        {t("tasks:boardFilters.allAssignees")}
-                      </button>
-                      {users?.members?.map((member) => (
+                {showAssignee && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
+                      {t("tasks:boardFilters.subjects.assignee")}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-64">
+                      <div className="grid grid-cols-1 gap-1 p-1">
                         <button
-                          key={member.userId}
                           className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                            selectedAssigneeIds.includes(member.userId)
+                            selectedAssigneeIds.length === 0
                               ? "bg-accent text-accent-foreground"
                               : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
                           }`}
-                          onClick={() => toggleAssigneeFilter(member.userId)}
+                          onClick={() => updateFilter("assignee", null)}
                           type="button"
                         >
                           <CheckSlot
-                            checked={selectedAssigneeIds.includes(
-                              member.userId,
+                            checked={selectedAssigneeIds.length === 0}
+                          />
+                          {t("tasks:boardFilters.allAssignees")}
+                        </button>
+                        {users?.members?.map((member) => (
+                          <button
+                            key={member.userId}
+                            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                              selectedAssigneeIds.includes(member.userId)
+                                ? "bg-accent text-accent-foreground"
+                                : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                            }`}
+                            onClick={() => toggleAssigneeFilter(member.userId)}
+                            type="button"
+                          >
+                            <CheckSlot
+                              checked={selectedAssigneeIds.includes(
+                                member.userId,
+                              )}
+                            />
+                            <span className="inline-flex items-center gap-2">
+                              <Avatar className="h-5 w-5">
+                                <AvatarImage
+                                  src={member.user?.image ?? ""}
+                                  alt={member.user?.name || ""}
+                                />
+                                <AvatarFallback className="border border-border/30 text-[10px] font-medium">
+                                  {getInitials(member.user?.name)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>{member.user?.name}</span>
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
+
+                {showDueDate && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
+                      {t("tasks:boardFilters.subjects.dueDate")}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-56">
+                      <div className="grid grid-cols-1 gap-1 p-1">
+                        <button
+                          className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                            selectedDueDateFilters.length === 0
+                              ? "bg-accent text-accent-foreground"
+                              : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                          }`}
+                          onClick={() => updateFilter("dueDate", null)}
+                          type="button"
+                        >
+                          <CheckSlot
+                            checked={selectedDueDateFilters.length === 0}
+                          />
+                          {t("tasks:boardFilters.allDueDates")}
+                        </button>
+                        {[
+                          DUE_DATE_FILTER_VALUES.dueThisWeek,
+                          DUE_DATE_FILTER_VALUES.dueNextWeek,
+                          DUE_DATE_FILTER_VALUES.noDueDate,
+                        ].map((dueDate) => (
+                          <button
+                            key={dueDate}
+                            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
+                              selectedDueDateFilters.includes(dueDate)
+                                ? "bg-accent text-accent-foreground"
+                                : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
+                            }`}
+                            onClick={() => toggleDueDateFilter(dueDate)}
+                            type="button"
+                          >
+                            <CheckSlot
+                              checked={selectedDueDateFilters.includes(dueDate)}
+                            />
+                            {t(
+                              `tasks:backlog.filters.${
+                                dueDate === DUE_DATE_FILTER_VALUES.dueThisWeek
+                                  ? "dueThisWeek"
+                                  : dueDate ===
+                                      DUE_DATE_FILTER_VALUES.dueNextWeek
+                                    ? "dueNextWeek"
+                                    : "noDueDate"
+                              }`,
                             )}
-                          />
-                          <span className="inline-flex items-center gap-2">
-                            <Avatar className="h-5 w-5">
-                              <AvatarImage
-                                src={member.user?.image ?? ""}
-                                alt={member.user?.name || ""}
-                              />
-                              <AvatarFallback className="border border-border/30 text-[10px] font-medium">
-                                {getInitials(member.user?.name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{member.user?.name}</span>
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                          </button>
+                        ))}
+                      </div>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
 
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
-                    {t("tasks:boardFilters.subjects.dueDate")}
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-56">
-                    <div className="grid grid-cols-1 gap-1 p-1">
-                      <button
-                        className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                          selectedDueDateFilters.length === 0
-                            ? "bg-accent text-accent-foreground"
-                            : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
-                        }`}
-                        onClick={() => updateFilter("dueDate", null)}
-                        type="button"
+                {showLabels && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
+                      {t("tasks:properties.labels")}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-64">
+                      <DropdownMenuItem
+                        onClick={clearLabelFilters}
+                        className="h-8 rounded-md text-sm"
                       >
                         <CheckSlot
-                          checked={selectedDueDateFilters.length === 0}
+                          checked={
+                            !filters.labels || filters.labels.length === 0
+                          }
                         />
-                        {t("tasks:boardFilters.allDueDates")}
-                      </button>
-                      {[
-                        DUE_DATE_FILTER_VALUES.dueThisWeek,
-                        DUE_DATE_FILTER_VALUES.dueNextWeek,
-                        DUE_DATE_FILTER_VALUES.noDueDate,
-                      ].map((dueDate) => (
-                        <button
-                          key={dueDate}
-                          className={`inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-left text-xs ${
-                            selectedDueDateFilters.includes(dueDate)
-                              ? "bg-accent text-accent-foreground"
-                              : "text-foreground/90 hover:bg-accent/60 hover:text-foreground"
-                          }`}
-                          onClick={() => toggleDueDateFilter(dueDate)}
-                          type="button"
-                        >
-                          <CheckSlot
-                            checked={selectedDueDateFilters.includes(dueDate)}
-                          />
-                          {t(
-                            `tasks:backlog.filters.${
-                              dueDate === DUE_DATE_FILTER_VALUES.dueThisWeek
-                                ? "dueThisWeek"
-                                : dueDate === DUE_DATE_FILTER_VALUES.dueNextWeek
-                                  ? "dueNextWeek"
-                                  : "noDueDate"
-                            }`,
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="h-8 rounded-md text-sm">
-                    {t("tasks:properties.labels")}
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-64">
-                    <DropdownMenuItem
-                      onClick={clearLabelFilters}
-                      className="h-8 rounded-md text-sm"
-                    >
-                      <CheckSlot
-                        checked={!filters.labels || filters.labels.length === 0}
-                      />
-                      {t("tasks:boardFilters.allLabels")}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    {uniqueLabels.length > 0 ? (
-                      uniqueLabels.map((label) => (
-                        <DropdownMenuItem
-                          key={label.id}
-                          onClick={() => toggleLabelGroup(label)}
-                          className="h-8 rounded-md text-sm"
-                        >
-                          <CheckSlot checked={isLabelGroupSelected(label)} />
-                          <span
-                            className="h-2.5 w-2.5 shrink-0 rounded-full"
-                            style={{
-                              backgroundColor:
-                                labelColors.find((c) => c.value === label.color)
-                                  ?.color || "var(--color-neutral-400)",
-                            }}
-                          />
-                          <span className="max-w-20 truncate">
-                            {label.name}
-                          </span>
-                        </DropdownMenuItem>
-                      ))
-                    ) : (
-                      <DropdownMenuItem
-                        disabled
-                        className="h-8 rounded-md text-sm text-muted-foreground"
-                      >
-                        {t("tasks:labels.empty")}
+                        {t("tasks:boardFilters.allLabels")}
                       </DropdownMenuItem>
-                    )}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                      <DropdownMenuSeparator />
+                      {uniqueLabels.length > 0 ? (
+                        uniqueLabels.map((label) => (
+                          <DropdownMenuItem
+                            key={label.id}
+                            onClick={() => toggleLabelGroup(label)}
+                            className="h-8 rounded-md text-sm"
+                          >
+                            <CheckSlot checked={isLabelGroupSelected(label)} />
+                            <span
+                              className="h-2.5 w-2.5 shrink-0 rounded-full"
+                              style={{
+                                backgroundColor:
+                                  labelColors.find(
+                                    (c) => c.value === label.color,
+                                  )?.color || "var(--color-neutral-400)",
+                              }}
+                            />
+                            <span className="max-w-20 truncate">
+                              {label.name}
+                            </span>
+                          </DropdownMenuItem>
+                        ))
+                      ) : (
+                        <DropdownMenuItem
+                          disabled
+                          className="h-8 rounded-md text-sm text-muted-foreground"
+                        >
+                          {t("tasks:labels.empty")}
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
 
                 {hasActiveFilters && (
                   <>
@@ -528,9 +570,9 @@ export default function BoardToolbar({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <SortControl sort={sort} onSortChange={onSortChange} />
+            {sortSlot}
 
-            {selectedStatusIds.length > 0 && (
+            {showStatus && selectedStatusIds.length > 0 && (
               <ActiveFilterChip
                 subject={t("tasks:boardFilters.subjects.status")}
                 operator={t("tasks:boardFilters.operators.isAnyOf")}
@@ -556,7 +598,7 @@ export default function BoardToolbar({
               />
             )}
 
-            {selectedPriorityIds.length > 0 && (
+            {showPriority && selectedPriorityIds.length > 0 && (
               <ActiveFilterChip
                 subject={t("tasks:boardFilters.subjects.priority")}
                 operator={t("tasks:boardFilters.operators.isAnyOf")}
@@ -581,7 +623,7 @@ export default function BoardToolbar({
               />
             )}
 
-            {selectedAssigneeIds.length > 0 && (
+            {showAssignee && selectedAssigneeIds.length > 0 && (
               <ActiveFilterChip
                 subject={t("tasks:boardFilters.subjects.assignee")}
                 operator={t("tasks:boardFilters.operators.isAnyOf")}
@@ -606,7 +648,7 @@ export default function BoardToolbar({
               />
             )}
 
-            {selectedDueDateFilters.length > 0 && (
+            {showDueDate && selectedDueDateFilters.length > 0 && (
               <ActiveFilterChip
                 subject={t("tasks:boardFilters.subjects.dueDate")}
                 operator={t("tasks:boardFilters.operators.isAnyOf")}
@@ -631,7 +673,7 @@ export default function BoardToolbar({
               />
             )}
 
-            {filters.labels && filters.labels.length > 0 && (
+            {showLabels && filters.labels && filters.labels.length > 0 && (
               <ActiveFilterChip
                 subject={t("tasks:boardFilters.subjects.labels")}
                 operator={t("tasks:boardFilters.operators.includeAnyOf")}
@@ -643,32 +685,11 @@ export default function BoardToolbar({
             )}
           </div>
 
-          <div className="inline-flex items-center gap-1">
-            <button
-              type="button"
-              className={`inline-flex h-6 items-center gap-1 rounded-md px-2 text-xs font-medium transition-colors ${
-                viewMode === "board"
-                  ? "bg-accent text-foreground"
-                  : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-              }`}
-              onClick={() => setViewMode("board")}
-            >
-              <PanelsTopLeft className="h-3 w-3" />
-              {t("tasks:view.board")}
-            </button>
-            <button
-              type="button"
-              className={`inline-flex h-6 items-center gap-1 rounded-md px-2 text-xs font-medium transition-colors ${
-                viewMode === "list"
-                  ? "bg-accent text-foreground"
-                  : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-              }`}
-              onClick={() => setViewMode("list")}
-            >
-              <Rows3 className="h-3 w-3" />
-              {t("tasks:view.list")}
-            </button>
-          </div>
+          {trailingActions && (
+            <div className="inline-flex items-center gap-1">
+              {trailingActions}
+            </div>
+          )}
         </div>
       </div>
     </div>

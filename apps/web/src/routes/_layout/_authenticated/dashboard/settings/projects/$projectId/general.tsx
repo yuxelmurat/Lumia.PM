@@ -608,20 +608,18 @@ function RouteComponent() {
               <AlertDialogClose render={<Button variant="outline" size="sm" />}>
                 {t("common:actions.cancel")}
               </AlertDialogClose>
-              <AlertDialogClose
-                render={
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={isDeleting}
-                    onClick={handleDeleteProject}
-                  />
-                }
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={isDeleting}
+                onClick={async () => {
+                  await handleDeleteProject();
+                }}
               >
                 {isDeleting
                   ? t("common:actions.deleting")
                   : t("settings:projectGeneral.deleteModalConfirm")}
-              </AlertDialogClose>
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

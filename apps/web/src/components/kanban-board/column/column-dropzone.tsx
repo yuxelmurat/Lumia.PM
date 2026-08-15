@@ -5,6 +5,7 @@ import {
 } from "@dnd-kit/sortable";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { ProjectWithTasks } from "@/types/project";
 import TaskCard from "../task-card";
 
@@ -32,6 +33,7 @@ export function ColumnDropzone({
   }, [isOver, onIsOverChange]);
 
   const reduceMotion = useReducedMotion();
+  const { t } = useTranslation();
 
   return (
     <div ref={setNodeRef} className="flex-1 min-h-0">
@@ -59,6 +61,12 @@ export function ColumnDropzone({
               </motion.div>
             ))}
           </AnimatePresence>
+
+          {column.tasks.length === 0 && (
+            <div className="py-6 px-2 text-center text-xs text-muted-foreground">
+              {t("tasks:board.columnEmpty", { name: column.name })}
+            </div>
+          )}
         </div>
       </SortableContext>
     </div>

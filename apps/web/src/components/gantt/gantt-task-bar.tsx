@@ -3,6 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useUpdateTask } from "@/hooks/mutations/task/use-update-task";
 import { cn } from "@/lib/cn";
+import {
+  dueDateStatusBarColors,
+  getDueDateStatus,
+} from "@/lib/due-date-status";
+import { getPriorityIcon } from "@/lib/priority";
 import { toast } from "@/lib/toast";
 import type Task from "@/types/task";
 
@@ -23,6 +28,7 @@ type GanttTaskBarProps = {
   };
   pixelsPerDay: number;
   isMobile?: boolean;
+  isCompleted?: boolean;
   onOpenTask: () => void;
 };
 
@@ -55,10 +61,13 @@ export function GanttTaskBar({
   timeline,
   pixelsPerDay,
   isMobile = false,
+  isCompleted = false,
   onOpenTask,
 }: GanttTaskBarProps) {
   const { t } = useTranslation();
   const { mutateAsync: updateTask } = useUpdateTask();
+  const dueDateStatus = getDueDateStatus(task.dueDate, isCompleted);
+  const tint = dueDateStatusBarColors[dueDateStatus];
   const [dragDisplay, setDragDisplay] = useState<{
     start: Date;
     end: Date;
@@ -289,7 +298,10 @@ export function GanttTaskBar({
     >
       <div
         style={{ gridColumn: `${lineStart} / ${lineEnd}` }}
-        className="group pointer-events-auto relative mx-1 flex min-h-[44px] min-w-0 items-stretch overflow-hidden rounded-md border border-primary/25 bg-background text-left text-sm font-medium leading-none text-foreground shadow-sm transition-colors hover:border-primary/40 sm:h-11 sm:min-h-0"
+        className={cn(
+          "group pointer-events-auto relative mx-1 flex min-h-[44px] min-w-0 items-stretch overflow-hidden rounded-md border bg-background text-left text-sm font-medium leading-none text-foreground shadow-sm transition-colors hover:brightness-95 sm:h-11 sm:min-h-0",
+          tint.border,
+        )}
       >
         <button
           type="button"
@@ -313,8 +325,18 @@ export function GanttTaskBar({
             }
           }}
         >
-          <div className="absolute inset-0 z-0 bg-primary/12 transition-colors group-hover:bg-primary/18" />
-          <span className="relative z-10 block truncate">{task.title}</span>
+          <div
+            className={cn(
+              "absolute inset-0 z-0 transition-colors group-hover:brightness-95",
+              tint.overlay,
+            )}
+          />
+          <span className="relative z-10 flex items-center gap-1.5">
+            <span className="shrink-0 [&>svg]:h-3 [&>svg]:w-3">
+              {getPriorityIcon(task.priority ?? "")}
+            </span>
+            <span className="truncate">{task.title}</span>
+          </span>
         </button>
         <button
           type="button"
