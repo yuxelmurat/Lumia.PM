@@ -38,6 +38,7 @@ export async function finalizeImageUpload({
   contentType,
   size,
   surface,
+  previousAssetId,
 }: {
   taskId: string;
   key: string;
@@ -45,6 +46,7 @@ export async function finalizeImageUpload({
   contentType: string;
   size: number;
   surface: "description" | "comment";
+  previousAssetId?: string;
 }) {
   const response = await client.task["image-upload"][":id"].finalize.$post({
     param: { id: taskId },
@@ -54,7 +56,29 @@ export async function finalizeImageUpload({
       contentType,
       size,
       surface,
+      previousAssetId,
     },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
+
+  return response.json();
+}
+
+export async function getTaskImageVersions({
+  taskId,
+  assetId,
+}: {
+  taskId: string;
+  assetId: string;
+}) {
+  const response = await client.task["image-upload"][":id"].versions[
+    ":assetId"
+  ].$get({
+    param: { id: taskId, assetId },
   });
 
   if (!response.ok) {

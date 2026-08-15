@@ -1,6 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   foreignKey,
   index,
@@ -648,6 +649,15 @@ export const assetTable = pgTable(
       onDelete: "set null",
       onUpdate: "cascade",
     }),
+    // Points at the id of the first asset in a revision chain (never at an
+    // intermediate one) so every version can be found with a single
+    // `versionGroupId = <root id> OR id = <root id>` lookup. Null means this
+    // asset has no other versions.
+    versionGroupId: text("version_group_id").references(
+      (): AnyPgColumn => assetTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    versionNumber: integer("version_number").notNull().default(1),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => [
@@ -656,6 +666,7 @@ export const assetTable = pgTable(
     index("asset_taskId_idx").on(table.taskId),
     index("asset_activityId_idx").on(table.activityId),
     index("asset_createdBy_idx").on(table.createdBy),
+    index("asset_versionGroupId_idx").on(table.versionGroupId),
   ],
 );
 

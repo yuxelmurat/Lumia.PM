@@ -337,6 +337,13 @@
 			"when": 1786831687354,
 			"tag": "0047_luxuriant_timeslip",
 			"breakpoints": true
+		},
+		{
+			"idx": 48,
+			"version": "7",
+			"when": 1786832535472,
+			"tag": "0048_lyrical_selene",
+			"breakpoints": true
 		}
 	]
 }

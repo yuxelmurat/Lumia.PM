@@ -49,6 +49,7 @@ import {
   ShikiCodeBlock,
 } from "@/components/task/extensions/shiki-code-block";
 import { TaskItemWithCheckbox } from "@/components/task/extensions/task-item-with-checkbox";
+import { VersionedImage } from "@/components/task/extensions/versioned-image";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogPopup } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,10 @@ import {
 import { isInCodeBlockLanguagePicker } from "@/lib/is-in-codeblock-language-picker";
 import { getSharedShikiHighlighter } from "@/lib/shiki-highlighter";
 import { toast } from "@/lib/toast";
-import { uploadTaskImage } from "@/lib/upload-task-image";
+import {
+  fetchTaskImageVersions,
+  uploadTaskImage,
+} from "@/lib/upload-task-image";
 
 type CommentEditorProps = {
   value: string;
@@ -310,9 +314,14 @@ export default function CommentEditor({
 
       if (asset.kind === "image") {
         chain
-          .setImage({
-            src: asset.url,
-            alt: asset.alt,
+          .insertContent({
+            type: "versionedImage",
+            attrs: {
+              src: asset.url,
+              alt: asset.alt,
+              assetId: asset.assetId ?? null,
+              versionNumber: asset.versionNumber ?? 1,
+            },
           })
           .run();
         return;
@@ -372,6 +381,42 @@ export default function CommentEditor({
       }
     },
     [insertUploadedAsset, t],
+  );
+
+  const uploadImageNewVersion = useCallback(
+    async ({
+      surface,
+      file,
+      previousAssetId,
+    }: {
+      taskId: string;
+      surface: "description" | "comment";
+      file: File;
+      previousAssetId: string;
+    }) => {
+      const resolvedTaskId =
+        taskIdRef.current ?? (await ensureTaskIdRef.current?.());
+      if (!resolvedTaskId) {
+        throw new Error(t("activity:comment.editor.uploadsOnlyOnSavedTasks"));
+      }
+      return uploadTaskImage({
+        taskId: resolvedTaskId,
+        surface,
+        file,
+        previousAssetId,
+      });
+    },
+    [t],
+  );
+
+  const getImageVersions = useCallback(
+    async ({ assetId }: { taskId: string; assetId: string }) => {
+      const resolvedTaskId =
+        taskIdRef.current ?? (await ensureTaskIdRef.current?.());
+      if (!resolvedTaskId) return [];
+      return fetchTaskImageVersions({ taskId: resolvedTaskId, assetId });
+    },
+    [],
   );
 
   const canUploadFiles = Boolean(taskId || ensureTaskId);
@@ -641,6 +686,13 @@ export default function CommentEditor({
             loading: "lazy",
           },
         }),
+        VersionedImage.configure({
+          taskId: taskId ?? "",
+          surface: uploadSurface,
+          uploadNewVersion: uploadImageNewVersion,
+          getVersions: getImageVersions,
+          i18nPrefix: "activity:comment.editor",
+        }),
         TaskItemWithCheckbox.configure({
           nested: true,
         }),
@@ -896,7 +948,15 @@ export default function CommentEditor({
         onChange(markdown);
       },
     },
-    [handleAssetFileUpload, resolvedPlaceholder, toShikiLanguage],
+    [
+      handleAssetFileUpload,
+      resolvedPlaceholder,
+      toShikiLanguage,
+      taskId,
+      uploadSurface,
+      uploadImageNewVersion,
+      getImageVersions,
+    ],
   );
 
   useEffect(() => {

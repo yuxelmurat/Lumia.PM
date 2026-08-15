@@ -69,7 +69,10 @@ import {
 import { isInCodeBlockLanguagePicker } from "@/lib/is-in-codeblock-language-picker";
 import { getSharedShikiHighlighter } from "@/lib/shiki-highlighter";
 import { toast } from "@/lib/toast";
-import { uploadTaskImage } from "@/lib/upload-task-image";
+import {
+  fetchTaskImageVersions,
+  uploadTaskImage,
+} from "@/lib/upload-task-image";
 import { AttachmentCard } from "./extensions/attachment-card";
 import { EmbedBlock } from "./extensions/embed-block";
 import { KaneoIssueLink } from "./extensions/kaneo-issue-link";
@@ -79,6 +82,7 @@ import {
   ShikiCodeBlock,
 } from "./extensions/shiki-code-block";
 import { TaskItemWithCheckbox } from "./extensions/task-item-with-checkbox";
+import { VersionedImage } from "./extensions/versioned-image";
 import "tippy.js/dist/tippy.css";
 
 type TaskDescriptionProps = {
@@ -367,9 +371,14 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
 
       if (asset.kind === "image") {
         chain
-          .setImage({
-            src: asset.url,
-            alt: asset.alt,
+          .insertContent({
+            type: "versionedImage",
+            attrs: {
+              src: asset.url,
+              alt: asset.alt,
+              assetId: asset.assetId ?? null,
+              versionNumber: asset.versionNumber ?? 1,
+            },
           })
           .run();
         return;
@@ -587,6 +596,13 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
             loading: "lazy",
           },
         }),
+        VersionedImage.configure({
+          taskId,
+          surface: "description",
+          uploadNewVersion: uploadTaskImage,
+          getVersions: fetchTaskImageVersions,
+          i18nPrefix: "tasks:detail.editor",
+        }),
         TaskItemWithCheckbox.configure({
           nested: true,
         }),
@@ -761,7 +777,7 @@ export default function TaskDescription({ taskId }: TaskDescriptionProps) {
         debouncedUpdate(markdown);
       },
     },
-    [getOverlayPosition, handleAssetFileUpload, t, toShikiLanguage],
+    [getOverlayPosition, handleAssetFileUpload, t, toShikiLanguage, taskId],
   );
 
   useEffect(() => {

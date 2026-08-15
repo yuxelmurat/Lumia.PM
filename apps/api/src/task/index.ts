@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
@@ -784,6 +784,7 @@ const task = new Hono<{
         contentType: v.string(),
         size: v.number(),
         surface: v.picklist(["description", "comment"] as const),
+        previousAssetId: v.optional(v.string()),
       }),
     ),
     workspaceAccess.fromTask(),
@@ -791,7 +792,8 @@ const task = new Hono<{
     requireEntitlement,
     async (c) => {
       const { id } = c.req.valid("param");
-      const { key, filename, contentType, size, surface } = c.req.valid("json");
+      const { key, filename, contentType, size, surface, previousAssetId } =
+        c.req.valid("json");
       const userId = c.get("userId");
 
       try {
@@ -866,6 +868,39 @@ const task = new Hono<{
         .where(eq(assetTable.objectKey, normalizedKey))
         .limit(1);
 
+      // "Upload a new version" replaces the visible image in place, but
+      // never overwrites the previous asset row — every revision keeps its
+      // own row so it stays viewable through the version history.
+      let versionGroupId: string | null = null;
+      let versionNumber = 1;
+      if (previousAssetId) {
+        const [previousAsset] = await db
+          .select({
+            id: assetTable.id,
+            taskId: assetTable.taskId,
+            versionGroupId: assetTable.versionGroupId,
+          })
+          .from(assetTable)
+          .where(eq(assetTable.id, previousAssetId))
+          .limit(1);
+
+        if (previousAsset && previousAsset.taskId === taskContext.taskId) {
+          versionGroupId = previousAsset.versionGroupId ?? previousAsset.id;
+          const [maxVersionRow] = await db
+            .select({
+              maxVersion: sql<number>`coalesce(max(${assetTable.versionNumber}), 1)`,
+            })
+            .from(assetTable)
+            .where(
+              or(
+                eq(assetTable.id, versionGroupId),
+                eq(assetTable.versionGroupId, versionGroupId),
+              ),
+            );
+          versionNumber = Number(maxVersionRow?.maxVersion ?? 1) + 1;
+        }
+      }
+
       const [asset] = existingAsset
         ? await db
             .update(assetTable)
@@ -897,6 +932,8 @@ const task = new Hono<{
               kind: isImageContentType(contentType) ? "image" : "attachment",
               surface,
               createdBy: userId || null,
+              versionGroupId,
+              versionNumber,
             })
             .returning({
               id: assetTable.id,
@@ -914,7 +951,74 @@ const task = new Hono<{
       return c.json({
         id: asset.id,
         url: `${apiBaseUrl}/asset/${asset.id}`,
+        versionNumber,
       });
+    },
+  )
+  .get(
+    "/image-upload/:id/versions/:assetId",
+    describeRoute({
+      operationId: "getTaskImageVersions",
+      tags: ["Tasks"],
+      description: "List every version of an uploaded task image, oldest first",
+      responses: {
+        200: {
+          description: "Image versions retrieved successfully",
+          content: {
+            "application/json": { schema: resolver(v.any()) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string(), assetId: v.string() })),
+    workspaceAccess.fromTask(),
+    async (c) => {
+      const { id, assetId } = c.req.valid("param");
+
+      const [anchor] = await db
+        .select({
+          id: assetTable.id,
+          taskId: assetTable.taskId,
+          versionGroupId: assetTable.versionGroupId,
+        })
+        .from(assetTable)
+        .where(eq(assetTable.id, assetId))
+        .limit(1);
+
+      if (!anchor || anchor.taskId !== id) {
+        throw new HTTPException(404, { message: "Asset not found" });
+      }
+
+      const groupRoot = anchor.versionGroupId ?? anchor.id;
+      const rows = await db
+        .select({
+          id: assetTable.id,
+          filename: assetTable.filename,
+          versionNumber: assetTable.versionNumber,
+          createdAt: assetTable.createdAt,
+        })
+        .from(assetTable)
+        .where(
+          or(
+            eq(assetTable.id, groupRoot),
+            eq(assetTable.versionGroupId, groupRoot),
+          ),
+        )
+        .orderBy(assetTable.versionNumber);
+
+      const apiBaseUrl = normalizeApiServerUrl(
+        process.env.KANEO_API_URL || new URL(c.req.url).origin,
+      );
+
+      return c.json(
+        rows.map((row) => ({
+          id: row.id,
+          url: `${apiBaseUrl}/asset/${row.id}`,
+          filename: row.filename,
+          versionNumber: row.versionNumber,
+          createdAt: row.createdAt,
+        })),
+      );
     },
   )
   .put(

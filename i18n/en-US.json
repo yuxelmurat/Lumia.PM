@@ -1658,6 +1658,14 @@
 				"copied": "Copied",
 				"dropImageToUpload": "Drop image to upload",
 				"previewImageAlt": "Preview image",
+				"version": {
+					"badge": "v{{number}}",
+					"uploadNew": "Upload a new version",
+					"history": "Version history",
+					"loading": "Loading versions...",
+					"uploading": "Uploading new version...",
+					"uploadFailed": "Failed to upload new version"
+				},
 				"codeLang": {
 					"bash": "Bash",
 					"csharp": "C#",
@@ -1753,6 +1761,14 @@
 					"failed": "Failed to upload file",
 					"imageSuccess": "Image uploaded",
 					"fileSuccess": "File attached"
+				},
+				"version": {
+					"badge": "v{{number}}",
+					"uploadNew": "Upload a new version",
+					"history": "Version history",
+					"loading": "Loading versions...",
+					"uploading": "Uploading new version...",
+					"uploadFailed": "Failed to upload new version"
 				},
 				"slash": {
 					"groups": {

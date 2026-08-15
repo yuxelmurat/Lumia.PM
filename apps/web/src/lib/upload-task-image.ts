@@ -1,5 +1,6 @@
 import createImageUpload, {
   finalizeImageUpload,
+  getTaskImageVersions,
 } from "@/fetchers/task/create-image-upload";
 
 const allowedImageMimeTypes = new Set([
@@ -35,10 +36,12 @@ export async function uploadTaskImage({
   taskId,
   surface,
   file,
+  previousAssetId,
 }: {
   taskId: string;
   surface: UploadSurface;
   file: File;
+  previousAssetId?: string;
 }) {
   if (!isSupportedImageFile(file)) {
     if (!isSupportedTaskAsset(file)) {
@@ -71,14 +74,27 @@ export async function uploadTaskImage({
     contentType: file.type,
     size: file.size,
     surface,
+    previousAssetId,
   });
 
   return {
     url: asset.url,
+    assetId: asset.id,
+    versionNumber: asset.versionNumber,
     alt: getImageAltText(file.name || "image"),
     filename: file.name || "file",
     kind: isSupportedImageFile(file) ? "image" : "attachment",
     mimeType: file.type,
     size: file.size,
   };
+}
+
+export async function fetchTaskImageVersions({
+  taskId,
+  assetId,
+}: {
+  taskId: string;
+  assetId: string;
+}) {
+  return getTaskImageVersions({ taskId, assetId });
 }
