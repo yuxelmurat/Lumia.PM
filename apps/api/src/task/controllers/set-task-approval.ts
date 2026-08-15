@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { taskTable } from "../../database/schema";
+import { taskApprovalTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { resolvePublicProject } from "../../utils/resolve-public-project";
 
@@ -79,6 +79,28 @@ async function setTaskApproval({
       message: "Failed to update task approval",
     });
   }
+
+  // A second stakeholder's response is a distinct row keyed by name, not an
+  // overwrite of the first — the same name responding again (e.g. revising
+  // their note) updates their own row in place.
+  const respondedAt = updatedTask.approvalRespondedAt ?? new Date();
+  await db
+    .insert(taskApprovalTable)
+    .values({
+      taskId,
+      clientName: trimmedClientName,
+      status,
+      note: trimmedNote || null,
+      respondedAt,
+    })
+    .onConflictDoUpdate({
+      target: [taskApprovalTable.taskId, taskApprovalTable.clientName],
+      set: {
+        status,
+        note: trimmedNote || null,
+        respondedAt,
+      },
+    });
 
   await publishEvent("task.approval_updated", {
     taskId: updatedTask.id,

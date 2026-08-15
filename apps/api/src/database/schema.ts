@@ -460,9 +460,11 @@ export const taskTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
-    // Client approval on a public project's shared link. Single current
-    // status per task, not a history log — see AGENTS.md reverse-state
-    // guidance for the reset action that clears these back to null.
+    // Client approval on a public project's shared link. Mirrors the most
+    // recent row in taskApprovalTable below so board/list/card badges can
+    // read a single status without a join; the full per-approver history
+    // lives in that table. See AGENTS.md reverse-state guidance for the
+    // reset action that clears both back to nothing.
     approvalStatus: text("approval_status"),
     approvalNote: text("approval_note"),
     approvalClientName: text("approval_client_name"),
@@ -474,6 +476,37 @@ export const taskTable = pgTable(
     index("task_assigneeId_idx").on(table.userId),
     index("task_columnId_idx").on(table.columnId),
     unique("task_project_number_unique").on(table.projectId, table.number),
+  ],
+);
+
+// One row per named approver's response to a task, so a second
+// stakeholder's review doesn't overwrite the first's. taskTable's
+// approval* columns above always mirror the latest row here.
+export const taskApprovalTable = pgTable(
+  "task_approval",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => taskTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    clientName: text("client_name").notNull(),
+    status: text("status").notNull(),
+    note: text("note"),
+    respondedAt: timestamp("responded_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("task_approval_taskId_idx").on(table.taskId),
+    unique("task_approval_task_client_unique").on(
+      table.taskId,
+      table.clientName,
+    ),
   ],
 );
 

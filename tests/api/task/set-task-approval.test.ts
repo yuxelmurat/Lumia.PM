@@ -3,7 +3,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mockTaskFindFirst = vi.fn();
 const mockProjectFindFirst = vi.fn();
 const mockUpdate = vi.fn();
+const mockInsert = vi.fn();
 const mockPublishEvent = vi.fn();
+
+function makeInsertMock() {
+  const chain = {
+    values: vi.fn(() => chain),
+    onConflictDoUpdate: vi.fn(() => Promise.resolve()),
+  };
+  return chain;
+}
 
 vi.mock("../../../apps/api/src/database", () => ({
   default: {
@@ -16,6 +25,7 @@ vi.mock("../../../apps/api/src/database", () => ({
       },
     },
     update: (...args: unknown[]) => mockUpdate(...args),
+    insert: (...args: unknown[]) => mockInsert(...args),
   },
 }));
 
@@ -64,6 +74,7 @@ describe("setTaskApproval", () => {
       approvalRespondedAt: new Date(),
     };
     mockUpdate.mockReturnValue(makeUpdateMock(updatedTask));
+    mockInsert.mockReturnValue(makeInsertMock());
 
     const result = await setTaskApproval({
       projectId: "proj-1",

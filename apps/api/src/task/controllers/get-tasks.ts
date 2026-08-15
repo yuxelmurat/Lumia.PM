@@ -16,6 +16,7 @@ import {
   externalLinkTable,
   labelTable,
   projectTable,
+  taskApprovalTable,
   taskTable,
   userTable,
 } from "../../database/schema";
@@ -177,6 +178,22 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
           .where(inArray(externalLinkTable.taskId, taskIds))
       : [];
 
+  const approvalsData =
+    taskIds.length > 0
+      ? await db
+          .select({
+            id: taskApprovalTable.id,
+            taskId: taskApprovalTable.taskId,
+            clientName: taskApprovalTable.clientName,
+            status: taskApprovalTable.status,
+            note: taskApprovalTable.note,
+            respondedAt: taskApprovalTable.respondedAt,
+          })
+          .from(taskApprovalTable)
+          .where(inArray(taskApprovalTable.taskId, taskIds))
+          .orderBy(asc(taskApprovalTable.respondedAt))
+      : [];
+
   const taskLabelsMap = new Map<
     string,
     Array<{ id: string; name: string; color: string }>
@@ -219,6 +236,29 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     });
   }
 
+  const taskApprovalsMap = new Map<
+    string,
+    Array<{
+      id: string;
+      clientName: string;
+      status: string;
+      note: string | null;
+      respondedAt: Date;
+    }>
+  >();
+  for (const approval of approvalsData) {
+    if (!taskApprovalsMap.has(approval.taskId)) {
+      taskApprovalsMap.set(approval.taskId, []);
+    }
+    taskApprovalsMap.get(approval.taskId)?.push({
+      id: approval.id,
+      clientName: approval.clientName,
+      status: approval.status,
+      note: approval.note,
+      respondedAt: approval.respondedAt,
+    });
+  }
+
   const projectColumns = await db
     .select()
     .from(columnTable)
@@ -237,6 +277,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
         ...task,
         labels: taskLabelsMap.get(task.id) || [],
         externalLinks: taskExternalLinksMap.get(task.id) || [],
+        approvals: taskApprovalsMap.get(task.id) || [],
       })),
   }));
 
@@ -246,6 +287,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       ...task,
       labels: taskLabelsMap.get(task.id) || [],
       externalLinks: taskExternalLinksMap.get(task.id) || [],
+      approvals: taskApprovalsMap.get(task.id) || [],
     }));
 
   const plannedTasks = paginatedTasks
@@ -254,6 +296,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       ...task,
       labels: taskLabelsMap.get(task.id) || [],
       externalLinks: taskExternalLinksMap.get(task.id) || [],
+      approvals: taskApprovalsMap.get(task.id) || [],
     }));
 
   return {

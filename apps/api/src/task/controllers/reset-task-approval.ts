@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { taskTable } from "../../database/schema";
+import { taskApprovalTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 
 async function resetTaskApproval(id: string) {
@@ -31,6 +31,8 @@ async function resetTaskApproval(id: string) {
       message: "Failed to reset task approval",
     });
   }
+
+  await db.delete(taskApprovalTable).where(eq(taskApprovalTable.taskId, id));
 
   await publishEvent("task.approval_updated", {
     taskId: updatedTask.id,

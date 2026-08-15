@@ -2,7 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockTaskFindFirst = vi.fn();
 const mockUpdate = vi.fn();
+const mockDelete = vi.fn();
 const mockPublishEvent = vi.fn();
+
+function makeDeleteMock() {
+  const chain = {
+    where: vi.fn(() => Promise.resolve()),
+  };
+  return chain;
+}
 
 vi.mock("../../../apps/api/src/database", () => ({
   default: {
@@ -12,6 +20,7 @@ vi.mock("../../../apps/api/src/database", () => ({
       },
     },
     update: (...args: unknown[]) => mockUpdate(...args),
+    delete: (...args: unknown[]) => mockDelete(...args),
   },
 }));
 
@@ -60,6 +69,7 @@ describe("resetTaskApproval", () => {
       approvalRespondedAt: null,
     };
     mockUpdate.mockReturnValue(makeUpdateMock(updatedTask));
+    mockDelete.mockReturnValue(makeDeleteMock());
 
     const result = await resetTaskApproval("task-1");
 

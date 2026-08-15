@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { taskTable, userTable } from "../../database/schema";
+import { taskApprovalTable, taskTable, userTable } from "../../database/schema";
 
 async function getTask(taskId: string) {
   const task = await db
@@ -36,7 +36,19 @@ async function getTask(taskId: string) {
     });
   }
 
-  return task[0];
+  const approvals = await db
+    .select({
+      id: taskApprovalTable.id,
+      clientName: taskApprovalTable.clientName,
+      status: taskApprovalTable.status,
+      note: taskApprovalTable.note,
+      respondedAt: taskApprovalTable.respondedAt,
+    })
+    .from(taskApprovalTable)
+    .where(eq(taskApprovalTable.taskId, taskId))
+    .orderBy(asc(taskApprovalTable.respondedAt));
+
+  return { ...task[0], approvals };
 }
 
 export default getTask;

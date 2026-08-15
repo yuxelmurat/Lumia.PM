@@ -402,58 +402,72 @@ export function PublicTaskDetailModal({
                 {t("publicProject:approval.sectionTitle")}
               </h3>
 
-              {task.approvalStatus && (
+              {task.approvals && task.approvals.length > 0 ? (
                 <div
                   className={cn(
-                    "flex flex-col gap-1.5 p-3 rounded-md border transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-[opacity]",
-                    task.approvalStatus === "approved"
-                      ? "bg-success/8 border-success/16"
-                      : "bg-warning/8 border-warning/16",
+                    "flex flex-col gap-2 transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-[opacity]",
                     approvalPanelVisible
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 -translate-y-1",
                   )}
                 >
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={
-                        task.approvalStatus === "approved"
-                          ? "success"
-                          : "warning"
-                      }
-                      className="gap-1 px-2 py-0.5 text-[10px] font-medium"
-                    >
-                      {task.approvalStatus === "approved" ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <MessageCircleWarning className="w-3 h-3" />
-                      )}
-                      {task.approvalStatus === "approved"
-                        ? t("publicProject:approval.statusApproved")
-                        : t("publicProject:approval.statusChangesRequested")}
-                    </Badge>
-                    {task.approvalClientName && (
-                      <span className="text-xs text-muted-foreground">
-                        {t("publicProject:approval.respondedAs", {
-                          name: task.approvalClientName,
-                        })}
-                      </span>
-                    )}
-                  </div>
-                  {task.approvalRespondedAt && (
-                    <span className="text-xs text-muted-foreground">
-                      {t("publicProject:approval.respondedOn", {
-                        date: formatDateTime(task.approvalRespondedAt),
-                      })}
-                    </span>
-                  )}
-                  {task.approvalNote && (
-                    <p className="text-sm text-foreground whitespace-pre-wrap">
-                      {task.approvalNote}
-                    </p>
-                  )}
+                  {task.approvals
+                    .slice()
+                    .sort(
+                      (a, b) =>
+                        new Date(a.respondedAt).getTime() -
+                        new Date(b.respondedAt).getTime(),
+                    )
+                    .map((approval) => (
+                      <div
+                        key={approval.id}
+                        className={cn(
+                          "flex flex-col gap-1.5 p-3 rounded-md border",
+                          approval.status === "approved"
+                            ? "bg-success/8 border-success/16"
+                            : "bg-warning/8 border-warning/16",
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              approval.status === "approved"
+                                ? "success"
+                                : "warning"
+                            }
+                            className="gap-1 px-2 py-0.5 text-[10px] font-medium"
+                          >
+                            {approval.status === "approved" ? (
+                              <CheckCircle2 className="w-3 h-3" />
+                            ) : (
+                              <MessageCircleWarning className="w-3 h-3" />
+                            )}
+                            {approval.status === "approved"
+                              ? t("publicProject:approval.statusApproved")
+                              : t(
+                                  "publicProject:approval.statusChangesRequested",
+                                )}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {t("publicProject:approval.respondedAs", {
+                              name: approval.clientName,
+                            })}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {t("publicProject:approval.respondedOn", {
+                            date: formatDateTime(approval.respondedAt),
+                          })}
+                        </span>
+                        {approval.note && (
+                          <p className="text-sm text-foreground whitespace-pre-wrap">
+                            {approval.note}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                 </div>
-              )}
+              ) : null}
 
               {pendingAction ? (
                 <div className="flex flex-col gap-2.5 p-3 rounded-md border border-border bg-muted/30">

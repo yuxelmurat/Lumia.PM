@@ -15,6 +15,14 @@ type TaskExternalLink = {
   metadata: Record<string, unknown> | null;
 };
 
+export type TaskApproval = {
+  id: string;
+  clientName: string;
+  status: string;
+  note: string | null;
+  respondedAt: string;
+};
+
 type Task = {
   id: string;
   title: string;
@@ -39,6 +47,7 @@ type Task = {
   approvalNote?: string | null;
   approvalClientName?: string | null;
   approvalRespondedAt?: string | null;
+  approvals?: TaskApproval[];
 };
 
 export default Task;

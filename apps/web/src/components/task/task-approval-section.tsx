@@ -41,50 +41,52 @@ export default function TaskApprovalSection({
         {t("tasks:approval.title")}
       </span>
 
-      <div className="flex flex-col gap-2 px-2">
-        {task.approvalStatus ? (
+      <div className="flex flex-col gap-3 px-2">
+        {task.approvals && task.approvals.length > 0 ? (
           <>
-            <div className="flex items-center gap-2">
-              <Badge
-                variant={
-                  task.approvalStatus === "approved" ? "success" : "warning"
-                }
-                className="gap-1 px-2 py-0.5 text-[10px] font-medium"
-              >
-                {task.approvalStatus === "approved" ? (
-                  <CheckCircle2 className="w-3 h-3" />
-                ) : (
-                  <MessageCircleWarning className="w-3 h-3" />
-                )}
-                {task.approvalStatus === "approved"
-                  ? t("tasks:approval.statusApproved")
-                  : t("tasks:approval.statusChangesRequested")}
-              </Badge>
-            </div>
-            {task.approvalClientName && (
-              <span className="text-xs text-muted-foreground">
-                {t("tasks:approval.respondedBy", {
-                  name: task.approvalClientName,
-                })}
-              </span>
-            )}
-            {task.approvalRespondedAt && (
-              <span className="text-xs text-muted-foreground">
-                {t("tasks:approval.respondedAt", {
-                  date: formatDateTime(task.approvalRespondedAt),
-                })}
-              </span>
-            )}
-            {task.approvalNote && (
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-muted-foreground/70">
-                  {t("tasks:approval.note")}
-                </span>
-                <p className="text-xs text-foreground whitespace-pre-wrap">
-                  {task.approvalNote}
-                </p>
-              </div>
-            )}
+            {task.approvals
+              .slice()
+              .sort(
+                (a, b) =>
+                  new Date(a.respondedAt).getTime() -
+                  new Date(b.respondedAt).getTime(),
+              )
+              .map((approval) => (
+                <div key={approval.id} className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={
+                        approval.status === "approved" ? "success" : "warning"
+                      }
+                      className="gap-1 px-2 py-0.5 text-[10px] font-medium"
+                    >
+                      {approval.status === "approved" ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : (
+                        <MessageCircleWarning className="w-3 h-3" />
+                      )}
+                      {approval.status === "approved"
+                        ? t("tasks:approval.statusApproved")
+                        : t("tasks:approval.statusChangesRequested")}
+                    </Badge>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {t("tasks:approval.respondedBy", {
+                      name: approval.clientName,
+                    })}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {t("tasks:approval.respondedAt", {
+                      date: formatDateTime(approval.respondedAt),
+                    })}
+                  </span>
+                  {approval.note && (
+                    <p className="text-xs text-foreground whitespace-pre-wrap">
+                      {approval.note}
+                    </p>
+                  )}
+                </div>
+              ))}
             {canReset && (
               <Button
                 variant="outline"

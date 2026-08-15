@@ -19,6 +19,7 @@ import {
   projectTemplateTable,
   projectTemplateTaskTable,
   sessionTable,
+  taskApprovalTable,
   taskRelationTable,
   taskReminderSentTable,
   taskTable,
@@ -196,7 +197,18 @@ export const taskTableRelations = relations(taskTable, ({ one, many }) => ({
   sourceRelations: many(taskRelationTable, { relationName: "sourceTask" }),
   targetRelations: many(taskRelationTable, { relationName: "targetTask" }),
   remindersSent: many(taskReminderSentTable),
+  approvals: many(taskApprovalTable),
 }));
+
+export const taskApprovalTableRelations = relations(
+  taskApprovalTable,
+  ({ one }) => ({
+    task: one(taskTable, {
+      fields: [taskApprovalTable.taskId],
+      references: [taskTable.id],
+    }),
+  }),
+);
 
 export const timeEntryTableRelations = relations(timeEntryTable, ({ one }) => ({
   task: one(taskTable, {
