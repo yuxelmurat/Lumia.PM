@@ -16,11 +16,15 @@ export async function getPublicProject(token: string) {
     });
   }
 
-  // Only name+logo are shown on this public, unauthenticated route — the
-  // rest of the company profile (tax id, address, phone) stays private to
-  // workspace settings.
+  // Only name+logo+accentColor are shown on this public, unauthenticated
+  // route — the rest of the company profile (tax id, address, phone) stays
+  // private to workspace settings.
   const [workspace] = await db
-    .select({ name: workspaceTable.name, logo: workspaceTable.logo })
+    .select({
+      name: workspaceTable.name,
+      logo: workspaceTable.logo,
+      accentColor: workspaceTable.accentColor,
+    })
     .from(workspaceTable)
     .where(eq(workspaceTable.id, result.data.workspaceId))
     .limit(1);
@@ -29,5 +33,6 @@ export async function getPublicProject(token: string) {
     ...result.data,
     workspaceName: workspace?.name ?? null,
     workspaceLogo: workspace?.logo ?? null,
+    workspaceAccentColor: workspace?.accentColor ?? null,
   };
 }

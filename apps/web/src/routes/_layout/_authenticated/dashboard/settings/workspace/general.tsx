@@ -41,6 +41,7 @@ import useUpdateWorkspace from "@/hooks/mutations/workspace/use-update-workspace
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import useGetFullWorkspace from "@/hooks/queries/workspace/use-get-full-workspace";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
+import { isValidHexColor } from "@/lib/contrast-color";
 import { toast } from "@/lib/toast";
 import { getWorkspaceProfileField } from "@/lib/workspace-profile-fields";
 
@@ -59,6 +60,7 @@ type WorkspaceFormValues = {
   address?: string;
   phone?: string;
   contactEmail?: string;
+  accentColor?: string;
 };
 
 type NormalizedWorkspaceValues = {
@@ -70,6 +72,7 @@ type NormalizedWorkspaceValues = {
   address: string;
   phone: string;
   contactEmail: string;
+  accentColor: string;
 };
 
 function normalizeWorkspaceValues(
@@ -84,6 +87,7 @@ function normalizeWorkspaceValues(
     address: (data.address ?? "").trim(),
     phone: (data.phone ?? "").trim(),
     contactEmail: (data.contactEmail ?? "").trim(),
+    accentColor: (data.accentColor ?? "").trim(),
   };
 }
 
@@ -108,6 +112,13 @@ function RouteComponent() {
           .refine(
             (value) => !value || z.email().safeParse(value).success,
             t("settings:workspaceGeneral.validation.contactEmailInvalid"),
+          ),
+        accentColor: z
+          .string()
+          .optional()
+          .refine(
+            (value) => !value || isValidHexColor(value),
+            t("settings:workspaceGeneral.validation.accentColorInvalid"),
           ),
       }),
     [t],
@@ -150,6 +161,10 @@ function RouteComponent() {
     workspace,
     "contactEmail",
   );
+  const workspaceAccentColor = getWorkspaceProfileField(
+    workspace,
+    "accentColor",
+  );
 
   // Ownership transfer is owner-only. Eligible recipients are any current
   // member who isn't the owner themselves.
@@ -174,6 +189,7 @@ function RouteComponent() {
       address: workspaceAddress,
       phone: workspacePhone,
       contactEmail: workspaceContactEmail,
+      accentColor: workspaceAccentColor,
     },
   });
 
@@ -189,6 +205,7 @@ function RouteComponent() {
       address: workspaceAddress,
       phone: workspacePhone,
       contactEmail: workspaceContactEmail,
+      accentColor: workspaceAccentColor,
     };
     lastSavedRef.current = normalizeWorkspaceValues(nextValues);
 
@@ -204,6 +221,7 @@ function RouteComponent() {
     workspaceAddress,
     workspacePhone,
     workspaceContactEmail,
+    workspaceAccentColor,
     workspaceForm,
   ]);
 
@@ -224,6 +242,8 @@ function RouteComponent() {
       const phoneChanged = lastSavedRef.current?.phone !== normalizedData.phone;
       const contactEmailChanged =
         lastSavedRef.current?.contactEmail !== normalizedData.contactEmail;
+      const accentColorChanged =
+        lastSavedRef.current?.accentColor !== normalizedData.accentColor;
       const hasChanges =
         nameChanged ||
         descriptionChanged ||
@@ -232,7 +252,8 @@ function RouteComponent() {
         taxIdChanged ||
         addressChanged ||
         phoneChanged ||
-        contactEmailChanged;
+        contactEmailChanged ||
+        accentColorChanged;
 
       if (!hasChanges) return;
 
@@ -254,6 +275,7 @@ function RouteComponent() {
           address?: string;
           phone?: string;
           contactEmail?: string;
+          accentColor?: string;
         } = {
           workspaceId: workspace.id,
         };
@@ -288,6 +310,10 @@ function RouteComponent() {
 
         if (contactEmailChanged) {
           updatePayload.contactEmail = normalizedData.contactEmail;
+        }
+
+        if (accentColorChanged) {
+          updatePayload.accentColor = normalizedData.accentColor;
         }
 
         await updateWorkspace(updatePayload);
@@ -535,6 +561,56 @@ function RouteComponent() {
                           disabled={!canEdit}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+
+                <FormField
+                  control={workspaceForm.control}
+                  name="accentColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm font-medium">
+                            {t("settings:workspaceGeneral.accentColorLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-muted-foreground">
+                            {t("settings:workspaceGeneral.accentColorHint")}
+                          </p>
+                        </div>
+                        <FormControl>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              className="h-9 w-9 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-1 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={!canEdit}
+                              value={
+                                field.value && isValidHexColor(field.value)
+                                  ? field.value
+                                  : "#d97706"
+                              }
+                              onChange={(event) =>
+                                field.onChange(event.target.value)
+                              }
+                              onBlur={field.onBlur}
+                            />
+                            <Input
+                              className="w-full sm:w-40"
+                              placeholder="#D97706"
+                              disabled={!canEdit}
+                              value={field.value ?? ""}
+                              onChange={(event) =>
+                                field.onChange(event.target.value)
+                              }
+                              onBlur={field.onBlur}
+                            />
+                          </div>
+                        </FormControl>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -14,6 +14,7 @@ export type WorkspaceWithProfileFields = {
   address?: string | null;
   phone?: string | null;
   contactEmail?: string | null;
+  accentColor?: string | null;
   watermarkEnabled?: boolean | null;
   watermarkStyle?: string | null;
   watermarkImageUrl?: string | null;

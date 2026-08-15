@@ -572,6 +572,8 @@
 			"companyProfileSubtitle": "Shown on client-facing pages (like shared project links) and used for invoicing.",
 			"logoLabel": "Logo",
 			"logoHint": "Shown in your sidebar and on shared project links your clients see",
+			"accentColorLabel": "Brand color",
+			"accentColorHint": "Used for buttons and highlights on the client-facing project page",
 			"legalNameLabel": "Legal / business name",
 			"legalNameHint": "Your company's registered name",
 			"legalNamePlaceholder": "Enter legal business name",
@@ -601,7 +603,8 @@
 			"validation": {
 				"nameRequired": "Workspace name is required",
 				"nameShort": "Workspace name must be at least 2 characters",
-				"contactEmailInvalid": "Enter a valid email address"
+				"contactEmailInvalid": "Enter a valid email address",
+				"accentColorInvalid": "Enter a valid hex color, like #D97706"
 			},
 			"transferOwnership": {
 				"toastSuccess": "Ownership transferred",

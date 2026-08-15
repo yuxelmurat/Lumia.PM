@@ -14,6 +14,7 @@ import { ThemeToggle } from "@/components/public-project/theme-toggle";
 import { Button } from "@/components/ui/button";
 import icons from "@/constants/project-icons";
 import useGetPublicProject from "@/hooks/queries/project/use-get-public-project";
+import { getContrastingTextColor, isValidHexColor } from "@/lib/contrast-color";
 import type Task from "@/types/task";
 
 export const Route = createFileRoute("/public-project/$projectId")({
@@ -43,6 +44,37 @@ function RouteComponent() {
   useEffect(() => {
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
   }, [viewMode]);
+
+  // A studio's own brand color (Company Profile) replaces the default
+  // accent on this client-facing page only. Dialogs/popovers in this app
+  // render into a portal at document.body, outside this route's own DOM
+  // subtree, so an inline style on a wrapper div here would never reach
+  // them — these have to be set on the document root instead, and
+  // restored on unmount so they don't leak into the rest of the app.
+  const accentColor = project?.workspaceAccentColor;
+  useEffect(() => {
+    if (!accentColor || !isValidHexColor(accentColor)) return;
+
+    const root = document.documentElement.style;
+    const previous = {
+      primary: root.getPropertyValue("--primary"),
+      primaryForeground: root.getPropertyValue("--primary-foreground"),
+      ring: root.getPropertyValue("--ring"),
+    };
+
+    root.setProperty("--primary", accentColor);
+    root.setProperty(
+      "--primary-foreground",
+      getContrastingTextColor(accentColor),
+    );
+    root.setProperty("--ring", accentColor);
+
+    return () => {
+      root.setProperty("--primary", previous.primary);
+      root.setProperty("--primary-foreground", previous.primaryForeground);
+      root.setProperty("--ring", previous.ring);
+    };
+  }, [accentColor]);
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);

@@ -14,6 +14,7 @@ type UpdateWorkspaceRequest = {
   address?: string;
   phone?: string;
   contactEmail?: string;
+  accentColor?: string;
   watermarkEnabled?: boolean;
   watermarkStyle?: string;
   watermarkImageUrl?: string;
@@ -35,6 +36,7 @@ function useUpdateWorkspace() {
       address,
       phone,
       contactEmail,
+      accentColor,
       watermarkEnabled,
       watermarkStyle,
       watermarkImageUrl,
@@ -52,6 +54,7 @@ function useUpdateWorkspace() {
         address?: string;
         phone?: string;
         contactEmail?: string;
+        accentColor?: string;
         watermarkEnabled?: boolean;
         watermarkStyle?: string;
         watermarkImageUrl?: string;
@@ -100,6 +103,10 @@ function useUpdateWorkspace() {
 
       if (contactEmail !== undefined) {
         updateData.contactEmail = contactEmail;
+      }
+
+      if (accentColor !== undefined) {
+        updateData.accentColor = accentColor;
       }
 
       if (watermarkEnabled !== undefined) {

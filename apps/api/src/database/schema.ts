@@ -123,6 +123,10 @@ export const workspaceTable = pgTable("workspace", {
   address: text("address"),
   phone: text("phone"),
   contactEmail: text("contact_email"),
+  // Hex color (e.g. "#D97706") a studio can set so its public-facing pages
+  // pick up its own brand color instead of Lumia.PM's fixed accent. Public,
+  // like name/logo — shown alongside them on the public project page.
+  accentColor: text("accent_color"),
   // Watermark settings: a branding/deterrent for images uploaded to tasks in
   // *public* projects (see task finalize-upload flow). This is not DRM — it's
   // a visible stamp meant to discourage casual reuse of unapproved renders,

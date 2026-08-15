@@ -365,6 +365,11 @@ export const auth = betterAuth({
               input: true,
               required: false,
             },
+            accentColor: {
+              type: "string",
+              input: true,
+              required: false,
+            },
             // Watermark settings for images uploaded to tasks in public
             // projects. Branding/deterrent only, not DRM — see
             // workspaceTable and apply-watermark.ts for details.
