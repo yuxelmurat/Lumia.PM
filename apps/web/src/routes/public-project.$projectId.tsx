@@ -162,6 +162,7 @@ function RouteComponent() {
         <PublicTaskDetailModal
           task={selectedTask}
           projectSlug={project.slug}
+          publicToken={projectId}
           columns={project.columns}
           open={isTaskModalOpen}
           onOpenChange={handleTaskModalClose}

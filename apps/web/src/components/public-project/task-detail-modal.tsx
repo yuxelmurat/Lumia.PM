@@ -46,6 +46,10 @@ type PublicTaskDetailModalProps = {
       })
     | null;
   projectSlug: string;
+  // The public approval route is keyed by the project's public share token,
+  // not its real id — `task.projectId` is the real internal id (from the
+  // task record) and must never be sent here.
+  publicToken: string;
   // The modal is opened from any column, so it resolves completion by slug
   // rather than being told; without these it falls back to the slug heuristic.
   columns?: Array<{ slug: string; isFinal: boolean }>;
@@ -56,6 +60,7 @@ type PublicTaskDetailModalProps = {
 export function PublicTaskDetailModal({
   task,
   projectSlug,
+  publicToken,
   columns,
   open,
   onOpenChange,
@@ -122,7 +127,7 @@ export function PublicTaskDetailModal({
 
     try {
       await setApproval.mutateAsync({
-        projectId: task.projectId,
+        projectId: publicToken,
         taskId: task.id,
         status: pendingAction,
         clientName: trimmedName,
