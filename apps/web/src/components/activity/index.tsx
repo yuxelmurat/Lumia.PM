@@ -1,4 +1,11 @@
-import { Calendar, CircleAlert, History, UserRound } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  CircleAlert,
+  History,
+  MessageCircleWarning,
+  UserRound,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import useGetWorkspaceUsers from "@/hooks/queries/workspace-users/use-get-workspace-users";
@@ -48,7 +55,10 @@ type WorkspaceUser = {
   } | null;
 };
 
-function getActivityTypeIcon(type: string) {
+function getActivityTypeIcon(
+  type: string,
+  eventData: Record<string, unknown> | null,
+) {
   const iconClass = "h-4 w-4";
   switch (type) {
     case "status_changed":
@@ -60,6 +70,12 @@ function getActivityTypeIcon(type: string) {
     case "assignee_changed":
     case "unassigned":
       return <UserRound className={iconClass} />;
+    case "approval_updated":
+      return eventData?.status === "approved" ? (
+        <CheckCircle2 className={`${iconClass} text-success`} />
+      ) : (
+        <MessageCircleWarning className={`${iconClass} text-warning`} />
+      );
     default:
       return <History className={iconClass} />;
   }
@@ -403,6 +419,22 @@ function renderActivityContent({
     }
   }
 
+  if (activity.type === "approval_updated") {
+    const status = eventData?.status;
+    return (
+      <span className="text-sm text-muted-foreground">
+        {status === "approved"
+          ? t("activity:approvedTask")
+          : t("activity:requestedChanges")}
+        {content ? (
+          <span className="ml-1 text-foreground/80">
+            &ldquo;{content}&rdquo;
+          </span>
+        ) : null}
+      </span>
+    );
+  }
+
   return (
     <span className="text-sm text-muted-foreground">
       {content || toDisplayCase(activity.type)}
@@ -432,7 +464,14 @@ function Activity({
     : null;
 
   const isExternalComment = Boolean(activity.externalSource);
-  const actorName = user?.user?.name || t("common:people.someone");
+  // Non-workspace actors (e.g. a client responding on a public approval
+  // link) have no `userId` to look up, but the row still carries their
+  // name — fall back to that instead of a generic "Someone" before
+  // giving up entirely.
+  const actorName =
+    user?.user?.name ||
+    (!activity.userId && activity.externalUserName) ||
+    t("common:people.someone");
 
   if (isCommentActivity(activity)) {
     const commentUser = isExternalComment
@@ -466,7 +505,10 @@ function Activity({
     );
   }
 
-  const activityIcon = getActivityTypeIcon(activity.type);
+  const activityIcon = getActivityTypeIcon(
+    activity.type,
+    getEventDataRecord(activity.eventData),
+  );
 
   return (
     <TimelineItem

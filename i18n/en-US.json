@@ -1587,6 +1587,9 @@
 		"changedTitle": "changed title from \"{{from}}\" to \"{{to}}\"",
 		"moved": "moved task from \"{{from}}\" to \"{{to}}\"",
 		"created": "created this task",
+		"approvedTask": "approved this task",
+		"requestedChanges": "requested changes",
+		"approvalClient": "Client",
 		"githubUser": "GitHub User",
 		"comment": {
 			"github": "GitHub",
