@@ -7,8 +7,8 @@
 <h1 align="center">Lumia.PM</h1>
 
 <p align="center">
-  Project management built for interior architecture and design studios.<br />
-  İç mimarlık ve tasarım stüdyoları için proje yönetimi.
+  Get client sign-off on renders without adding another login they'll never use.<br />
+  Müşterinizden, hiç kullanmayacağı bir hesap açtırmadan render onayı alın.
 </p>
 
 <div align="center">
@@ -20,6 +20,8 @@
 
 <div align="center">
   <h3>
+    <a href="#getting-started">Get Started</a>
+    <span> | </span>
     <a href="https://lumiapm.com">Website</a>
     <span> | </span>
     <a href="apps/docs">Documentation</a>
@@ -44,16 +46,25 @@
 
 ## Why Lumia.PM?
 
-Interior architecture and design studios don't run projects like software teams do. A render goes through rounds of revision, a client needs to approve it without ever touching a "real" project management tool, and every studio has its own brand it wants that client-facing moment to carry.
+Ever chased a client through three WhatsApp threads and a shared drive full of `render_v2_final_FINAL.jpg` files just to find out which version they actually approved?
 
-Lumia.PM is built around that workflow: plan projects and run tasks with your team internally, then share a branded, client-facing link so a client can review renders, leave pinned feedback on a specific spot in an image, and approve or request changes — without ever seeing your internal workspace.
+Interior architecture and design studios don't run projects the way software teams do. A render goes through rounds of revision. A client needs to approve it without ever touching a "real" project management tool. And every studio wants that client-facing moment — the one where the client sees the work — to carry its own brand, not a generic app's.
+
+Lumia.PM is built around that workflow, not against it. Plan projects and run tasks with your team internally, then share one branded link. Your client opens it, reviews the render, pins feedback to the exact spot that's bothering them, and approves or requests changes — without ever logging in, and without ever seeing your internal workspace.
 
 **What makes it different:**
 - **Client approval built in** — a branded link, not a login your client needs
-- **Version history on renders** — see every revision, not just the latest upload
-- **Clean interface** that focuses on your work, not the tool
-- **Self-hosted** so your data stays yours
-- **Open source** with a permissive MIT license
+- **Every revision stays** — version history on renders, not just the latest upload
+- **One system, not four** — replaces the board, the shared drive, the email thread, and the spreadsheet
+- **Your data stays yours** — self-hosted, so nothing leaves your infrastructure
+- **Free to self-host, forever** — open source under a permissive MIT license
+
+## How it works
+
+1. **Create a project** and set up your board — use a template so it starts with your studio's standard columns and tasks.
+2. **Upload renders and materials** as you work. Every re-upload keeps the previous version instead of replacing it.
+3. **Generate a branded client link** from the project's settings, with an optional expiry date.
+4. **Your client reviews, pins feedback, and approves** — no account, no password, no tutorial.
 
 ## What Lumia.PM replaces
 
@@ -73,14 +84,14 @@ Most studios currently stitch together a generic task board (Trello, Asana, Mond
 **Task & project management**
 - Kanban board, backlog, and list views with drag-and-drop
 - Custom fields per project (materials, room, budget line, or anything your studio tracks)
-- Project templates so a new project starts with your studio's standard columns and tasks
+- Project templates so every new project starts with your studio's standard columns and tasks — no rebuilding from scratch
 - Priorities, due dates, assignees, labels, and bulk task actions
 - Task import/export, including PDF export for client-facing reports
 - Time entries for tracking hours against tasks
 
 **Visual & render workflow**
-- Image uploads with full version history — every revision stays available, not just the latest
-- Pin-based annotations directly on an image, tied to a specific point, not a vague comment
+- Image uploads with full version history — go back to any revision, not just the latest one
+- Pin-based annotations tied to a specific point on an image, so feedback is unambiguous instead of a paragraph of description
 - A moodboard-style gallery view for browsing a task's images at a glance
 - Automatic watermarking applied to images shared through client links
 
@@ -132,6 +143,8 @@ If your team just needs a generic Trello-style board, any of those tools will do
 
 ## Getting Started
 
+You can be running Lumia.PM, with a project ready to share with a client, in under ten minutes.
+
 ### Quick Start with Docker Compose
 
 The fastest way to try Lumia.PM is with Docker Compose. This sets up Lumia.PM and PostgreSQL with a single combined container:
@@ -176,6 +189,8 @@ In Docker Compose, the bundled container reaches PostgreSQL at the service hostn
 If you run the API on your host instead of inside Compose, use `localhost` or set `DATABASE_URL` explicitly.
 
 > **Note:** environment variables still use the `KANEO_*` prefix internally (e.g. `KANEO_CLIENT_URL`) — see [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) for the full list and why.
+
+Prefer not to host it yourself? [Start a free 14-day trial of Lumia.PM Cloud](https://lumiapm.com/pricing) — no credit card required, and you can export or move to self-hosting at any time.
 
 ### First login
 
@@ -254,16 +269,25 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Neden Lumia.PM?
 
-İç mimarlık ve tasarım stüdyoları, projelerini yazılım ekipleri gibi yürütmez. Bir render birçok revizyon turundan geçer, müşterinin "gerçek" bir proje yönetim aracına hiç dokunmadan onay vermesi gerekir ve her stüdyonun, müşteriyle buluştuğu o anı kendi markasıyla taşımak istediği bir kimliği vardır.
+Hiç bir müşteriyi üç ayrı WhatsApp yazışması ve `render_v2_final_FINAL.jpg` dosyalarıyla dolu bir paylaşımlı sürücü arasında kovalayıp, sonunda hangi versiyonu onayladığını anlamaya mı çalıştınız?
 
-Lumia.PM tam olarak bu iş akışı için tasarlandı: projelerinizi ve görevlerinizi ekibinizle iç ortamda planlayın, ardından markalı, müşteriye özel bir bağlantı paylaşın; müşteri render'ları inceleyebilsin, görselin belirli bir noktasına iğneli (pin) yorum bırakabilsin ve değişiklik talep edebilsin ya da onaylayabilsin — iç çalışma alanınızı hiç görmeden.
+İç mimarlık ve tasarım stüdyoları, projelerini yazılım ekipleri gibi yürütmez. Bir render birçok revizyon turundan geçer. Müşterinin "gerçek" bir proje yönetim aracına hiç dokunmadan onay vermesi gerekir. Ve her stüdyo, müşteriyle buluştuğu o anın — işin müşteriye göründüğü anın — kendi markasını taşımasını ister, genel bir uygulamanınkini değil.
+
+Lumia.PM bu iş akışına karşı değil, tam olarak onun için tasarlandı. Projelerinizi ve görevlerinizi ekibinizle iç ortamda planlayın, ardından tek bir markalı bağlantı paylaşın. Müşteriniz bunu açar, render'ı inceler, canını sıkan tam noktaya geri bildirim iğneler ve değişiklik talep eder ya da onaylar — hiç giriş yapmadan, iç çalışma alanınızı hiç görmeden.
 
 **Onu farklı kılan:**
 - **Müşteri onayı yerleşik olarak gelir** — müşterinizin ihtiyaç duyduğu şey bir giriş değil, markalı bir bağlantıdır
-- **Render'larda versiyon geçmişi** — sadece son yükleneni değil, her revizyonu görün
-- **Sade arayüz**, aracın kendisi değil işiniz öne çıkar
-- **Self-hosted (kendi sunucunuzda barındırılır)** — verileriniz size ait kalır
-- **Açık kaynak**, izin verici MIT lisansıyla
+- **Hiçbir revizyon kaybolmaz** — render'larda versiyon geçmişi, sadece son yüklenen değil
+- **Dört araç değil, tek sistem** — panonun, paylaşımlı sürücünün, e-posta yazışmasının ve Excel dosyasının yerini alır
+- **Verileriniz size ait kalır** — self-hosted, hiçbir şey kendi altyapınızın dışına çıkmaz
+- **Self-host'ta sonsuza kadar ücretsiz** — izin verici MIT lisansıyla açık kaynak
+
+## Nasıl çalışır?
+
+1. **Bir proje oluşturun** ve board'unuzu kurun — bir şablon kullanarak stüdyonuzun standart kolon ve görevleriyle başlayın.
+2. **Render ve malzemeleri yükleyin.** Her yeniden yükleme, öncekinin üzerine yazmak yerine önceki versiyonu saklar.
+3. **Proje ayarlarından markalı bir müşteri bağlantısı oluşturun**, isteğe bağlı bir geçerlilik süresiyle.
+4. **Müşteriniz inceler, geri bildirim iğneler ve onaylar** — hesap yok, şifre yok, öğrenmesi gereken bir arayüz yok.
 
 ## Lumia.PM neyin yerini alıyor?
 
@@ -283,14 +307,14 @@ Lumia.PM tam olarak bu iş akışı için tasarlandı: projelerinizi ve görevle
 **Görev ve proje yönetimi**
 - Sürükle-bırak destekli kanban board, backlog ve liste görünümleri
 - Proje başına özel alanlar (malzeme, oda, bütçe kalemi veya stüdyonuzun takip ettiği her şey)
-- Yeni bir projenin stüdyonuzun standart kolon ve görevleriyle başlamasını sağlayan proje şablonları
+- Her yeni projenin stüdyonuzun standart kolon ve görevleriyle başlamasını sağlayan proje şablonları — sıfırdan kurmaya gerek kalmaz
 - Öncelikler, teslim tarihleri, atananlar, etiketler ve toplu görev işlemleri
 - Görev içe/dışa aktarma, müşteriye yönelik raporlar için PDF dışa aktarım dahil
 - Görevlere karşı harcanan saatleri takip etmek için zaman kayıtları (time entries)
 
 **Görsel ve render iş akışı**
-- Tam versiyon geçmişiyle görsel yükleme — sadece son değil, her revizyon erişilebilir kalır
-- Görselin belirli bir noktasına bağlı, muğlak bir yorum değil, iğne tabanlı (pin) doğrudan işaretleme
+- Tam versiyon geçmişiyle görsel yükleme — sadece son değil, herhangi bir revizyona geri dönebilirsiniz
+- Görselin belirli bir noktasına bağlı iğne tabanlı işaretleme, böylece geri bildirim uzun bir açıklama paragrafı yerine net ve tartışmasız olur
 - Bir görevin görsellerine tek bakışta göz atmak için moodboard tarzı galeri görünümü
 - Müşteri bağlantıları üzerinden paylaşılan görsellere otomatik uygulanan filigran
 
@@ -342,6 +366,8 @@ Ekibinizin ihtiyacı sadece Trello tarzı genel bir panoysa, bu araçların herh
 
 ## Kurulum ve Kullanım
 
+Lumia.PM'i çalıştırıp müşterinizle paylaşacağınız bir proje hazırlamanız on dakikadan az sürer.
+
 ### Docker Compose ile Hızlı Başlangıç
 
 Lumia.PM'i denemenin en hızlı yolu Docker Compose'dur. Bu, Lumia.PM ve PostgreSQL'i tek bir birleşik container ile ayağa kaldırır:
@@ -386,6 +412,8 @@ Docker Compose içinde, birleşik container PostgreSQL'e `postgres` servis adı 
 API'yi Compose içinde değil de kendi makinenizde çalıştırıyorsanız `localhost` kullanın veya `DATABASE_URL` değerini elle belirtin.
 
 > **Not:** ortam değişkenleri hâlâ dahili olarak `KANEO_*` ön ekini kullanır (ör. `KANEO_CLIENT_URL`) — tam liste ve nedeni için [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) dosyasına bakın.
+
+Kendiniz barındırmak istemiyor musunuz? [Lumia.PM Cloud'u 14 gün ücretsiz deneyin](https://lumiapm.com/pricing) — kredi kartı gerekmez, istediğiniz an verilerinizi dışa aktarabilir veya self-hosting'e geçebilirsiniz.
 
 ### İlk giriş
 
