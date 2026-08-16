@@ -107,22 +107,28 @@ Most studios currently stitch together a generic task board (Trello, Asana, Mond
 
 ## How Lumia.PM compares
 
-This isn't a scored benchmark — it's a comparison of what's built in versus what you'd normally have to bolt on yourself when using a generic project management tool for studio work.
+Trello, Asana, Monday.com, and ClickUp are mature, general-purpose tools — they have larger integration marketplaces, polished mobile apps, and make sense for teams that just need a generic board. That breadth is real, and it's not what Lumia.PM is trying to win on.
 
-| Capability | Lumia.PM | Generic PM tools (Trello, Asana, Monday.com, ClickUp) |
-|---|---|---|
-| No-login, branded client approval link | ✅ Built in | ⚠️ Usually requires a paid "guest" seat or a third-party form/e-signature tool |
-| Pinned feedback directly on a render | ✅ Built in | ❌ Comments are usually attached to the card, not a point on the image |
-| Version history on uploaded images | ✅ Built in | ❌ Re-uploads typically overwrite or pile up as separate, unordered attachments |
-| Multi-approver task approval with reset | ✅ Built in | ❌ Not a native concept; simulated with checklists or custom automations |
-| Automatic watermarking for client shares | ✅ Built in | ❌ Not available; done manually outside the tool |
-| Self-hosted, own your data | ✅ Yes | ❌ Cloud-only for most mainstream plans |
-| Open source (MIT) | ✅ Yes | ❌ Closed source |
-| Free at unlimited scale when self-hosted | ✅ Yes | ❌ Per-seat pricing once you pass the free tier |
-| AI tool access via MCP | ✅ Built in | ⚠️ Varies; usually a paid add-on or limited API |
-| General-purpose task boards for any team | ⚠️ Works, but opinionated toward studio workflows | ✅ Broader, more generic feature set |
+Lumia.PM is narrower on purpose: it's built for the specific handoffs a design studio repeats on every project — getting a render approved by a client who won't log into a PM tool, keeping every revision instead of overwriting the last one, and knowing who signed off before work moves forward. Those aren't add-ons in a generic tool; they're usually solved with a separate e-signature tool, a shared drive, or a checklist someone has to remember to update.
 
-If your team just needs a generic Trello-style board, any of those tools will do that job fine. Lumia.PM exists for the parts of a design studio's workflow — render approval, version history, client-branded sharing — that generic tools don't model natively.
+<!-- prettier-ignore -->
+| Capability | Lumia.PM | Trello / Asana / Monday / ClickUp |
+|:---|:---:|:---:|
+| No-login, branded client approval link | ✅ | ⚠️ paid guest seat or 3rd-party tool |
+| Pinned feedback on a specific spot in a render | ✅ | ❌ |
+| Version history on uploaded images | ✅ | ❌ |
+| Multi-approver approval, with reset | ✅ | ⚠️ simulated with checklists |
+| Automatic watermarking on client shares | ✅ | ❌ |
+| Self-hosted, you own the data | ✅ | ❌ cloud-only on mainstream plans |
+| Open source (MIT) | ✅ | ❌ |
+| Free at unlimited scale, self-hosted | ✅ | ❌ per-seat pricing |
+| Native AI tool access (MCP) | ✅ | ⚠️ limited/paid API |
+| Mobile apps & third-party integration marketplace | ⚠️ | ✅ |
+| General-purpose boards for non-studio teams | ⚠️ | ✅ |
+
+✅ built in &nbsp;·&nbsp; ⚠️ possible, but not native &nbsp;·&nbsp; ❌ not offered
+
+If your team just needs a generic Trello-style board, any of those tools will do that job well — that's not the gap Lumia.PM is trying to close. It exists for the render-approval, version-history, and client-branded sharing workflow that generic tools don't model natively.
 
 ## Getting Started
 
@@ -311,22 +317,28 @@ Lumia.PM tam olarak bu iş akışı için tasarlandı: projelerinizi ve görevle
 
 ## Lumia.PM rakiplerine göre nasıl?
 
-Bu, puanlanmış bir kıyaslama değil — stüdyo işleri için genel amaçlı bir proje yönetim aracı kullandığınızda normalde kendinizin eklemesi gereken şeylerle, Lumia.PM'de zaten yerleşik olarak gelenlerin bir karşılaştırması.
+Trello, Asana, Monday.com ve ClickUp olgun, genel amaçlı araçlar — daha büyük entegrasyon pazar yerleri, cilalı mobil uygulamaları var ve sadece genel bir panoya ihtiyacı olan ekipler için gayet mantıklılar. Bu genişlik gerçek ve Lumia.PM'in kazanmaya çalıştığı alan bu değil.
 
-| Yetenek | Lumia.PM | Genel amaçlı PM araçları (Trello, Asana, Monday.com, ClickUp) |
-|---|---|---|
-| Girişsiz, markalı müşteri onay bağlantısı | ✅ Yerleşik | ⚠️ Genellikle ücretli bir "misafir" koltuğu ya da üçüncü parti form/e-imza aracı gerekir |
-| Render üzerinde doğrudan iğneli (pin) geri bildirim | ✅ Yerleşik | ❌ Yorumlar genelde görsel üzerindeki bir noktaya değil, karta bağlıdır |
-| Yüklenen görsellerde versiyon geçmişi | ✅ Yerleşik | ❌ Yeniden yükleme genelde üzerine yazar veya sırasız, ayrı ekler olarak birikir |
-| Sıfırlanabilir, çoklu onaylayıcılı görev onayı | ✅ Yerleşik | ❌ Yerleşik bir kavram değil; checklist veya özel otomasyonlarla taklit edilir |
-| Müşteri paylaşımları için otomatik filigran | ✅ Yerleşik | ❌ Yok; aracın dışında elle yapılır |
-| Self-hosted, verinizin sahibi siz olursunuz | ✅ Evet | ❌ Yaygın planların çoğunda sadece bulut üzerinden |
-| Açık kaynak (MIT) | ✅ Evet | ❌ Kapalı kaynak |
-| Self-host edildiğinde sınırsız ölçekte ücretsiz | ✅ Evet | ❌ Ücretsiz katmanı geçtiğinizde kullanıcı başı ücretlendirme |
-| MCP ile yapay zekâ araç erişimi | ✅ Yerleşik | ⚠️ Değişken; genelde ücretli eklenti veya sınırlı API |
-| Herhangi bir ekip için genel amaçlı görev panosu | ⚠️ Çalışır, ama stüdyo iş akışlarına göre yönlenmiştir | ✅ Daha geniş, daha genel bir özellik seti |
+Lumia.PM bilinçli olarak dar bir alana odaklanıyor: bir stüdyonun her projede tekrar ettiği belirli teslim noktaları için tasarlandı — bir PM aracına giriş yapmayacak bir müşteriden render onayı almak, son revizyonun üzerine yazmak yerine her versiyonu saklamak ve iş ilerlemeden önce kimin onayladığını bilmek. Bunlar genel bir araçta hazır gelen özellikler değil; genelde ayrı bir e-imza aracı, paylaşımlı bir sürücü veya birinin güncellemeyi hatırlaması gereken bir checklist ile çözülür.
 
-Ekibinizin ihtiyacı sadece Trello tarzı genel bir pano ise, bu araçların herhangi biri o işi görür. Lumia.PM, genel amaçlı araçların doğal olarak modellemediği kısımlar — render onayı, versiyon geçmişi, müşteriye markalı paylaşım — için var.
+<!-- prettier-ignore -->
+| Yetenek | Lumia.PM | Trello / Asana / Monday / ClickUp |
+|:---|:---:|:---:|
+| Girişsiz, markalı müşteri onay bağlantısı | ✅ | ⚠️ ücretli misafir koltuğu ya da 3. parti araç |
+| Render üzerinde belirli bir noktaya iğneli geri bildirim | ✅ | ❌ |
+| Yüklenen görsellerde versiyon geçmişi | ✅ | ❌ |
+| Sıfırlanabilir, çoklu onaylayıcılı onay | ✅ | ⚠️ checklist ile taklit edilir |
+| Müşteri paylaşımlarında otomatik filigran | ✅ | ❌ |
+| Self-hosted, verinin sahibi siz | ✅ | ❌ yaygın planlarda sadece bulut |
+| Açık kaynak (MIT) | ✅ | ❌ |
+| Self-host'ta sınırsız ölçekte ücretsiz | ✅ | ❌ kullanıcı başı ücretlendirme |
+| Yerleşik yapay zekâ araç erişimi (MCP) | ✅ | ⚠️ sınırlı/ücretli API |
+| Mobil uygulamalar ve 3. parti entegrasyon pazarı | ⚠️ | ✅ |
+| Stüdyo dışı ekipler için genel amaçlı pano | ⚠️ | ✅ |
+
+✅ yerleşik &nbsp;·&nbsp; ⚠️ mümkün ama yerleşik değil &nbsp;·&nbsp; ❌ sunulmuyor
+
+Ekibinizin ihtiyacı sadece Trello tarzı genel bir panoysa, bu araçların herhangi biri o işi gayet iyi görür — Lumia.PM'in kapatmaya çalıştığı boşluk bu değil. Lumia.PM, genel amaçlı araçların doğal olarak modellemediği render onayı, versiyon geçmişi ve müşteriye markalı paylaşım iş akışı için var.
 
 ## Kurulum ve Kullanım
 
