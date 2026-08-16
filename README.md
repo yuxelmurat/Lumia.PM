@@ -155,5 +155,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  Built with ❤️ by the Lumia.PM team and <a href="https://github.com/yuxelmurat/Lumia.PM/graphs/contributors">contributors</a>
+  Built with ❤️ by <a href="https://lumiapm.com/about">Murat Yüksel</a> and <a href="https://github.com/yuxelmurat/Lumia.PM/graphs/contributors">contributors</a>
 </p>
