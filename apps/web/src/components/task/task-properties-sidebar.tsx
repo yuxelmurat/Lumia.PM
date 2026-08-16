@@ -766,7 +766,9 @@ export default function TaskPropertiesSidebar({
           </div>
         </div>
 
-        {taskId && <TaskApprovalSection taskId={taskId} />}
+        {taskId && (
+          <TaskApprovalSection taskId={taskId} workspaceId={workspaceId} />
+        )}
 
         {taskId && (
           <TaskCustomFields taskId={taskId} workspaceId={workspaceId} />

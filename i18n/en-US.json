@@ -1910,7 +1910,18 @@
 			"note": "Note",
 			"reset": "Reset",
 			"resetSuccess": "Approval status reset",
-			"resetError": "Failed to reset approval status"
+			"resetError": "Failed to reset approval status",
+			"pdf": {
+				"exportButton": "Export PDF",
+				"documentTitle": "Render Approval Summary",
+				"project": "Project",
+				"status": "Status",
+				"statusPending": "Pending review",
+				"description": "Description",
+				"approvalHistory": "Approval history",
+				"respondedOn": "Responded",
+				"generatedOn": "Generated"
+			}
 		},
 		"move": {
 			"title": "Move task",

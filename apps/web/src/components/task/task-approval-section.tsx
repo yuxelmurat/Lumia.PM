@@ -1,22 +1,32 @@
-import { CheckCircle2, MessageCircleWarning } from "lucide-react";
+import { CheckCircle2, Download, MessageCircleWarning } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useResetTaskApproval } from "@/hooks/mutations/task/use-reset-task-approval";
+import useGetProject from "@/hooks/queries/project/use-get-project";
 import useGetTask from "@/hooks/queries/task/use-get-task";
+import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { formatDateTime } from "@/lib/format";
 import { toast } from "@/lib/toast";
+import { getWorkspaceProfileField } from "@/lib/workspace-profile-fields";
 
 type TaskApprovalSectionProps = {
   taskId: string;
+  workspaceId: string;
 };
 
 export default function TaskApprovalSection({
   taskId,
+  workspaceId,
 }: TaskApprovalSectionProps) {
   const { t } = useTranslation();
   const { data: task } = useGetTask(taskId);
+  const { data: workspace } = useActiveWorkspace();
+  const { data: project } = useGetProject({
+    id: task?.projectId ?? "",
+    workspaceId,
+  });
   const { canManageTasks } = useWorkspacePermission();
   const canReset = canManageTasks();
 
@@ -35,11 +45,54 @@ export default function TaskApprovalSection({
     }
   };
 
+  const handleExportPdf = async () => {
+    // jsPDF plus the embedded Turkish-capable font is ~500KB — kept out of
+    // the main task-page bundle and only fetched when this button is used.
+    const { exportTaskApprovalPdf } = await import("@/lib/export-task-pdf");
+    exportTaskApprovalPdf({
+      task,
+      projectName: project?.name ?? "",
+      workspace: {
+        name: workspace?.name || "",
+        legalName: getWorkspaceProfileField(workspace, "legalName"),
+        address: getWorkspaceProfileField(workspace, "address"),
+        taxId: getWorkspaceProfileField(workspace, "taxId"),
+        phone: getWorkspaceProfileField(workspace, "phone"),
+        contactEmail: getWorkspaceProfileField(workspace, "contactEmail"),
+      },
+      strings: {
+        documentTitle: t("tasks:approval.pdf.documentTitle"),
+        project: t("tasks:approval.pdf.project"),
+        status: t("tasks:approval.pdf.status"),
+        statusApproved: t("tasks:approval.statusApproved"),
+        statusChangesRequested: t("tasks:approval.statusChangesRequested"),
+        statusPending: t("tasks:approval.pdf.statusPending"),
+        description: t("tasks:approval.pdf.description"),
+        approvalHistory: t("tasks:approval.pdf.approvalHistory"),
+        noApprovals: t("tasks:approval.noResponse"),
+        respondedOn: t("tasks:approval.pdf.respondedOn"),
+        generatedOn: t("tasks:approval.pdf.generatedOn"),
+      },
+    });
+  };
+
   return (
     <div className="hidden lg:flex px-3 flex-col gap-2 p-2">
       <span className="text-xs font-medium text-foreground/70 px-2">
         {t("tasks:approval.title")}
       </span>
+
+      <div className="px-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-fit gap-1.5"
+          onClick={handleExportPdf}
+        >
+          <Download className="w-3.5 h-3.5" />
+          {t("tasks:approval.pdf.exportButton")}
+        </Button>
+      </div>
 
       <div className="flex flex-col gap-3 px-2">
         {task.approvals && task.approvals.length > 0 ? (
