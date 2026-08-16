@@ -12,6 +12,7 @@ import {
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
+  assetTable,
   columnTable,
   externalLinkTable,
   labelTable,
@@ -20,6 +21,7 @@ import {
   taskTable,
   userTable,
 } from "../../database/schema";
+import { normalizeApiServerUrl } from "../../utils/openapi-spec";
 
 type GetTasksOptions = {
   assigneeId?: string;
@@ -259,6 +261,71 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     });
   }
 
+  const imageAssetsData =
+    taskIds.length > 0
+      ? await db
+          .select({
+            id: assetTable.id,
+            taskId: assetTable.taskId,
+            filename: assetTable.filename,
+            versionGroupId: assetTable.versionGroupId,
+            versionNumber: assetTable.versionNumber,
+            createdAt: assetTable.createdAt,
+          })
+          .from(assetTable)
+          .where(
+            and(
+              inArray(assetTable.taskId, taskIds),
+              eq(assetTable.kind, "image"),
+            ),
+          )
+      : [];
+
+  const apiBaseUrl = normalizeApiServerUrl(
+    process.env.KANEO_API_URL || "http://localhost:1337",
+  );
+
+  // A "moodboard" gallery shows one thumbnail per render, not one per
+  // upload — group by version chain and keep only the latest revision.
+  const latestByGroup = new Map<
+    string,
+    (typeof imageAssetsData)[number] & { groupKey: string }
+  >();
+  for (const asset of imageAssetsData) {
+    const groupKey = asset.versionGroupId ?? asset.id;
+    const current = latestByGroup.get(`${asset.taskId}:${groupKey}`);
+    if (!current || asset.versionNumber > current.versionNumber) {
+      latestByGroup.set(`${asset.taskId}:${groupKey}`, { ...asset, groupKey });
+    }
+  }
+
+  const taskImagesMap = new Map<
+    string,
+    Array<{
+      id: string;
+      url: string;
+      filename: string;
+      versionNumber: number;
+      createdAt: Date;
+    }>
+  >();
+  for (const asset of latestByGroup.values()) {
+    if (!asset.taskId) continue;
+    if (!taskImagesMap.has(asset.taskId)) {
+      taskImagesMap.set(asset.taskId, []);
+    }
+    taskImagesMap.get(asset.taskId)?.push({
+      id: asset.id,
+      url: `${apiBaseUrl}/asset/${asset.id}`,
+      filename: asset.filename,
+      versionNumber: asset.versionNumber,
+      createdAt: asset.createdAt,
+    });
+  }
+  for (const images of taskImagesMap.values()) {
+    images.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  }
+
   const projectColumns = await db
     .select()
     .from(columnTable)
@@ -278,6 +345,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
         labels: taskLabelsMap.get(task.id) || [],
         externalLinks: taskExternalLinksMap.get(task.id) || [],
         approvals: taskApprovalsMap.get(task.id) || [],
+        images: taskImagesMap.get(task.id) || [],
       })),
   }));
 
@@ -288,6 +356,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       labels: taskLabelsMap.get(task.id) || [],
       externalLinks: taskExternalLinksMap.get(task.id) || [],
       approvals: taskApprovalsMap.get(task.id) || [],
+      images: taskImagesMap.get(task.id) || [],
     }));
 
   const plannedTasks = paginatedTasks
@@ -297,6 +366,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       labels: taskLabelsMap.get(task.id) || [],
       externalLinks: taskExternalLinksMap.get(task.id) || [],
       approvals: taskApprovalsMap.get(task.id) || [],
+      images: taskImagesMap.get(task.id) || [],
     }));
 
   return {

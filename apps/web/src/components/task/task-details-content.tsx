@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Activity from "@/components/activity";
 import CommentInput from "@/components/activity/comment-input";
 import { isCommentActivity } from "@/components/activity/utils";
+import { TaskImageGallery } from "@/components/common/task-image-gallery";
 import { ExternalLinksAccordion } from "@/components/external-links/external-links-accordion";
 import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
 import { Timeline } from "@/components/ui/timeline";
@@ -79,6 +80,11 @@ export default function TaskDetailsContent({
         <TaskTitle taskId={taskId} />
         <TaskDescription taskId={taskId} />
       </div>
+      {task?.images && task.images.length > 0 && (
+        <div className="mt-4">
+          <TaskImageGallery images={task.images} />
+        </div>
+      )}
       {!isLoadingExternalLinks && externalLinks.length > 0 && (
         <div className="mt-4">
           <ExternalLinksAccordion

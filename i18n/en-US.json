@@ -1728,6 +1728,12 @@
 		"board": {
 			"columnEmpty": "No tasks in {{name}}"
 		},
+		"gallery": {
+			"title": "Gallery",
+			"versionBadge": "v{{number}}",
+			"previous": "Previous image",
+			"next": "Next image"
+		},
 		"common": {
 			"selectTask": "Select task",
 			"loadingTask": "Loading task...",

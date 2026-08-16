@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { TaskImageGallery } from "@/components/common/task-image-gallery";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -266,6 +267,10 @@ export function PublicTaskDetailModal({
               <div className="pt-1">
                 <MarkdownRenderer content={task.description} />
               </div>
+            )}
+
+            {task.images && task.images.length > 0 && (
+              <TaskImageGallery images={task.images} />
             )}
 
             {labels.length > 0 && (

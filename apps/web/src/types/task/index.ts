@@ -23,6 +23,13 @@ export type TaskApproval = {
   respondedAt: string;
 };
 
+export type TaskImage = {
+  id: string;
+  url: string;
+  filename: string;
+  versionNumber: number;
+};
+
 type Task = {
   id: string;
   title: string;
@@ -48,6 +55,7 @@ type Task = {
   approvalClientName?: string | null;
   approvalRespondedAt?: string | null;
   approvals?: TaskApproval[];
+  images?: TaskImage[];
 };
 
 export default Task;
