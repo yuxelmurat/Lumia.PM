@@ -1,6 +1,6 @@
 import { labelColorToHex } from "./colors.js";
-import type { KaneoClient } from "./kaneo.js";
 import { toProjectKey, uniqueKey } from "./keys.js";
+import type { KaneoClient } from "./lumiapm.js";
 import {
   boardProjectName,
   buildDescription,

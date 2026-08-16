@@ -1,0 +1,40 @@
+# Lumia.PM Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "lumiapm.fullname" . }}-lumiapm
+  labels:
+    {{- include "lumiapm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: lumiapm
+spec:
+  type: {{ .Values.lumiapm.service.type }}
+  ports:
+    - port: {{ .Values.lumiapm.service.port }}
+      targetPort: lumiapm
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "lumiapm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: lumiapm
+
+{{- if .Values.postgresql.enabled }}
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "lumiapm.fullname" . }}-postgresql
+  labels:
+    {{- include "lumiapm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+spec:
+  type: {{ .Values.postgresql.service.type }}
+  ports:
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: postgresql
+      protocol: TCP
+      name: postgresql
+  selector:
+    {{- include "lumiapm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+{{- end }}

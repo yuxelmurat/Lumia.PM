@@ -4,8 +4,8 @@ const { reference } = await loadLocales();
 
 const schema = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "https://kaneo.app/i18n/schema.json",
-  title: "Kaneo locale schema",
+  $id: "https://lumiapm.com/i18n/schema.json",
+  title: "Lumia.PM locale schema",
   type: "object",
   additionalProperties: false,
   properties: buildProperties(reference.data),

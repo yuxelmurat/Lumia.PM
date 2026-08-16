@@ -136,7 +136,7 @@
 				},
 				{
 					"anchor": "GitHub",
-					"href": "https://github.com/usekaneo/kaneo",
+					"href": "https://github.com/yuxelmurat/Lumia.PM",
 					"icon": "github"
 				}
 			]
@@ -146,7 +146,7 @@
 		"links": [
 			{
 				"label": "GitHub",
-				"href": "https://github.com/usekaneo/kaneo"
+				"href": "https://github.com/yuxelmurat/Lumia.PM"
 			}
 		],
 		"primary": {
@@ -161,7 +161,7 @@
 	"footer": {
 		"socials": {
 			"website": "https://lumiapm.com",
-			"github": "https://github.com/usekaneo/kaneo",
+			"github": "https://github.com/yuxelmurat/Lumia.PM",
 			"x": "https://x.com/lumiapm",
 			"instagram": "https://instagram.com/lumiapm",
 			"linkedin": "https://linkedin.com/company/lumiapm"
@@ -180,8 +180,8 @@
 	},
 	"integrations": {
 		"plausible": {
-			"domain": "kaneo.app",
-			"server": "plausible.kaneo.app"
+			"domain": "lumiapm.com",
+			"server": "plausible.lumiapm.com"
 		}
 	}
 }

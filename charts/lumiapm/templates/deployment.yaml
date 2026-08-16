@@ -1,0 +1,111 @@
+{{- $corsOrigins := .Values.lumiapm.env.corsOrigins -}}
+{{- $corsOriginsValue := "" -}}
+{{- if kindIs "slice" $corsOrigins -}}
+  {{- $corsOriginsValue = join "," $corsOrigins -}}
+{{- else if $corsOrigins -}}
+  {{- $corsOriginsValue = $corsOrigins -}}
+{{- else if .Values.lumiapm.env.clientUrl -}}
+  {{- $corsOriginsValue = .Values.lumiapm.env.clientUrl -}}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lumiapm.fullname" . }}
+  labels:
+    {{- include "lumiapm.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "lumiapm.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "lumiapm.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: lumiapm
+    spec:
+      serviceAccountName: {{ include "lumiapm.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: lumiapm
+          securityContext:
+            {{- toYaml .Values.lumiapm.securityContext | nindent 12 }}
+          image: "{{ .Values.lumiapm.image.repository }}:{{ .Values.lumiapm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.lumiapm.image.pullPolicy }}
+          ports:
+            - name: lumiapm
+              containerPort: {{ .Values.lumiapm.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: KANEO_CLIENT_URL
+              value: "{{ .Values.lumiapm.env.clientUrl }}"
+            - name: CORS_ORIGINS
+              value: {{ $corsOriginsValue | quote }}
+            - name: AUTH_SECRET
+              {{- if .Values.lumiapm.env.existingSecret.enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.lumiapm.env.existingSecret.name }}
+                  key: {{ .Values.lumiapm.env.existingSecret.key }}
+              {{- else }}
+              value: {{ .Values.lumiapm.env.authSecret | quote }}
+              {{- end }}
+            {{- if and (not .Values.lumiapm.env.database.external.enabled) .Values.postgresql.auth.existingSecret }}
+            - name: KANEO_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.auth.existingSecret }}
+                  key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+            {{- end }}
+            - name: DATABASE_URL
+              {{- if .Values.lumiapm.env.database.external.enabled }}
+              {{- if .Values.lumiapm.env.database.external.existingSecret.enabled }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.lumiapm.env.database.external.existingSecret.name }}
+                  key: {{ .Values.lumiapm.env.database.external.existingSecret.passwordKey }}
+              {{- else }}
+              value: "postgresql://{{ include "lumiapm.urlencodeUserinfo" .Values.lumiapm.env.database.external.username }}:{{ include "lumiapm.urlencodeUserinfo" .Values.lumiapm.env.database.external.password }}@{{ .Values.lumiapm.env.database.external.host }}:{{ .Values.lumiapm.env.database.external.port }}/{{ .Values.lumiapm.env.database.external.database }}"
+              {{- end }}
+              {{- else }}
+              {{- if .Values.postgresql.auth.existingSecret }}
+              value: "postgresql://{{ include "lumiapm.urlencodeUserinfo" .Values.postgresql.auth.username }}:$(KANEO_POSTGRES_PASSWORD)@{{ include "lumiapm.fullname" . }}-postgresql:{{ .Values.postgresql.service.port }}/{{ .Values.postgresql.auth.database }}"
+              {{- else }}
+              value: "postgresql://{{ include "lumiapm.urlencodeUserinfo" .Values.postgresql.auth.username }}:{{ include "lumiapm.urlencodeUserinfo" .Values.postgresql.auth.password }}@{{ include "lumiapm.fullname" . }}-postgresql:{{ .Values.postgresql.service.port }}/{{ .Values.postgresql.auth.database }}"
+              {{- end }}
+              {{- end }}
+            - name: DISABLE_REGISTRATION
+              value: {{ .Values.lumiapm.env.disableRegistration | quote }}
+            - name: DISABLE_PASSWORD_REGISTRATION
+              value: {{ .Values.lumiapm.env.disablePasswordRegistration | quote }}
+            - name: DISABLE_EMAIL_OTP_SIGN_IN
+              value: {{ .Values.lumiapm.env.disableEmailOtpSignIn | quote }}
+            {{- with .Values.lumiapm.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.lumiapm.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.lumiapm.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.lumiapm.resources | nindent 12 }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

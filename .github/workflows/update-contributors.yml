@@ -4,11 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 2 * * *'
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/FUNDING.yml'
 
 jobs:
   update-contributors:
@@ -30,28 +25,13 @@ jobs:
           output: CONTRIBUTORS.svg
           avatarSize: 42
 
-      - name: Generate Sponsors Section
-        if: ${{ github.repository_owner == 'usekaneo' }}
-        uses: JamesIves/github-sponsors-readme-action@v1
-        with:
-          token: ${{ secrets.GH_ANDREJ }}
-          file: 'README.md'
-          minimum: 1
-          marker: sponsors
-
-      - name: Sync Site Sponsors
-        if: ${{ github.repository_owner == 'usekaneo' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ANDREJ }}
-        run: node apps/site/scripts/sync-sponsors.mjs
-
       - name: Commit and Push Changes
         id: commit
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add CONTRIBUTORS.svg README.md apps/site/constants/sponsors.json
-          if git commit -m "docs: update contributors and sponsors"; then
+          git add CONTRIBUTORS.svg
+          if git commit -m "docs: update contributors"; then
             git push
             echo "pushed=true" >> "$GITHUB_OUTPUT"
           else
@@ -62,4 +42,4 @@ jobs:
         if: ${{ steps.commit.outputs.pushed == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run deploy-site.yml --repo "${GITHUB_REPOSITORY}" --ref main 
+        run: gh workflow run deploy-site.yml --repo "${GITHUB_REPOSITORY}" --ref main

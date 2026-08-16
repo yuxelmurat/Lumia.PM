@@ -32,8 +32,8 @@ fi
 # This image requires either DATABASE_URL or POSTGRES_PASSWORD so startup
 # fails fast instead of silently falling back to localhost inside the container.
 if [ -z "${DATABASE_URL:-}" ]; then
-  POSTGRES_DB="${POSTGRES_DB:-kaneo}"
-  POSTGRES_USER="${POSTGRES_USER:-kaneo}"
+  POSTGRES_DB="${POSTGRES_DB:-lumiapm}"
+  POSTGRES_USER="${POSTGRES_USER:-lumiapm}"
   if [ -n "${POSTGRES_PASSWORD:-}" ]; then
     encoded_user="$(urlencode "$POSTGRES_USER")"
     encoded_password="$(urlencode "$POSTGRES_PASSWORD")"

@@ -1,6 +1,6 @@
 apiVersion: v2
-name: kaneo
-description: Kaneo - All you need. Nothing you don't. Open source project management that works for you.
+name: lumia-pm
+description: Lumia.PM - project management built for interior architecture and design studios.
 type: application
 version: 2.17.6
 appVersion: "2.17.6"
@@ -10,14 +10,14 @@ keywords:
   - task-management
   - productivity
   - collaboration
-home: https://kaneo.app
+home: https://lumiapm.com
 sources:
-  - https://github.com/usekaneo/kaneo
-icon: https://assets.kaneo.app/logo-text.png
+  - https://github.com/yuxelmurat/Lumia.PM
+icon: https://raw.githubusercontent.com/yuxelmurat/Lumia.PM/main/apps/web/public/logo/logo.png
 maintainers:
-  - name: Kaneo Team
-    url: https://github.com/usekaneo
-    email: info@kaneo.app
+  - name: Lumia.PM Team
+    url: https://github.com/yuxelmurat
+    email: help@lumiapm.com
 annotations:
   artifacthub.io/license: MIT
   artifacthub.io/containsSecurityUpdates: "false"

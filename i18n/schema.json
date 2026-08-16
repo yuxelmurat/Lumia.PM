@@ -1,7 +1,7 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://kaneo.app/i18n/schema.json",
-	"title": "Kaneo locale schema",
+	"$id": "https://lumiapm.com/i18n/schema.json",
+	"title": "Lumia.PM locale schema",
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
@@ -11,6 +11,42 @@
 			"properties": {
 				"appName": {
 					"type": "string"
+				},
+				"imageUpload": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"clickToUpload": {
+							"type": "string"
+						},
+						"orDragImage": {
+							"type": "string"
+						},
+						"pasteUrlInstead": {
+							"type": "string"
+						},
+						"removeImage": {
+							"type": "string"
+						},
+						"errorInvalidType": {
+							"type": "string"
+						},
+						"errorTooLarge": {
+							"type": "string"
+						},
+						"errorProcessing": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"clickToUpload",
+						"orDragImage",
+						"pasteUrlInstead",
+						"removeImage",
+						"errorInvalidType",
+						"errorTooLarge",
+						"errorProcessing"
+					]
 				},
 				"actions": {
 					"type": "object",
@@ -272,6 +308,12 @@
 								"keyHint": {
 									"type": "string"
 								},
+								"templateLabel": {
+									"type": "string"
+								},
+								"blankProject": {
+									"type": "string"
+								},
 								"createButton": {
 									"type": "string"
 								},
@@ -292,6 +334,8 @@
 								"projectName",
 								"keyLabel",
 								"keyHint",
+								"templateLabel",
+								"blankProject",
 								"createButton",
 								"successToast",
 								"errorToast"
@@ -301,7 +345,7 @@
 							"type": "object",
 							"additionalProperties": false,
 							"properties": {
-								"breadcrumbKaneo": {
+								"breadcrumbProductName": {
 									"type": "string"
 								},
 								"title": {
@@ -327,7 +371,7 @@
 								}
 							},
 							"required": [
-								"breadcrumbKaneo",
+								"breadcrumbProductName",
 								"title",
 								"description",
 								"namePlaceholder",
@@ -516,6 +560,7 @@
 			},
 			"required": [
 				"appName",
+				"imageUpload",
 				"actions",
 				"a11y",
 				"sidebar",
@@ -2209,6 +2254,69 @@
 						"descriptionPlaceholder": {
 							"type": "string"
 						},
+						"companyProfileTitle": {
+							"type": "string"
+						},
+						"companyProfileSubtitle": {
+							"type": "string"
+						},
+						"logoLabel": {
+							"type": "string"
+						},
+						"logoHint": {
+							"type": "string"
+						},
+						"accentColorLabel": {
+							"type": "string"
+						},
+						"accentColorHint": {
+							"type": "string"
+						},
+						"legalNameLabel": {
+							"type": "string"
+						},
+						"legalNameHint": {
+							"type": "string"
+						},
+						"legalNamePlaceholder": {
+							"type": "string"
+						},
+						"taxIdLabel": {
+							"type": "string"
+						},
+						"taxIdHint": {
+							"type": "string"
+						},
+						"taxIdPlaceholder": {
+							"type": "string"
+						},
+						"addressLabel": {
+							"type": "string"
+						},
+						"addressHint": {
+							"type": "string"
+						},
+						"addressPlaceholder": {
+							"type": "string"
+						},
+						"phoneLabel": {
+							"type": "string"
+						},
+						"phoneHint": {
+							"type": "string"
+						},
+						"phonePlaceholder": {
+							"type": "string"
+						},
+						"contactEmailLabel": {
+							"type": "string"
+						},
+						"contactEmailHint": {
+							"type": "string"
+						},
+						"contactEmailPlaceholder": {
+							"type": "string"
+						},
 						"dangerZone": {
 							"type": "string"
 						},
@@ -2251,9 +2359,20 @@
 								},
 								"nameShort": {
 									"type": "string"
+								},
+								"contactEmailInvalid": {
+									"type": "string"
+								},
+								"accentColorInvalid": {
+									"type": "string"
 								}
 							},
-							"required": ["nameRequired", "nameShort"]
+							"required": [
+								"nameRequired",
+								"nameShort",
+								"contactEmailInvalid",
+								"accentColorInvalid"
+							]
 						},
 						"transferOwnership": {
 							"type": "object",
@@ -2328,6 +2447,27 @@
 						"descriptionLabel",
 						"descriptionHint",
 						"descriptionPlaceholder",
+						"companyProfileTitle",
+						"companyProfileSubtitle",
+						"logoLabel",
+						"logoHint",
+						"accentColorLabel",
+						"accentColorHint",
+						"legalNameLabel",
+						"legalNameHint",
+						"legalNamePlaceholder",
+						"taxIdLabel",
+						"taxIdHint",
+						"taxIdPlaceholder",
+						"addressLabel",
+						"addressHint",
+						"addressPlaceholder",
+						"phoneLabel",
+						"phoneHint",
+						"phonePlaceholder",
+						"contactEmailLabel",
+						"contactEmailHint",
+						"contactEmailPlaceholder",
 						"dangerZone",
 						"dangerZoneSubtitle",
 						"deleteWorkspace",
@@ -2922,6 +3062,523 @@
 						"nameRequired"
 					]
 				},
+				"workspaceCustomFields": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"cardDescription": {
+							"type": "string"
+						},
+						"createField": {
+							"type": "string"
+						},
+						"editField": {
+							"type": "string"
+						},
+						"deleteField": {
+							"type": "string"
+						},
+						"saveField": {
+							"type": "string"
+						},
+						"nameLabel": {
+							"type": "string"
+						},
+						"namePlaceholder": {
+							"type": "string"
+						},
+						"typeLabel": {
+							"type": "string"
+						},
+						"requiredLabel": {
+							"type": "string"
+						},
+						"optionsLabel": {
+							"type": "string"
+						},
+						"optionPlaceholder": {
+							"type": "string"
+						},
+						"addOption": {
+							"type": "string"
+						},
+						"createDescription": {
+							"type": "string"
+						},
+						"editDescription": {
+							"type": "string"
+						},
+						"deleteConfirmTitle": {
+							"type": "string"
+						},
+						"deleteConfirmDescription": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"createSuccess": {
+							"type": "string"
+						},
+						"updateSuccess": {
+							"type": "string"
+						},
+						"deleteSuccess": {
+							"type": "string"
+						},
+						"createError": {
+							"type": "string"
+						},
+						"updateError": {
+							"type": "string"
+						},
+						"deleteError": {
+							"type": "string"
+						},
+						"nameRequired": {
+							"type": "string"
+						},
+						"optionsRequired": {
+							"type": "string"
+						},
+						"required": {
+							"type": "string"
+						},
+						"types": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"text": {
+									"type": "string"
+								},
+								"number": {
+									"type": "string"
+								},
+								"date": {
+									"type": "string"
+								},
+								"select": {
+									"type": "string"
+								},
+								"checkbox": {
+									"type": "string"
+								}
+							},
+							"required": ["text", "number", "date", "select", "checkbox"]
+						}
+					},
+					"required": [
+						"pageTitle",
+						"title",
+						"subtitle",
+						"cardDescription",
+						"createField",
+						"editField",
+						"deleteField",
+						"saveField",
+						"nameLabel",
+						"namePlaceholder",
+						"typeLabel",
+						"requiredLabel",
+						"optionsLabel",
+						"optionPlaceholder",
+						"addOption",
+						"createDescription",
+						"editDescription",
+						"deleteConfirmTitle",
+						"deleteConfirmDescription",
+						"empty",
+						"createSuccess",
+						"updateSuccess",
+						"deleteSuccess",
+						"createError",
+						"updateError",
+						"deleteError",
+						"nameRequired",
+						"optionsRequired",
+						"required",
+						"types"
+					]
+				},
+				"workspaceProjectTemplates": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"cardDescription": {
+							"type": "string"
+						},
+						"createTemplate": {
+							"type": "string"
+						},
+						"editTemplate": {
+							"type": "string"
+						},
+						"deleteTemplate": {
+							"type": "string"
+						},
+						"saveTemplate": {
+							"type": "string"
+						},
+						"nameLabel": {
+							"type": "string"
+						},
+						"namePlaceholder": {
+							"type": "string"
+						},
+						"descriptionLabel": {
+							"type": "string"
+						},
+						"descriptionPlaceholder": {
+							"type": "string"
+						},
+						"iconLabel": {
+							"type": "string"
+						},
+						"iconPlaceholder": {
+							"type": "string"
+						},
+						"columnsLabel": {
+							"type": "string"
+						},
+						"columnNamePlaceholder": {
+							"type": "string"
+						},
+						"columnSlugPlaceholder": {
+							"type": "string"
+						},
+						"doneColumn": {
+							"type": "string"
+						},
+						"addColumn": {
+							"type": "string"
+						},
+						"tasksLabel": {
+							"type": "string"
+						},
+						"taskTitlePlaceholder": {
+							"type": "string"
+						},
+						"taskDescriptionPlaceholder": {
+							"type": "string"
+						},
+						"taskColumnPlaceholder": {
+							"type": "string"
+						},
+						"addTask": {
+							"type": "string"
+						},
+						"createDescription": {
+							"type": "string"
+						},
+						"editDescription": {
+							"type": "string"
+						},
+						"deleteConfirmTitle": {
+							"type": "string"
+						},
+						"deleteConfirmDescription": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"columnCount": {
+							"type": "string"
+						},
+						"createSuccess": {
+							"type": "string"
+						},
+						"updateSuccess": {
+							"type": "string"
+						},
+						"deleteSuccess": {
+							"type": "string"
+						},
+						"createError": {
+							"type": "string"
+						},
+						"updateError": {
+							"type": "string"
+						},
+						"deleteError": {
+							"type": "string"
+						},
+						"nameRequired": {
+							"type": "string"
+						},
+						"columnsRequired": {
+							"type": "string"
+						},
+						"columnNameRequired": {
+							"type": "string"
+						},
+						"columnSlugsUnique": {
+							"type": "string"
+						},
+						"taskTitleRequired": {
+							"type": "string"
+						},
+						"taskColumnRequired": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"pageTitle",
+						"title",
+						"subtitle",
+						"cardDescription",
+						"createTemplate",
+						"editTemplate",
+						"deleteTemplate",
+						"saveTemplate",
+						"nameLabel",
+						"namePlaceholder",
+						"descriptionLabel",
+						"descriptionPlaceholder",
+						"iconLabel",
+						"iconPlaceholder",
+						"columnsLabel",
+						"columnNamePlaceholder",
+						"columnSlugPlaceholder",
+						"doneColumn",
+						"addColumn",
+						"tasksLabel",
+						"taskTitlePlaceholder",
+						"taskDescriptionPlaceholder",
+						"taskColumnPlaceholder",
+						"addTask",
+						"createDescription",
+						"editDescription",
+						"deleteConfirmTitle",
+						"deleteConfirmDescription",
+						"empty",
+						"columnCount",
+						"createSuccess",
+						"updateSuccess",
+						"deleteSuccess",
+						"createError",
+						"updateError",
+						"deleteError",
+						"nameRequired",
+						"columnsRequired",
+						"columnNameRequired",
+						"columnSlugsUnique",
+						"taskTitleRequired",
+						"taskColumnRequired"
+					]
+				},
+				"workspaceWatermark": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						},
+						"scopeNotice": {
+							"type": "string"
+						},
+						"readOnlyNotice": {
+							"type": "string"
+						},
+						"noPermissionHint": {
+							"type": "string"
+						},
+						"enableToEditHint": {
+							"type": "string"
+						},
+						"enableLabel": {
+							"type": "string"
+						},
+						"enableHint": {
+							"type": "string"
+						},
+						"styleTitle": {
+							"type": "string"
+						},
+						"styleSubtitle": {
+							"type": "string"
+						},
+						"styleLabel": {
+							"type": "string"
+						},
+						"styles": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"corner": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"label": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										}
+									},
+									"required": ["label", "description"]
+								},
+								"center": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"label": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										}
+									},
+									"required": ["label", "description"]
+								},
+								"tile": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"label": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										}
+									},
+									"required": ["label", "description"]
+								}
+							},
+							"required": ["corner", "center", "tile"]
+						},
+						"imageTitle": {
+							"type": "string"
+						},
+						"imageSubtitle": {
+							"type": "string"
+						},
+						"imageUrlLabel": {
+							"type": "string"
+						},
+						"imageUrlHint": {
+							"type": "string"
+						},
+						"positionTitle": {
+							"type": "string"
+						},
+						"positionSubtitle": {
+							"type": "string"
+						},
+						"cornerLabel": {
+							"type": "string"
+						},
+						"cornerHint": {
+							"type": "string"
+						},
+						"corners": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"top-left": {
+									"type": "string"
+								},
+								"top-right": {
+									"type": "string"
+								},
+								"bottom-left": {
+									"type": "string"
+								},
+								"bottom-right": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"top-left",
+								"top-right",
+								"bottom-left",
+								"bottom-right"
+							]
+						},
+						"sizeLabel": {
+							"type": "string"
+						},
+						"sizeHint": {
+							"type": "string"
+						},
+						"sizeCenterHint": {
+							"type": "string"
+						},
+						"toastUpdated": {
+							"type": "string"
+						},
+						"toastUpdateError": {
+							"type": "string"
+						},
+						"validation": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"imageUrlInvalid": {
+									"type": "string"
+								},
+								"sizeRange": {
+									"type": "string"
+								}
+							},
+							"required": ["imageUrlInvalid", "sizeRange"]
+						}
+					},
+					"required": [
+						"pageTitle",
+						"title",
+						"subtitle",
+						"scopeNotice",
+						"readOnlyNotice",
+						"noPermissionHint",
+						"enableToEditHint",
+						"enableLabel",
+						"enableHint",
+						"styleTitle",
+						"styleSubtitle",
+						"styleLabel",
+						"styles",
+						"imageTitle",
+						"imageSubtitle",
+						"imageUrlLabel",
+						"imageUrlHint",
+						"positionTitle",
+						"positionSubtitle",
+						"cornerLabel",
+						"cornerHint",
+						"corners",
+						"sizeLabel",
+						"sizeHint",
+						"sizeCenterHint",
+						"toastUpdated",
+						"toastUpdateError",
+						"validation"
+					]
+				},
 				"projectGeneral": {
 					"type": "object",
 					"additionalProperties": false,
@@ -3189,6 +3846,48 @@
 						},
 						"toastUpdateError": {
 							"type": "string"
+						},
+						"expiredNotice": {
+							"type": "string"
+						},
+						"expiryLabel": {
+							"type": "string"
+						},
+						"expiryHint": {
+							"type": "string"
+						},
+						"expiryClear": {
+							"type": "string"
+						},
+						"expiryToastUpdated": {
+							"type": "string"
+						},
+						"expiryToastUpdateError": {
+							"type": "string"
+						},
+						"regenerateLabel": {
+							"type": "string"
+						},
+						"regenerateHint": {
+							"type": "string"
+						},
+						"regenerateButton": {
+							"type": "string"
+						},
+						"regenerateModalTitle": {
+							"type": "string"
+						},
+						"regenerateModalDescription": {
+							"type": "string"
+						},
+						"regenerateModalConfirm": {
+							"type": "string"
+						},
+						"regenerateToastUpdated": {
+							"type": "string"
+						},
+						"regenerateToastUpdateError": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -3204,7 +3903,21 @@
 						"copy",
 						"copiedToast",
 						"toastUpdated",
-						"toastUpdateError"
+						"toastUpdateError",
+						"expiredNotice",
+						"expiryLabel",
+						"expiryHint",
+						"expiryClear",
+						"expiryToastUpdated",
+						"expiryToastUpdateError",
+						"regenerateLabel",
+						"regenerateHint",
+						"regenerateButton",
+						"regenerateModalTitle",
+						"regenerateModalDescription",
+						"regenerateModalConfirm",
+						"regenerateToastUpdated",
+						"regenerateToastUpdateError"
 					]
 				},
 				"projectWorkflow": {
@@ -3639,6 +4352,12 @@
 								"repoNotFound": {
 									"type": "string"
 								},
+								"redirected": {
+									"type": "string"
+								},
+								"notGiteaInstance": {
+									"type": "string"
+								},
 								"verifyError": {
 									"type": "string"
 								},
@@ -3689,6 +4408,8 @@
 								"verifyOk",
 								"verifyWarning",
 								"repoNotFound",
+								"redirected",
+								"notGiteaInstance",
 								"verifyError",
 								"tokenRequired",
 								"tokenRequiredVerify",
@@ -4835,6 +5556,9 @@
 				"workspaceGeneral",
 				"workspaceRoles",
 				"workspaceLabels",
+				"workspaceCustomFields",
+				"workspaceProjectTemplates",
+				"workspaceWatermark",
 				"projectGeneral",
 				"projectIntegrations",
 				"projectVisibility",
@@ -5561,6 +6285,15 @@
 				"created": {
 					"type": "string"
 				},
+				"approvedTask": {
+					"type": "string"
+				},
+				"requestedChanges": {
+					"type": "string"
+				},
+				"approvalClient": {
+					"type": "string"
+				},
 				"githubUser": {
 					"type": "string"
 				},
@@ -5758,6 +6491,38 @@
 								"previewImageAlt": {
 									"type": "string"
 								},
+								"version": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"badge": {
+											"type": "string"
+										},
+										"uploadNew": {
+											"type": "string"
+										},
+										"history": {
+											"type": "string"
+										},
+										"loading": {
+											"type": "string"
+										},
+										"uploading": {
+											"type": "string"
+										},
+										"uploadFailed": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"badge",
+										"uploadNew",
+										"history",
+										"loading",
+										"uploading",
+										"uploadFailed"
+									]
+								},
 								"codeLang": {
 									"type": "object",
 									"additionalProperties": false,
@@ -5937,6 +6702,7 @@
 								"copied",
 								"dropImageToUpload",
 								"previewImageAlt",
+								"version",
 								"codeLang",
 								"table",
 								"mermaid"
@@ -5975,6 +6741,9 @@
 				"changedTitle",
 				"moved",
 				"created",
+				"approvedTask",
+				"requestedChanges",
+				"approvalClient",
 				"githubUser",
 				"comment"
 			]
@@ -6066,6 +6835,79 @@
 						}
 					},
 					"required": ["board", "list"]
+				},
+				"board": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"columnEmpty": {
+							"type": "string"
+						}
+					},
+					"required": ["columnEmpty"]
+				},
+				"gallery": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"versionBadge": {
+							"type": "string"
+						},
+						"previous": {
+							"type": "string"
+						},
+						"next": {
+							"type": "string"
+						},
+						"pin": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"unknownAuthor": {
+									"type": "string"
+								},
+								"close": {
+									"type": "string"
+								},
+								"resolve": {
+									"type": "string"
+								},
+								"reopen": {
+									"type": "string"
+								},
+								"delete": {
+									"type": "string"
+								},
+								"namePlaceholder": {
+									"type": "string"
+								},
+								"contentPlaceholder": {
+									"type": "string"
+								},
+								"cancel": {
+									"type": "string"
+								},
+								"submit": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"unknownAuthor",
+								"close",
+								"resolve",
+								"reopen",
+								"delete",
+								"namePlaceholder",
+								"contentPlaceholder",
+								"cancel",
+								"submit"
+							]
+						}
+					},
+					"required": ["title", "versionBadge", "previous", "next", "pin"]
 				},
 				"common": {
 					"type": "object",
@@ -6182,6 +7024,38 @@
 										"failed",
 										"imageSuccess",
 										"fileSuccess"
+									]
+								},
+								"version": {
+									"type": "object",
+									"additionalProperties": false,
+									"properties": {
+										"badge": {
+											"type": "string"
+										},
+										"uploadNew": {
+											"type": "string"
+										},
+										"history": {
+											"type": "string"
+										},
+										"loading": {
+											"type": "string"
+										},
+										"uploading": {
+											"type": "string"
+										},
+										"uploadFailed": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"badge",
+										"uploadNew",
+										"history",
+										"loading",
+										"uploading",
+										"uploadFailed"
 									]
 								},
 								"slash": {
@@ -6490,6 +7364,7 @@
 								"dropToUpload",
 								"checkbox",
 								"upload",
+								"version",
 								"slash",
 								"languages",
 								"embed",
@@ -6672,6 +7547,135 @@
 						"start",
 						"startDate",
 						"noDate"
+					]
+				},
+				"customFields": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"selectPlaceholder": {
+							"type": "string"
+						},
+						"noValue": {
+							"type": "string"
+						},
+						"clear": {
+							"type": "string"
+						},
+						"updateSuccess": {
+							"type": "string"
+						},
+						"updateError": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"empty",
+						"selectPlaceholder",
+						"noValue",
+						"clear",
+						"updateSuccess",
+						"updateError"
+					]
+				},
+				"approval": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"statusApproved": {
+							"type": "string"
+						},
+						"statusChangesRequested": {
+							"type": "string"
+						},
+						"noResponse": {
+							"type": "string"
+						},
+						"respondedBy": {
+							"type": "string"
+						},
+						"respondedAt": {
+							"type": "string"
+						},
+						"note": {
+							"type": "string"
+						},
+						"reset": {
+							"type": "string"
+						},
+						"resetSuccess": {
+							"type": "string"
+						},
+						"resetError": {
+							"type": "string"
+						},
+						"pdf": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"exportButton": {
+									"type": "string"
+								},
+								"documentTitle": {
+									"type": "string"
+								},
+								"project": {
+									"type": "string"
+								},
+								"status": {
+									"type": "string"
+								},
+								"statusPending": {
+									"type": "string"
+								},
+								"description": {
+									"type": "string"
+								},
+								"approvalHistory": {
+									"type": "string"
+								},
+								"respondedOn": {
+									"type": "string"
+								},
+								"generatedOn": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"exportButton",
+								"documentTitle",
+								"project",
+								"status",
+								"statusPending",
+								"description",
+								"approvalHistory",
+								"respondedOn",
+								"generatedOn"
+							]
+						}
+					},
+					"required": [
+						"title",
+						"statusApproved",
+						"statusChangesRequested",
+						"noResponse",
+						"respondedBy",
+						"respondedAt",
+						"note",
+						"reset",
+						"resetSuccess",
+						"resetError",
+						"pdf"
 					]
 				},
 				"move": {
@@ -6917,6 +7921,9 @@
 						"filter": {
 							"type": "string"
 						},
+						"searchPlaceholder": {
+							"type": "string"
+						},
 						"addFilter": {
 							"type": "string"
 						},
@@ -6983,6 +7990,7 @@
 						"moveAll",
 						"addTask",
 						"filter",
+						"searchPlaceholder",
 						"addFilter",
 						"sections",
 						"noTasksInSection",
@@ -7191,6 +8199,50 @@
 						"resizeStart",
 						"resizeDue",
 						"taskAriaLabel"
+					]
+				},
+				"calendar": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"searchPlaceholder": {
+							"type": "string"
+						},
+						"today": {
+							"type": "string"
+						},
+						"noTasks": {
+							"type": "string"
+						},
+						"noTasksSubtitle": {
+							"type": "string"
+						},
+						"noTasksFound": {
+							"type": "string"
+						},
+						"noTasksMatch": {
+							"type": "string"
+						},
+						"moreCount": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"pageTitle",
+						"title",
+						"searchPlaceholder",
+						"today",
+						"noTasks",
+						"noTasksSubtitle",
+						"noTasksFound",
+						"noTasksMatch",
+						"moreCount"
 					]
 				},
 				"delete": {
@@ -7560,18 +8612,23 @@
 				"priority",
 				"boardSearchPlaceholder",
 				"view",
+				"board",
+				"gallery",
 				"common",
 				"detail",
 				"entity",
 				"relations",
 				"subtasks",
 				"properties",
+				"customFields",
+				"approval",
 				"move",
 				"popover",
 				"backlog",
 				"sort",
 				"boardFilters",
 				"gantt",
+				"calendar",
 				"delete",
 				"archive",
 				"listView",
@@ -8182,6 +9239,9 @@
 					},
 					"required": ["viewDetailsAria"]
 				},
+				"emptyColumn": {
+					"type": "string"
+				},
 				"taskDetail": {
 					"type": "object",
 					"additionalProperties": false,
@@ -8271,6 +9331,78 @@
 						}
 					},
 					"required": ["poweredBy"]
+				},
+				"approval": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"sectionTitle": {
+							"type": "string"
+						},
+						"statusApproved": {
+							"type": "string"
+						},
+						"statusChangesRequested": {
+							"type": "string"
+						},
+						"respondedAs": {
+							"type": "string"
+						},
+						"respondedOn": {
+							"type": "string"
+						},
+						"approveButton": {
+							"type": "string"
+						},
+						"requestChangesButton": {
+							"type": "string"
+						},
+						"nameLabel": {
+							"type": "string"
+						},
+						"namePlaceholder": {
+							"type": "string"
+						},
+						"nameRequired": {
+							"type": "string"
+						},
+						"noteLabel": {
+							"type": "string"
+						},
+						"notePlaceholder": {
+							"type": "string"
+						},
+						"submit": {
+							"type": "string"
+						},
+						"cancel": {
+							"type": "string"
+						},
+						"submitSuccess": {
+							"type": "string"
+						},
+						"submitError": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"sectionTitle",
+						"statusApproved",
+						"statusChangesRequested",
+						"respondedAs",
+						"respondedOn",
+						"approveButton",
+						"requestChangesButton",
+						"nameLabel",
+						"namePlaceholder",
+						"nameRequired",
+						"noteLabel",
+						"notePlaceholder",
+						"submit",
+						"cancel",
+						"submitSuccess",
+						"submitError"
+					]
 				}
 			},
 			"required": [
@@ -8279,10 +9411,12 @@
 				"readOnly",
 				"error",
 				"taskCard",
+				"emptyColumn",
 				"taskDetail",
 				"theme",
 				"copyUrl",
-				"branding"
+				"branding",
+				"approval"
 			]
 		}
 	},

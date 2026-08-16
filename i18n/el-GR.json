@@ -77,7 +77,7 @@
 				"errorToast": "Αποτυχία δημιουργίας έργου"
 			},
 			"createWorkspace": {
-				"breadcrumbLumia.PM": "LUMIA.PM",
+				"breadcrumbProductName": "LUMIA.PM",
 				"title": "Δημιουργία νέου χώρου εργασίας",
 				"description": "Δημιουργήστε έναν νέο χώρο εργασίας ορίζοντας ένα όνομα.",
 				"namePlaceholder": "Όνομα χώρου εργασίας",
@@ -372,7 +372,7 @@
 			"webhookDescription": "Στείλτε τις ειδοποιήσεις λογαριασμού στο δικό σας endpoint ως JSON.",
 			"endpointUrl": "Endpoint URL",
 			"signingSecret": "Μυστικό υπογραφής",
-			"webhookUrlPlaceholder": "https://example.com/webhooks/kaneo",
+			"webhookUrlPlaceholder": "https://example.com/webhooks/lumia-pm",
 			"webhookSecretPlaceholder": "Προαιρετικό κοινόχρηστο μυστικό",
 			"webhookSecretHintConfigured": "Ένα μυστικό υπογραφής έχει ήδη ρυθμιστεί ({{masked}}). Εισαγάγετε νέο για να το αντικαταστήσετε.",
 			"webhookSecretHintOptional": "Προαιρετικό. Το Lumia.PM υπογράφει το σώμα του αιτήματος όταν έχει οριστεί μυστικό.",
@@ -910,7 +910,7 @@
 		"genericWebhookIntegration": {
 			"connect": "Σύνδεση webhook",
 			"connected": "Συνδεδεμένο",
-			"connectionHint": "Στείλτε γεγονότα εργασιών στο δικό σας endpoint ως JSON. Περιλαμβάνεται υπογεγραμμένη κεφαλίδα X-Kaneo-Signature όταν έχει ρυθμιστεί μυστικό.",
+			"connectionHint": "Στείλτε γεγονότα εργασιών στο δικό σας endpoint ως JSON. Περιλαμβάνεται υπογεγραμμένη κεφαλίδα X-Lumia-Signature όταν έχει ρυθμιστεί μυστικό.",
 			"connectionTitle": "Σύνδεση εξερχόμενου webhook",
 			"disconnect": "Αποσύνδεση",
 			"events": {
@@ -931,7 +931,7 @@
 			"eventsTitle": "Ειδοποιήσεις γεγονότων",
 			"paused": "Σε παύση",
 			"saveChanges": "Αποθήκευση αλλαγών",
-			"secretHint": "Προαιρετικό. Αν δοθεί, το Lumia.PM υπογράφει το σώμα του αιτήματος και στέλνει το hex digest στην κεφαλίδα X-Kaneo-Signature.",
+			"secretHint": "Προαιρετικό. Αν δοθεί, το Lumia.PM υπογράφει το σώμα του αιτήματος και στέλνει το hex digest στην κεφαλίδα X-Lumia-Signature.",
 			"secretHintConfigured": "Έχει ήδη ρυθμιστεί ένα μυστικό υπογραφής ({{secret}}). Εισαγάγετε ένα νέο για να το αντικαταστήσετε.",
 			"secretLabel": "Μυστικό υπογραφής",
 			"secretPlaceholder": "Προαιρετικό κοινόχρηστο μυστικό",
@@ -949,7 +949,7 @@
 			},
 			"webhookHint": "Το Lumia.PM στέλνει αιτήματα POST με JSON payload για κάθε ενεργοποιημένο γεγονός.",
 			"webhookLabel": "URL endpoint",
-			"webhookPlaceholder": "https://example.com/webhooks/kaneo",
+			"webhookPlaceholder": "https://example.com/webhooks/lumia-pm",
 			"reminderLeadTimeLabel": "Αποστολή του webhook τόσες ώρες πριν από τη λήξη"
 		},
 		"telegramIntegration": {

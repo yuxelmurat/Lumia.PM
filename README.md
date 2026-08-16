@@ -1,75 +1,54 @@
 <p align="center">
-  <a href="https://kaneo.app">
-    <img src="https://assets.kaneo.app/logo-text.png" alt="Kaneo's logo" width="450" />
+  <a href="https://lumiapm.com">
+    <img src="https://raw.githubusercontent.com/yuxelmurat/Lumia.PM/main/apps/web/public/logo/logo.png" alt="Lumia.PM logo" width="120" />
   </a>
+</p>
+
+<h1 align="center">Lumia.PM</h1>
+
+<p align="center">
+  Project management built for interior architecture and design studios.
 </p>
 
 <div align="center">
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/usekaneo/kaneo/ci.yml?branch=main)](https://github.com/usekaneo/kaneo/actions)
-[![Discord](https://img.shields.io/discord/1326250681530843178?color=7389D8&label=&logo=discord&logoColor=ffffff)](https://discord.gg/rU4tSyhXXU)
-[![Sponsors](https://img.shields.io/github/sponsors/andrejsshell)](https://github.com/sponsors/andrejsshell)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/yuxelmurat/Lumia.PM/ci.yml?branch=main)](https://github.com/yuxelmurat/Lumia.PM/actions)
 
 </div>
 
 <div align="center">
   <h3>
-    <a href="https://kaneo.app/docs/core">Quick Start</a>
+    <a href="https://lumiapm.com">Website</a>
     <span> | </span>
-    <a href="https://kaneo.app">Website</a>
+    <a href="apps/docs">Documentation</a>
     <span> | </span>
-    <a href="https://cloud.kaneo.app">Cloud</a>
-    <span> | </span>
-    <a href="https://discord.gg/rU4tSyhXXU">Discord</a>
+    <a href="https://lumiapm.com/about">Contact</a>
   </h3>
 </div>
 
-
 <p align="center">
-  <img src="https://assets.kaneo.app/readme.png" alt="Kaneo Dashboard" />
+  <img src="https://raw.githubusercontent.com/yuxelmurat/Lumia.PM/main/apps/site/public/images/hero.png" alt="Lumia.PM dashboard" />
 </p>
 
-## Why Kaneo?
+## Why Lumia.PM?
 
-After years of using bloated, overcomplicated project management platforms that distracted from actual work, we built Kaneo to be different.
+Interior architecture and design studios don't run projects like software teams do. A render goes through rounds of revision, a client needs to approve it without ever touching a "real" project management tool, and every studio has its own brand it wants that client-facing moment to carry.
 
-The problem with most tools isn't that they lack features, it's that they have **too many**. Every notification, every unnecessary button, every complex workflow pulls your team away from what matters: **building great products**.
-
-We believe the best tools are **invisible**. They should amplify your team's natural workflow, not force you to adapt to theirs. Kaneo is built on the principle that **less is more**: every feature exists because it solves a real problem, not because it looks impressive in a demo.
+Lumia.PM is built around that workflow: plan projects and run tasks with your team internally, then share a branded, client-facing link so a client can review renders, leave pinned feedback on a specific spot in an image, and approve or request changes — without ever seeing your internal workspace.
 
 **What makes it different:**
+- **Client approval built in** — a branded link, not a login your client needs
+- **Version history on renders** — see every revision, not just the latest upload
 - **Clean interface** that focuses on your work, not the tool
 - **Self-hosted** so your data stays yours
-- **Actually fast** because we care about performance
 - **Open source** with a permissive MIT license
-
-Learn more about Kaneo's features and capabilities in our [documentation](https://kaneo.app/docs/core).
-
-## Sponsors
-
-Kaneo is open source. If you find it useful, consider [sponsoring the project](https://github.com/sponsors/andrejsshell) to help support ongoing development.
-
-<!-- sponsors --><a href="https://github.com/danielsada"><img src="https:&#x2F;&#x2F;github.com&#x2F;danielsada.png" width="60px" alt="User avatar: Daniel Sada" /></a><a href="https://github.com/randoneering"><img src="https:&#x2F;&#x2F;github.com&#x2F;randoneering.png" width="60px" alt="User avatar: (justin)randoneering" /></a><a href="https://github.com/floreabogdan"><img src="https:&#x2F;&#x2F;github.com&#x2F;floreabogdan.png" width="60px" alt="User avatar: Bogdan FLOREA" /></a><a href="https://github.com/meruw"><img src="https:&#x2F;&#x2F;github.com&#x2F;meruw.png" width="60px" alt="User avatar: meri" /></a><a href="https://github.com/barbanet"><img src="https:&#x2F;&#x2F;github.com&#x2F;barbanet.png" width="60px" alt="User avatar: Damián Culotta" /></a><!-- sponsors -->
 
 ## Getting Started
 
-### One-Click Deployment with drim
-
-For straightforward deployments, use [drim](https://github.com/usekaneo/drim) - a CLI tool that handles everything for you:
-
-```bash
-curl -fsSL https://assets.kaneo.app/install.sh | sh
-drim setup
-```
-
-That's it. Your Kaneo instance will be running with automatic HTTPS, database setup, and all services configured.
-
-Perfect for quick deployments and production setups where you want things to just work.
-
 ### Quick Start with Docker Compose
 
-The fastest way to try Kaneo is with Docker Compose. This sets up Kaneo and PostgreSQL with a single Kaneo container:
+The fastest way to try Lumia.PM is with Docker Compose. This sets up Lumia.PM and PostgreSQL with a single combined container:
 
 ```yaml
 services:
@@ -83,13 +62,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kaneo -d kaneo"]
+      test: ["CMD-SHELL", "pg_isready -U lumiapm -d lumiapm"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  kaneo:
-    image: ghcr.io/usekaneo/kaneo:latest
+  lumiapm:
+    build:
+      context: .
+      dockerfile: Dockerfile.lumiapm
     ports:
       - "5173:5173"
     env_file:
@@ -105,10 +86,10 @@ volumes:
 
 Save this as `compose.yml`, copy `.env.sample` to `.env`, uncomment `KANEO_CLIENT_URL=http://localhost:5173`, and set `POSTGRES_PASSWORD=<password>` and `AUTH_SECRET=<output of openssl rand -hex 32>`, run `docker compose up -d`, and open [http://localhost:5173](http://localhost:5173).
 
-In Docker Compose, the bundled Kaneo container reaches PostgreSQL at the service hostname `postgres`.
+In Docker Compose, the bundled container reaches PostgreSQL at the service hostname `postgres`.
 If you run the API on your host instead of inside Compose, use `localhost` or set `DATABASE_URL` explicitly.
 
-> **Important:** See our [full documentation](https://kaneo.app/docs/core) for detailed setup instructions, environment variable configuration, and troubleshooting guides.
+> **Note:** environment variables still use the `KANEO_*` prefix internally (e.g. `KANEO_CLIENT_URL`) — see [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) for the full list and why.
 
 ### Development Setup
 
@@ -116,23 +97,21 @@ For development, see our [Environment Setup Guide](ENVIRONMENT_SETUP.md) for det
 
 ### Configuration
 
-Kaneo requires several environment variables to be configured. The Docker Compose setup above handles the database automatically, but you'll need to configure environment variables for the API and web services.
-
-For complete configuration instructions, including all required environment variables, database setup for non-Docker deployments, and advanced settings, see the [documentation](https://kaneo.app/docs/core). Advanced deployments can still use the separate `ghcr.io/usekaneo/api` and `ghcr.io/usekaneo/web` images.
+Lumia.PM requires several environment variables to be configured. The Docker Compose setup above handles the database automatically, but you'll need to configure environment variables for the API and web services. See [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) for complete configuration instructions, including database setup for non-Docker deployments and advanced settings.
 
 ## Kubernetes Deployment
 
-If you're running Kubernetes, we provide a comprehensive Helm chart. Check out the [Helm chart documentation](./charts/kaneo/README.md) for detailed installation instructions, production configuration examples, TLS setup, and more.
+If you're running Kubernetes, we provide a comprehensive Helm chart. Check out the [Helm chart documentation](./charts/lumiapm/README.md) for detailed installation instructions, production configuration examples, TLS setup, and more.
 
 ## Development
 
-Want to hack on Kaneo? See our [Environment Setup Guide](ENVIRONMENT_SETUP.md) for detailed instructions on configuring environment variables and troubleshooting common issues like CORS problems.
+Want to hack on Lumia.PM? See our [Environment Setup Guide](ENVIRONMENT_SETUP.md) for detailed instructions on configuring environment variables and troubleshooting common issues like CORS problems.
 
 Quick start:
 ```bash
 # Clone and install dependencies
-git clone https://github.com/usekaneo/kaneo.git
-cd kaneo
+git clone https://github.com/yuxelmurat/Lumia.PM.git
+cd Lumia.PM
 pnpm install
 
 # Create a .env file in the root with required environment variables
@@ -142,17 +121,17 @@ pnpm install
 pnpm dev
 ```
 
-For contributing guidelines, code structure, and development best practices, check out our [contributing guide](CONTRIBUTING.md) and [documentation](https://kaneo.app/docs/core).
+For contributing guidelines, code structure, and development best practices, check out our [contributing guide](CONTRIBUTING.md).
 
 ## MCP Server
 
-Kaneo has an official [MCP (Model Context Protocol) server](https://kaneo.app/docs/core/integrations/mcp), so AI tools like Claude, Cursor, and other MCP clients can manage your tasks, projects, and labels. Every instance ships a built-in HTTP MCP endpoint at `/api/mcp`, and for stdio clients there is the official [@kaneo/mcp](https://www.npmjs.com/package/@kaneo/mcp) package on npm (`npx -y @kaneo/mcp`).
+Lumia.PM ships a built-in HTTP MCP endpoint at `/api/mcp` so AI tools like Claude, Cursor, and other MCP clients can manage your tasks, projects, and labels. A stdio client package is also available on npm (`npx -y @kaneo/mcp`) — the package name is a legacy of this project's origins as a fork of [Kaneo](https://github.com/usekaneo/kaneo) and has not been republished under a new name.
 
 ## Community
 
-- **[Discord](https://discord.gg/rU4tSyhXXU)** - Chat with users and contributors
-- **[GitHub Issues](https://github.com/usekaneo/kaneo/issues)** - Bug reports and feature requests
-- **[Documentation](https://kaneo.app/docs/core)** - Detailed guides, API docs, and tutorials
+- **[GitHub Issues](https://github.com/yuxelmurat/Lumia.PM/issues)** - Bug reports and feature requests
+- **[Documentation](apps/docs)** - Setup guides and API docs
+- **Email** - [help@lumiapm.com](mailto:help@lumiapm.com)
 
 ## Contributing
 
@@ -160,9 +139,14 @@ We're always looking for help, whether that's:
 - Reporting bugs or suggesting features
 - Improving documentation
 - Contributing code
-- Helping other users on Discord
 
 Check out [CONTRIBUTING.md](CONTRIBUTING.md) for the details on how to get involved.
+
+## About
+
+Lumia.PM is a product of Lumia.app, a software brand built by Murat Yüksel. Read more on the [about page](https://lumiapm.com/about).
+
+This project started as a fork of [Kaneo](https://github.com/usekaneo/kaneo), an open source project management platform originally created by Andrej Acevski, under the MIT license. The `LICENSE` file's original copyright notice is preserved as required by that license; a handful of internal package names under the `@kaneo/*` npm scope (`packages/mcp`, `packages/planka-import`, and the workspace packages in `apps/`) are also unchanged, since renaming a published npm package or workspace scope is a breaking change on its own and out of scope for this rebrand.
 
 ## License
 
@@ -170,10 +154,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-<div align="center">
-  <img src="https://repobeats.axiom.co/api/embed/3e8367ec2b2350e4fc48662df33c81dac657b833.svg" alt="Repobeats analytics image" />
-</div>
-
 <p align="center">
-  Built with ❤️ by the Kaneo team and <a href="#contributors">contributors</a>
+  Built with ❤️ by the Lumia.PM team and <a href="https://github.com/yuxelmurat/Lumia.PM/graphs/contributors">contributors</a>
 </p>

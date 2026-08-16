@@ -1,6 +1,8 @@
-# Kaneo agent guide
+# Lumia.PM agent guide
 
-Kaneo is a fast, deliberately simple, self-hosted project-management platform. The Hono API owns domain behavior and authorization, the React app consumes its typed client, PostgreSQL stores durable state, and events plus WebSockets keep clients current. Redis is optional and coordinates realtime delivery across multiple API instances.
+Lumia.PM is a fast, deliberately simple, self-hosted project-management platform built for interior architecture and design studios. The Hono API owns domain behavior and authorization, the React app consumes its typed client, PostgreSQL stores durable state, and events plus WebSockets keep clients current. Redis is optional and coordinates realtime delivery across multiple API instances.
+
+The codebase is a fork of the open-source [Kaneo](https://github.com/usekaneo/kaneo) project; internal package names under the `@kaneo/*` npm scope are a legacy of that fork and are intentionally left as-is (see the note in the root README).
 
 This is an operating guide, not a README. These rules are good defaults; explicit developer and user instructions take precedence.
 
@@ -23,7 +25,7 @@ This is an operating guide, not a README. These rules are good defaults; explici
 - `packages/libs` — shared typed Hono client and URL helpers.
 - `packages/permissions` — canonical permission vocabulary and built-in roles.
 - `packages/mcp` — published stdio MCP package.
-- `charts/kaneo` — Helm deployment surface.
+- `charts/lumiapm` — Helm deployment surface.
 - `tests/api` contains API unit tests; `tests/api-integration` contains PostgreSQL-backed integration tests.
 
 ## Boundaries that must hold
@@ -89,7 +91,7 @@ Run repository-wide checks when a change crosses packages broadly, before a requ
 
 ## Glossary
 
-- **instance**: one deployed Kaneo installation.
+- **instance**: one deployed Lumia.PM installation.
 - **workspace**: the top-level collaboration and authorization boundary.
 - **project**: a task container inside a workspace.
 - **role**: a workspace-scoped set of permission statements.

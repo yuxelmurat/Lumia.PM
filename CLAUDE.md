@@ -1,4 +1,4 @@
-# Kaneo project instructions
+# Lumia.PM project instructions
 
 Canonical guidance: [AGENTS.md](./AGENTS.md)
 
