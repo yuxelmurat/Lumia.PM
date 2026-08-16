@@ -15,6 +15,7 @@ import {
   assetTable,
   columnTable,
   externalLinkTable,
+  imagePinTable,
   labelTable,
   projectTable,
   taskApprovalTable,
@@ -299,6 +300,34 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     }
   }
 
+  const latestAssetIds = Array.from(latestByGroup.values()).map(
+    (asset) => asset.id,
+  );
+  const pinsData =
+    latestAssetIds.length > 0
+      ? await db
+          .select({
+            id: imagePinTable.id,
+            assetId: imagePinTable.assetId,
+            xPercent: imagePinTable.xPercent,
+            yPercent: imagePinTable.yPercent,
+            content: imagePinTable.content,
+            clientName: imagePinTable.clientName,
+            resolved: imagePinTable.resolved,
+            createdAt: imagePinTable.createdAt,
+          })
+          .from(imagePinTable)
+          .where(inArray(imagePinTable.assetId, latestAssetIds))
+          .orderBy(asc(imagePinTable.createdAt))
+      : [];
+  const assetPinsMap = new Map<string, typeof pinsData>();
+  for (const pin of pinsData) {
+    if (!assetPinsMap.has(pin.assetId)) {
+      assetPinsMap.set(pin.assetId, []);
+    }
+    assetPinsMap.get(pin.assetId)?.push(pin);
+  }
+
   const taskImagesMap = new Map<
     string,
     Array<{
@@ -307,6 +336,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       filename: string;
       versionNumber: number;
       createdAt: Date;
+      pins: typeof pinsData;
     }>
   >();
   for (const asset of latestByGroup.values()) {
@@ -320,6 +350,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
       filename: asset.filename,
       versionNumber: asset.versionNumber,
       createdAt: asset.createdAt,
+      pins: assetPinsMap.get(asset.id) || [],
     });
   }
   for (const images of taskImagesMap.values()) {

@@ -351,6 +351,13 @@
 			"when": 1786833611719,
 			"tag": "0049_glossy_hobgoblin",
 			"breakpoints": true
+		},
+		{
+			"idx": 50,
+			"version": "7",
+			"when": 1786842181176,
+			"tag": "0050_dazzling_james_howlett",
+			"breakpoints": true
 		}
 	]
 }

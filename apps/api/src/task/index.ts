@@ -1,4 +1,4 @@
-import { eq, or, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
@@ -7,6 +7,7 @@ import { requireEntitlement } from "../billing/require-entitlement-middleware";
 import db from "../database";
 import {
   assetTable,
+  imagePinTable,
   projectTable,
   taskTable,
   workspaceTable,
@@ -1019,6 +1020,77 @@ const task = new Hono<{
           createdAt: row.createdAt,
         })),
       );
+    },
+  )
+  .patch(
+    "/:id/image-pin/:pinId",
+    describeRoute({
+      operationId: "updateImagePin",
+      tags: ["Tasks"],
+      description: "Resolve or reopen a pin comment on a task image",
+      responses: {
+        200: {
+          description: "Pin comment updated successfully",
+          content: {
+            "application/json": { schema: resolver(v.any()) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string(), pinId: v.string() })),
+    validator("json", v.object({ resolved: v.boolean() })),
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ task: ["update"] }),
+    async (c) => {
+      const { id, pinId } = c.req.valid("param");
+      const { resolved } = c.req.valid("json");
+
+      const [pin] = await db
+        .update(imagePinTable)
+        .set({ resolved })
+        .where(and(eq(imagePinTable.id, pinId), eq(imagePinTable.taskId, id)))
+        .returning();
+
+      if (!pin) {
+        throw new HTTPException(404, { message: "Pin comment not found" });
+      }
+
+      return c.json(pin);
+    },
+  )
+  .delete(
+    "/:id/image-pin/:pinId",
+    describeRoute({
+      operationId: "deleteImagePin",
+      tags: ["Tasks"],
+      description: "Delete a pin comment on a task image",
+      responses: {
+        200: {
+          description: "Pin comment deleted successfully",
+          content: {
+            "application/json": {
+              schema: resolver(v.object({ success: v.boolean() })),
+            },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string(), pinId: v.string() })),
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ task: ["update"] }),
+    async (c) => {
+      const { id, pinId } = c.req.valid("param");
+
+      const [pin] = await db
+        .delete(imagePinTable)
+        .where(and(eq(imagePinTable.id, pinId), eq(imagePinTable.taskId, id)))
+        .returning();
+
+      if (!pin) {
+        throw new HTTPException(404, { message: "Pin comment not found" });
+      }
+
+      return c.json({ success: true });
     },
   )
   .put(

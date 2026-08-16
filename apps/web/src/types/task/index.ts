@@ -23,11 +23,22 @@ export type TaskApproval = {
   respondedAt: string;
 };
 
+export type ImagePin = {
+  id: string;
+  xPercent: number;
+  yPercent: number;
+  content: string;
+  clientName: string | null;
+  resolved: boolean;
+  createdAt: string;
+};
+
 export type TaskImage = {
   id: string;
   url: string;
   filename: string;
   versionNumber: number;
+  pins?: ImagePin[];
 };
 
 type Task = {

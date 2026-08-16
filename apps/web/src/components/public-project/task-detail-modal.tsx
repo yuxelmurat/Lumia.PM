@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogPopup } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import useAddImagePin from "@/hooks/mutations/project/use-add-image-pin";
 import useSetPublicTaskApproval from "@/hooks/mutations/project/use-set-public-task-approval";
 import { cn } from "@/lib/cn";
 import {
@@ -78,6 +79,7 @@ export function PublicTaskDetailModal({
   const [approvalPanelVisible, setApprovalPanelVisible] = useState(false);
 
   const setApproval = useSetPublicTaskApproval();
+  const addImagePin = useAddImagePin();
 
   // Discard any in-progress response form when a different task is opened
   // or the modal is closed, so it never resurfaces stale draft state.
@@ -270,7 +272,31 @@ export function PublicTaskDetailModal({
             )}
 
             {task.images && task.images.length > 0 && (
-              <TaskImageGallery images={task.images} />
+              <TaskImageGallery
+                images={task.images}
+                canAddPin
+                requireNameForPin
+                defaultPinAuthorName={
+                  clientName || task.approvalClientName || ""
+                }
+                onAddPin={async ({
+                  image,
+                  xPercent,
+                  yPercent,
+                  content,
+                  clientName: authorName,
+                }) => {
+                  await addImagePin.mutateAsync({
+                    projectId: publicToken,
+                    taskId: task.id,
+                    assetId: image.id,
+                    clientName: authorName ?? "",
+                    content,
+                    xPercent,
+                    yPercent,
+                  });
+                }}
+              />
             )}
 
             {labels.length > 0 && (

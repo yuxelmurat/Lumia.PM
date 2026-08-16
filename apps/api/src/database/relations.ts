@@ -10,6 +10,7 @@ import {
   customFieldValueTable,
   externalLinkTable,
   githubIntegrationTable,
+  imagePinTable,
   integrationTable,
   invitationTable,
   labelTable,
@@ -232,7 +233,7 @@ export const activityTableRelations = relations(activityTable, ({ one }) => ({
   }),
 }));
 
-export const assetTableRelations = relations(assetTable, ({ one }) => ({
+export const assetTableRelations = relations(assetTable, ({ one, many }) => ({
   workspace: one(workspaceTable, {
     fields: [assetTable.workspaceId],
     references: [workspaceTable.id],
@@ -251,6 +252,22 @@ export const assetTableRelations = relations(assetTable, ({ one }) => ({
   }),
   creator: one(userTable, {
     fields: [assetTable.createdBy],
+    references: [userTable.id],
+  }),
+  pins: many(imagePinTable),
+}));
+
+export const imagePinTableRelations = relations(imagePinTable, ({ one }) => ({
+  asset: one(assetTable, {
+    fields: [imagePinTable.assetId],
+    references: [assetTable.id],
+  }),
+  task: one(taskTable, {
+    fields: [imagePinTable.taskId],
+    references: [taskTable.id],
+  }),
+  user: one(userTable, {
+    fields: [imagePinTable.userId],
     references: [userTable.id],
   }),
 }));

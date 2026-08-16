@@ -3,6 +3,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   boolean,
+  doublePrecision,
   foreignKey,
   index,
   integer,
@@ -700,6 +701,49 @@ export const assetTable = pgTable(
     index("asset_activityId_idx").on(table.activityId),
     index("asset_createdBy_idx").on(table.createdBy),
     index("asset_versionGroupId_idx").on(table.versionGroupId),
+  ],
+);
+
+// A pin marks a specific point on one image version — "this corner needs
+// to be brighter" instead of a freeform note about the whole render.
+// Tied to the specific asset (version) it was placed on, not the version
+// group, so re-uploading a new version doesn't silently relocate old pins.
+export const imagePinTable = pgTable(
+  "image_pin",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => taskTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    // Percent offsets (0-100) from the image's top-left corner, so a pin's
+    // position holds regardless of the viewer's screen size or zoom level.
+    xPercent: doublePrecision("x_percent").notNull(),
+    yPercent: doublePrecision("y_percent").notNull(),
+    content: text("content").notNull(),
+    // Set for a client pinned via the public link; null for a team member
+    // pinned from the authenticated app (see userId instead).
+    clientName: text("client_name"),
+    userId: text("user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    resolved: boolean("resolved").notNull().default(false),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("image_pin_assetId_idx").on(table.assetId),
+    index("image_pin_taskId_idx").on(table.taskId),
   ],
 );
 

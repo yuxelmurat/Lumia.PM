@@ -1,8 +1,9 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
   assetTable,
+  imagePinTable,
   taskApprovalTable,
   taskTable,
   userTable,
@@ -80,6 +81,34 @@ async function getTask(taskId: string) {
       latestByGroup.set(groupKey, asset);
     }
   }
+  const latestAssetIds = Array.from(latestByGroup.values()).map(
+    (asset) => asset.id,
+  );
+  const pins =
+    latestAssetIds.length > 0
+      ? await db
+          .select({
+            id: imagePinTable.id,
+            assetId: imagePinTable.assetId,
+            xPercent: imagePinTable.xPercent,
+            yPercent: imagePinTable.yPercent,
+            content: imagePinTable.content,
+            clientName: imagePinTable.clientName,
+            resolved: imagePinTable.resolved,
+            createdAt: imagePinTable.createdAt,
+          })
+          .from(imagePinTable)
+          .where(inArray(imagePinTable.assetId, latestAssetIds))
+          .orderBy(asc(imagePinTable.createdAt))
+      : [];
+  const assetPinsMap = new Map<string, typeof pins>();
+  for (const pin of pins) {
+    if (!assetPinsMap.has(pin.assetId)) {
+      assetPinsMap.set(pin.assetId, []);
+    }
+    assetPinsMap.get(pin.assetId)?.push(pin);
+  }
+
   const images = Array.from(latestByGroup.values())
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
     .map((asset) => ({
@@ -87,6 +116,7 @@ async function getTask(taskId: string) {
       url: `${apiBaseUrl}/asset/${asset.id}`,
       filename: asset.filename,
       versionNumber: asset.versionNumber,
+      pins: assetPinsMap.get(asset.id) || [],
     }));
 
   return { ...task[0], approvals, images };

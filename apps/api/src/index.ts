@@ -54,6 +54,7 @@ import search from "./search";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
+import addImagePin from "./task/controllers/add-image-pin";
 import setTaskApproval from "./task/controllers/set-task-approval";
 import taskRelation from "./task-relation";
 import telegramIntegration from "./telegram-integration";
@@ -266,6 +267,25 @@ export function createApp() {
       });
 
       return c.json(task);
+    },
+  );
+
+  const publicProjectImagePinApi = api.put(
+    "/public-project/:projectId/task/:taskId/asset/:assetId/pin",
+    async (c) => {
+      const { projectId, taskId, assetId } = c.req.param();
+      const body = await c.req.json();
+      const pin = await addImagePin({
+        token: projectId,
+        taskId,
+        assetId,
+        clientName: body?.clientName,
+        content: body?.content,
+        xPercent: Number(body?.xPercent),
+        yPercent: Number(body?.yPercent),
+      });
+
+      return c.json(pin);
     },
   );
 
@@ -774,6 +794,7 @@ export function createApp() {
     projectApi,
     publicProjectApi,
     publicProjectApprovalApi,
+    publicProjectImagePinApi,
     searchApi,
     slackIntegrationApi,
     taskApi,
@@ -895,6 +916,7 @@ const {
   projectApi,
   publicProjectApi,
   publicProjectApprovalApi,
+  publicProjectImagePinApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
@@ -944,6 +966,7 @@ export type AppType =
   | typeof workspaceApi
   | typeof publicProjectApi
   | typeof publicProjectApprovalApi
+  | typeof publicProjectImagePinApi
   | typeof invitationPublicApi
   | typeof oauthApi;
 

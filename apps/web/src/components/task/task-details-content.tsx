@@ -8,11 +8,14 @@ import { TaskImageGallery } from "@/components/common/task-image-gallery";
 import { ExternalLinksAccordion } from "@/components/external-links/external-links-accordion";
 import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
 import { Timeline } from "@/components/ui/timeline";
+import { useDeleteImagePin } from "@/hooks/mutations/task/use-delete-image-pin";
+import { useUpdateImagePin } from "@/hooks/mutations/task/use-update-image-pin";
 import useGetActivitiesByTaskId from "@/hooks/queries/activity/use-get-activities-by-task-id";
 import useExternalLinks from "@/hooks/queries/external-link/use-external-links";
 import useGetProject from "@/hooks/queries/project/use-get-project";
 import useGetTask from "@/hooks/queries/task/use-get-task";
 import useGetTaskRelations from "@/hooks/queries/task-relation/use-get-task-relations";
+import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import type { ExternalLink } from "@/types/external-link";
 import TaskDescription from "./task-description";
 import TaskRelations from "./task-relations";
@@ -41,6 +44,10 @@ export default function TaskDetailsContent({
     useExternalLinks(taskId ?? "");
   const { data: relations = [] } = useGetTaskRelations(taskId ?? "");
   const { user } = useAuth();
+  const { canManageTasks } = useWorkspacePermission();
+  const canManagePins = canManageTasks();
+  const updateImagePin = useUpdateImagePin();
+  const deleteImagePin = useDeleteImagePin();
 
   const parentRelation = relations.find(
     (rel) => rel.relationType === "subtask" && rel.targetTaskId === taskId,
@@ -80,9 +87,18 @@ export default function TaskDetailsContent({
         <TaskTitle taskId={taskId} />
         <TaskDescription taskId={taskId} />
       </div>
-      {task?.images && task.images.length > 0 && (
+      {task?.images && task.images.length > 0 && taskId && (
         <div className="mt-4">
-          <TaskImageGallery images={task.images} />
+          <TaskImageGallery
+            images={task.images}
+            canManagePins={canManagePins}
+            onResolvePin={(pin, resolved) =>
+              updateImagePin.mutate({ id: taskId, pinId: pin.id, resolved })
+            }
+            onDeletePin={(pin) =>
+              deleteImagePin.mutate({ id: taskId, pinId: pin.id })
+            }
+          />
         </div>
       )}
       {!isLoadingExternalLinks && externalLinks.length > 0 && (

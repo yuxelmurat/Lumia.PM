@@ -1732,7 +1732,18 @@
 			"title": "Gallery",
 			"versionBadge": "v{{number}}",
 			"previous": "Previous image",
-			"next": "Next image"
+			"next": "Next image",
+			"pin": {
+				"unknownAuthor": "Anonymous",
+				"close": "Close",
+				"resolve": "Resolve",
+				"reopen": "Reopen",
+				"delete": "Delete",
+				"namePlaceholder": "Your name",
+				"contentPlaceholder": "What needs to change here?",
+				"cancel": "Cancel",
+				"submit": "Add pin"
+			}
 		},
 		"common": {
 			"selectTask": "Select task",

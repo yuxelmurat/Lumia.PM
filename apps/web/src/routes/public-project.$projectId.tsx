@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Layout, List } from "lucide-react";
-import { createElement, useEffect, useState } from "react";
+import { createElement, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
 import { CopyUrlButton } from "@/components/public-project/copy-url-button";
@@ -38,8 +38,21 @@ function RouteComponent() {
     return "kanban";
   });
 
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  // Only the id is kept in state — the task itself is looked up live from
+  // `project` on every render, so the modal always reflects the latest
+  // query data (e.g. a pin the viewer just added) instead of a stale
+  // snapshot captured at the moment the card was clicked.
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+  const selectedTask = useMemo<Task | null>(() => {
+    if (!selectedTaskId || !project) return null;
+    for (const column of project.columns) {
+      const found = column.tasks.find((task) => task.id === selectedTaskId);
+      if (found) return found;
+    }
+    return null;
+  }, [selectedTaskId, project]);
 
   useEffect(() => {
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
@@ -77,13 +90,13 @@ function RouteComponent() {
   }, [accentColor]);
 
   const handleTaskClick = (task: Task) => {
-    setSelectedTask(task);
+    setSelectedTaskId(task.id);
     setIsTaskModalOpen(true);
   };
 
   const handleTaskModalClose = () => {
     setIsTaskModalOpen(false);
-    setSelectedTask(null);
+    setSelectedTaskId(null);
   };
 
   if (isLoading) {
