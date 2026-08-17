@@ -4,7 +4,9 @@ import type { InferRequestType } from "hono/client";
 export type SetTaskPublicLinkRequest = InferRequestType<
   (typeof client)["task"][":id"]["public-link"]["$put"]
 >["param"] &
-  InferRequestType<(typeof client)["task"][":id"]["public-link"]["$put"]>["json"];
+  InferRequestType<
+    (typeof client)["task"][":id"]["public-link"]["$put"]
+  >["json"];
 
 async function setTaskPublicLink({
   id,

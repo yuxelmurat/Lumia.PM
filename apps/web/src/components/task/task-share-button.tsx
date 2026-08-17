@@ -91,7 +91,14 @@ export function TaskShareButton({ task }: TaskShareButtonProps) {
     } finally {
       savingToggleRef.current = false;
     }
-  }, [task.id, task.isPublic, task.publicLinkExpiresAt, setTaskPublicLink, refreshTask, t]);
+  }, [
+    task.id,
+    task.isPublic,
+    task.publicLinkExpiresAt,
+    setTaskPublicLink,
+    refreshTask,
+    t,
+  ]);
 
   const handleSaveExpiry = useCallback(
     async (nextValue: string) => {
@@ -177,9 +184,11 @@ export function TaskShareButton({ task }: TaskShareButtonProps) {
                   <Button
                     size="sm"
                     onClick={() => {
-                      navigator.clipboard.writeText(publicUrl).then(() =>
-                        toast.success(t("tasks:detail.share.copiedToast")),
-                      );
+                      navigator.clipboard
+                        .writeText(publicUrl)
+                        .then(() =>
+                          toast.success(t("tasks:detail.share.copiedToast")),
+                        );
                     }}
                   >
                     {t("tasks:detail.share.copy")}
@@ -256,9 +265,7 @@ export function TaskShareButton({ task }: TaskShareButtonProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose
-              render={<Button variant="outline" />}
-            >
+            <AlertDialogClose render={<Button variant="outline" />}>
               {t("common:actions.cancel")}
             </AlertDialogClose>
             <Button variant="destructive" onClick={handleRegenerate}>

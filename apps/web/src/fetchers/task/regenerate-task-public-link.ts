@@ -8,9 +8,7 @@ export type RegenerateTaskPublicLinkRequest = InferRequestType<
 async function regenerateTaskPublicLink({
   id,
 }: RegenerateTaskPublicLinkRequest) {
-  const response = await client.task[":id"]["public-link"][
-    "regenerate"
-  ].$post({
+  const response = await client.task[":id"]["public-link"].regenerate.$post({
     param: { id },
   });
 

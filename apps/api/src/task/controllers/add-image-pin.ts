@@ -58,7 +58,12 @@ function validatePinInput({
 async function insertImagePin(
   taskId: string,
   assetId: string,
-  { trimmedClientName, trimmedContent, xPercent, yPercent }: {
+  {
+    trimmedClientName,
+    trimmedContent,
+    xPercent,
+    yPercent,
+  }: {
     trimmedClientName: string;
     trimmedContent: string;
     xPercent: number;

@@ -35,12 +35,12 @@ import getTask from "./controllers/get-task";
 import getTasks from "./controllers/get-tasks";
 import importTasks from "./controllers/import-tasks";
 import moveTask from "./controllers/move-task";
+import regenerateTaskPublicLink from "./controllers/regenerate-task-public-link";
 import {
   requireBulkTaskEntitlement,
   requireBulkTaskPermission,
   requireTaskAssigneePermission,
 } from "./controllers/require-task-permission";
-import regenerateTaskPublicLink from "./controllers/regenerate-task-public-link";
 import resetTaskApproval from "./controllers/reset-task-approval";
 import setTaskPublicLink from "./controllers/set-task-public-link";
 import updateTask from "./controllers/update-task";

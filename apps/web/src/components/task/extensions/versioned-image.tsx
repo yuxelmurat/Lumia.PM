@@ -101,7 +101,6 @@ function VersionedImageView({
       className="kaneo-versioned-image group/kvi relative inline-block align-top max-w-full"
     >
       {src ? (
-        // biome-ignore lint/a11y/useAltText: alt is applied via the attribute above
         <img
           src={src}
           alt={alt}
@@ -180,7 +179,6 @@ function VersionedImageView({
                     setVersions(null);
                   }}
                 >
-                  {/* biome-ignore lint/a11y/useAltText: decorative thumbnail, label is the sibling span */}
                   <img
                     src={version.url}
                     alt=""

@@ -16,7 +16,7 @@ async function cancelSubscription(workspaceId: string) {
     .from(workspaceBillingTable)
     .where(eq(workspaceBillingTable.workspaceId, workspaceId));
 
-  if (!billing || !billing.plan) {
+  if (!billing?.plan) {
     throw new HTTPException(400, {
       message: "This workspace has no subscription to cancel",
     });

@@ -1230,7 +1230,7 @@ export default function CommentEditor({
       const resolvedLanguage = language === "auto" ? "" : language;
       const { nodePos } = hoveredCodeBlock;
       const node = editor.state.doc.nodeAt(nodePos);
-      if (!node || node.type.name !== "codeBlock") return;
+      if (node?.type.name !== "codeBlock") return;
 
       editor
         .chain()
@@ -1477,7 +1477,7 @@ export default function CommentEditor({
   const copyHoveredCodeBlock = useCallback(async () => {
     if (!editor || !hoveredCodeBlock) return;
     const node = editor.state.doc.nodeAt(hoveredCodeBlock.nodePos);
-    if (!node || node.type.name !== "codeBlock") return;
+    if (node?.type.name !== "codeBlock") return;
 
     const content = node.textContent || "";
     if (!content) return;

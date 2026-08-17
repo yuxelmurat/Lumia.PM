@@ -6,9 +6,7 @@ export type RegeneratePublicLinkRequest = InferRequestType<
 >["param"];
 
 async function regeneratePublicLink({ id }: RegeneratePublicLinkRequest) {
-  const response = await client.project[":id"]["public-link"][
-    "regenerate"
-  ].$post({
+  const response = await client.project[":id"]["public-link"].regenerate.$post({
     param: { id },
   });
 
