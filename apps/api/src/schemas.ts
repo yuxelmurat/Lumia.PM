@@ -137,6 +137,9 @@ export const taskSchema = v.object({
   approvalNote: v.optional(v.nullable(v.string())),
   approvalClientName: v.optional(v.nullable(v.string())),
   approvalRespondedAt: v.optional(v.nullable(v.date())),
+  isPublic: v.optional(v.nullable(v.boolean())),
+  publicShareToken: v.optional(v.nullable(v.string())),
+  publicLinkExpiresAt: v.optional(v.nullable(v.date())),
 });
 
 export const activitySchema = v.object({

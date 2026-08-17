@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import useAddImagePin from "@/hooks/mutations/project/use-add-image-pin";
 import useSetPublicTaskApproval from "@/hooks/mutations/project/use-set-public-task-approval";
+import useAddImagePinByToken from "@/hooks/mutations/task/use-add-image-pin-by-token";
+import useSetPublicTaskApprovalByToken from "@/hooks/mutations/task/use-set-public-task-approval-by-token";
 import { cn } from "@/lib/cn";
 import {
   dueDateStatusColors,
@@ -50,8 +52,19 @@ type PublicTaskDetailModalProps = {
   projectSlug: string;
   // The public approval route is keyed by the project's public share token,
   // not its real id — `task.projectId` is the real internal id (from the
-  // task record) and must never be sent here.
+  // task record) and must never be sent here. When `shareMode` is "task",
+  // this is instead the task's own share token (see public-task.$token.tsx)
+  // and there's no separate project link to leak.
   publicToken: string;
+  // "project": approve/pin calls go through /public-project/:token/task/:id/...
+  // (used from the project board modal). "task": calls go through
+  // /public-task/:token/... directly — the task-only share link, which
+  // never exposes the rest of the project. Defaults to "project" so the
+  // existing board modal usage is unaffected.
+  shareMode?: "project" | "task";
+  // Renders the same content without the Dialog chrome, for the standalone
+  // /public-task/:token page. The board modal usage leaves this off.
+  standalone?: boolean;
   // The modal is opened from any column, so it resolves completion by slug
   // rather than being told; without these it falls back to the slug heuristic.
   columns?: Array<{ slug: string; isFinal: boolean }>;
@@ -63,6 +76,8 @@ export function PublicTaskDetailModal({
   task,
   projectSlug,
   publicToken,
+  shareMode = "project",
+  standalone = false,
   columns,
   open,
   onOpenChange,
@@ -78,8 +93,14 @@ export function PublicTaskDetailModal({
   const [nameError, setNameError] = useState(false);
   const [approvalPanelVisible, setApprovalPanelVisible] = useState(false);
 
-  const setApproval = useSetPublicTaskApproval();
-  const addImagePin = useAddImagePin();
+  // Both hook sets are always instantiated (rules of hooks) — only one
+  // side's mutateAsync is ever actually called, picked by `shareMode`.
+  const setProjectApproval = useSetPublicTaskApproval();
+  const setTaskApproval = useSetPublicTaskApprovalByToken();
+  const addProjectImagePin = useAddImagePin();
+  const addTaskImagePin = useAddImagePinByToken();
+  const setApproval =
+    shareMode === "task" ? setTaskApproval : setProjectApproval;
 
   // Discard any in-progress response form when a different task is opened
   // or the modal is closed, so it never resurfaces stale draft state.
@@ -129,13 +150,24 @@ export function PublicTaskDetailModal({
     }
 
     try {
-      await setApproval.mutateAsync({
-        projectId: publicToken,
-        taskId: task.id,
-        status: pendingAction,
-        clientName: trimmedName,
-        note: pendingAction === "changes_requested" ? note.trim() : undefined,
-      });
+      if (shareMode === "task") {
+        await setTaskApproval.mutateAsync({
+          token: publicToken,
+          status: pendingAction,
+          clientName: trimmedName,
+          note:
+            pendingAction === "changes_requested" ? note.trim() : undefined,
+        });
+      } else {
+        await setProjectApproval.mutateAsync({
+          projectId: publicToken,
+          taskId: task.id,
+          status: pendingAction,
+          clientName: trimmedName,
+          note:
+            pendingAction === "changes_requested" ? note.trim() : undefined,
+        });
+      }
       toast.success(t("publicProject:approval.submitSuccess"));
       closeApprovalForm();
     } catch (error) {
@@ -191,27 +223,34 @@ export function PublicTaskDetailModal({
       ? t(`tasks:priority.${task.priority}`)
       : "";
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup className="w-full max-w-4xl max-h-[85vh] p-0">
-        <div className="bg-background border border-border rounded-xl flex flex-col max-h-[85vh] shadow-lg">
+  const body = (
+    <div
+      className={cn(
+        "bg-background border border-border rounded-xl flex flex-col shadow-lg",
+        standalone ? "max-h-[calc(100svh-3rem)]" : "max-h-[85vh]",
+      )}
+    >
           <div className="flex items-center justify-between px-4 py-3 border-b border-border/70 shrink-0">
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <span className="text-sm font-medium text-muted-foreground shrink-0">
-                {projectSlug.toUpperCase()}-{task.number}
-              </span>
+              {projectSlug ? (
+                <span className="text-sm font-medium text-muted-foreground shrink-0">
+                  {projectSlug.toUpperCase()}-{task.number}
+                </span>
+              ) : null}
               {statusLabel ? (
                 <span className="text-xs text-muted-foreground px-1.5 py-0.5 bg-muted rounded-md shrink-0">
                   {statusLabel}
                 </span>
               ) : null}
             </div>
-            <DialogClose
-              className="shrink-0 p-1.5 hover:bg-muted rounded transition-colors"
-              render={<button type="button" />}
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </DialogClose>
+            {standalone ? null : (
+              <DialogClose
+                className="shrink-0 p-1.5 hover:bg-muted rounded transition-colors"
+                render={<button type="button" />}
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </DialogClose>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
@@ -286,15 +325,26 @@ export function PublicTaskDetailModal({
                   content,
                   clientName: authorName,
                 }) => {
-                  await addImagePin.mutateAsync({
-                    projectId: publicToken,
-                    taskId: task.id,
-                    assetId: image.id,
-                    clientName: authorName ?? "",
-                    content,
-                    xPercent,
-                    yPercent,
-                  });
+                  if (shareMode === "task") {
+                    await addTaskImagePin.mutateAsync({
+                      token: publicToken,
+                      assetId: image.id,
+                      clientName: authorName ?? "",
+                      content,
+                      xPercent,
+                      yPercent,
+                    });
+                  } else {
+                    await addProjectImagePin.mutateAsync({
+                      projectId: publicToken,
+                      taskId: task.id,
+                      assetId: image.id,
+                      clientName: authorName ?? "",
+                      content,
+                      xPercent,
+                      yPercent,
+                    });
+                  }
                 }}
               />
             )}
@@ -594,6 +644,16 @@ export function PublicTaskDetailModal({
             </div>
           </div>
         </div>
+  );
+
+  if (standalone) {
+    return body;
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogPopup className="w-full max-w-4xl max-h-[85vh] p-0">
+        {body}
       </DialogPopup>
     </Dialog>
   );

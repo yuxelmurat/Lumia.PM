@@ -9,6 +9,7 @@ import {
   TaskPropertiesSidebarSkeleton,
 } from "@/components/task/task-page-skeleton";
 import TaskPropertiesSidebar from "@/components/task/task-properties-sidebar";
+import { TaskShareButton } from "@/components/task/task-share-button";
 import { Button } from "@/components/ui/button";
 import useGetActivitiesByTaskId from "@/hooks/queries/activity/use-get-activities-by-task-id";
 import useGetProject from "@/hooks/queries/project/use-get-project";
@@ -57,6 +58,11 @@ function RouteComponent() {
       taskId={taskId}
       projectId={projectId}
       workspaceId={workspaceId}
+      headerActions={
+        !isLoading && !isTaskError && task ? (
+          <TaskShareButton task={task} />
+        ) : null
+      }
       rightSidebar={
         isLoading ? (
           <TaskPropertiesSidebarSkeleton className="h-full w-full lg:w-72 xl:w-80 flex flex-col gap-2" />

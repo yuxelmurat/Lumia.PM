@@ -470,6 +470,16 @@ export const taskTable = pgTable(
     approvalNote: text("approval_note"),
     approvalClientName: text("approval_client_name"),
     approvalRespondedAt: timestamp("approval_responded_at", { mode: "date" }),
+    // A single task can be shared on its own — the client only sees this
+    // task (title, description, images, approval) rather than the whole
+    // project board. Mirrors project.publicShareToken/isPublic/expiry so a
+    // leaked link can be revoked by regenerating the token without losing
+    // the approval history.
+    isPublic: boolean("is_public").default(false),
+    publicShareToken: text("public_share_token").unique(),
+    publicLinkExpiresAt: timestamp("public_link_expires_at", {
+      mode: "date",
+    }),
   },
   (table) => [
     index("task_projectId_idx").on(table.projectId),

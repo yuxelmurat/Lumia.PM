@@ -14,6 +14,39 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:9000:9000"
+    env_file:
+      - .env
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY}
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    env_file:
+      - .env
+    entrypoint: >
+      sh -c "
+      mc alias set local http://minio:9000 $${S3_ACCESS_KEY_ID} $${S3_SECRET_ACCESS_KEY} &&
+      mc mb -p local/$${S3_BUCKET} &&
+      exit 0
+      "
+
   lumiapm:
     build:
       context: .
@@ -25,6 +58,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5173/api/health"]
@@ -41,3 +76,4 @@ services:
 
 volumes:
   postgres_data:
+  minio_data:

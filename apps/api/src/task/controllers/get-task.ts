@@ -31,6 +31,9 @@ async function getTask(taskId: string) {
       approvalNote: taskTable.approvalNote,
       approvalClientName: taskTable.approvalClientName,
       approvalRespondedAt: taskTable.approvalRespondedAt,
+      isPublic: taskTable.isPublic,
+      publicShareToken: taskTable.publicShareToken,
+      publicLinkExpiresAt: taskTable.publicLinkExpiresAt,
     })
     .from(taskTable)
     .leftJoin(userTable, eq(taskTable.userId, userTable.id))

@@ -3,22 +3,17 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { assetTable, imagePinTable, taskTable } from "../../database/schema";
 import { resolvePublicProject } from "../../utils/resolve-public-project";
+import { resolvePublicTask } from "../../utils/resolve-public-task";
 
 const MAX_CLIENT_NAME_LENGTH = 100;
 const MAX_CONTENT_LENGTH = 1000;
 
-async function addImagePin({
-  token,
-  taskId,
-  assetId,
+function validatePinInput({
   clientName,
   content,
   xPercent,
   yPercent,
 }: {
-  token: string;
-  taskId: string;
-  assetId: string;
   clientName: string;
   content: string;
   xPercent: number;
@@ -57,17 +52,19 @@ async function addImagePin({
     });
   }
 
-  // Validates the link itself (exists, public, not expired) before ever
-  // touching the task, same as the approval route.
-  const project = await resolvePublicProject(token);
+  return { trimmedClientName, trimmedContent };
+}
 
-  const task = await db.query.taskTable.findFirst({
-    where: eq(taskTable.id, taskId),
-  });
-  if (!task || task.projectId !== project.id) {
-    throw new HTTPException(404, { message: "Task not found" });
-  }
-
+async function insertImagePin(
+  taskId: string,
+  assetId: string,
+  { trimmedClientName, trimmedContent, xPercent, yPercent }: {
+    trimmedClientName: string;
+    trimmedContent: string;
+    xPercent: number;
+    yPercent: number;
+  },
+) {
   const asset = await db.query.assetTable.findFirst({
     where: eq(assetTable.id, assetId),
   });
@@ -92,6 +89,83 @@ async function addImagePin({
   }
 
   return pin;
+}
+
+async function addImagePin({
+  token,
+  taskId,
+  assetId,
+  clientName,
+  content,
+  xPercent,
+  yPercent,
+}: {
+  token: string;
+  taskId: string;
+  assetId: string;
+  clientName: string;
+  content: string;
+  xPercent: number;
+  yPercent: number;
+}) {
+  const { trimmedClientName, trimmedContent } = validatePinInput({
+    clientName,
+    content,
+    xPercent,
+    yPercent,
+  });
+
+  // Validates the link itself (exists, public, not expired) before ever
+  // touching the task, same as the approval route.
+  const project = await resolvePublicProject(token);
+
+  const task = await db.query.taskTable.findFirst({
+    where: eq(taskTable.id, taskId),
+  });
+  if (!task || task.projectId !== project.id) {
+    throw new HTTPException(404, { message: "Task not found" });
+  }
+
+  return insertImagePin(taskId, assetId, {
+    trimmedClientName,
+    trimmedContent,
+    xPercent,
+    yPercent,
+  });
+}
+
+// Task-level share link: the token resolves directly to one task, so
+// there's no separate `taskId` to cross-check against a project.
+export async function addImagePinByTaskToken({
+  token,
+  assetId,
+  clientName,
+  content,
+  xPercent,
+  yPercent,
+}: {
+  token: string;
+  assetId: string;
+  clientName: string;
+  content: string;
+  xPercent: number;
+  yPercent: number;
+}) {
+  const { trimmedClientName, trimmedContent } = validatePinInput({
+    clientName,
+    content,
+    xPercent,
+    yPercent,
+  });
+
+  const task = await resolvePublicTask(token);
+
+  return insertImagePin(task.id, assetId, {
+    trimmedClientName,
+    trimmedContent,
+    xPercent,
+    yPercent,
+  });
 }
 
 export default addImagePin;

@@ -23,6 +23,7 @@ import { Route as DeviceIndexRouteImport } from './routes/device/index'
 import { Route as DeviceApproveRouteImport } from './routes/device/approve'
 import { Route as McpAuthorizeRouteImport } from './routes/mcp.authorize'
 import { Route as PublicProjectProjectIdRouteImport } from './routes/public-project.$projectId'
+import { Route as PublicTaskTokenRouteImport } from './routes/public-task.$token'
 import { Route as LayoutAuthenticatedDashboardRouteImport } from './routes/_layout/_authenticated/dashboard'
 import { Route as LayoutAuthenticatedInvitationsRouteImport } from './routes/_layout/_authenticated/invitations'
 import { Route as LayoutAuthenticatedOnboardingRouteImport } from './routes/_layout/_authenticated/onboarding'
@@ -127,6 +128,11 @@ const McpAuthorizeRoute = McpAuthorizeRouteImport.update({
 const PublicProjectProjectIdRoute = PublicProjectProjectIdRouteImport.update({
   id: '/public-project/$projectId',
   path: '/public-project/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicTaskTokenRoute = PublicTaskTokenRouteImport.update({
+  id: '/public-task/$token',
+  path: '/public-task/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutAuthenticatedDashboardRoute =
@@ -392,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/device/approve': typeof DeviceApproveRoute
   '/mcp/authorize': typeof McpAuthorizeRoute
   '/public-project/$projectId': typeof PublicProjectProjectIdRoute
+  '/public-task/$token': typeof PublicTaskTokenRoute
   '/device/': typeof DeviceIndexRoute
   '/dashboard': typeof LayoutAuthenticatedDashboardRouteWithChildren
   '/invitations': typeof LayoutAuthenticatedInvitationsRoute
@@ -442,6 +449,7 @@ export interface FileRoutesByTo {
   '/device/approve': typeof DeviceApproveRoute
   '/mcp/authorize': typeof McpAuthorizeRoute
   '/public-project/$projectId': typeof PublicProjectProjectIdRoute
+  '/public-task/$token': typeof PublicTaskTokenRoute
   '/device': typeof DeviceIndexRoute
   '/invitations': typeof LayoutAuthenticatedInvitationsRoute
   '/onboarding': typeof LayoutAuthenticatedOnboardingRoute
@@ -494,6 +502,7 @@ export interface FileRoutesById {
   '/device/approve': typeof DeviceApproveRoute
   '/mcp/authorize': typeof McpAuthorizeRoute
   '/public-project/$projectId': typeof PublicProjectProjectIdRoute
+  '/public-task/$token': typeof PublicTaskTokenRoute
   '/device/': typeof DeviceIndexRoute
   '/_layout/_authenticated/dashboard': typeof LayoutAuthenticatedDashboardRouteWithChildren
   '/_layout/_authenticated/invitations': typeof LayoutAuthenticatedInvitationsRoute
@@ -547,6 +556,7 @@ export interface FileRouteTypes {
     | '/device/approve'
     | '/mcp/authorize'
     | '/public-project/$projectId'
+    | '/public-task/$token'
     | '/device/'
     | '/dashboard'
     | '/invitations'
@@ -597,6 +607,7 @@ export interface FileRouteTypes {
     | '/device/approve'
     | '/mcp/authorize'
     | '/public-project/$projectId'
+    | '/public-task/$token'
     | '/device'
     | '/invitations'
     | '/onboarding'
@@ -648,6 +659,7 @@ export interface FileRouteTypes {
     | '/device/approve'
     | '/mcp/authorize'
     | '/public-project/$projectId'
+    | '/public-task/$token'
     | '/device/'
     | '/_layout/_authenticated/dashboard'
     | '/_layout/_authenticated/invitations'
@@ -696,6 +708,7 @@ export interface RootRouteChildren {
   TestErrorRoute: typeof TestErrorRoute
   McpAuthorizeRoute: typeof McpAuthorizeRoute
   PublicProjectProjectIdRoute: typeof PublicProjectProjectIdRoute
+  PublicTaskTokenRoute: typeof PublicTaskTokenRoute
   InvitationAcceptInviteIdRoute: typeof InvitationAcceptInviteIdRoute
 }
 
@@ -797,6 +810,13 @@ declare module '@tanstack/react-router' {
       path: '/public-project/$projectId'
       fullPath: '/public-project/$projectId'
       preLoaderRoute: typeof PublicProjectProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public-task/$token': {
+      id: '/public-task/$token'
+      path: '/public-task/$token'
+      fullPath: '/public-task/$token'
+      preLoaderRoute: typeof PublicTaskTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout/_authenticated/dashboard': {
@@ -1295,6 +1315,7 @@ const rootRouteChildren: RootRouteChildren = {
   TestErrorRoute: TestErrorRoute,
   McpAuthorizeRoute: McpAuthorizeRoute,
   PublicProjectProjectIdRoute: PublicProjectProjectIdRoute,
+  PublicTaskTokenRoute: PublicTaskTokenRoute,
   InvitationAcceptInviteIdRoute: InvitationAcceptInviteIdRoute,
 }
 export const routeTree = rootRouteImport

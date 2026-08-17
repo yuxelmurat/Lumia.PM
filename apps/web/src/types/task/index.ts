@@ -67,6 +67,9 @@ type Task = {
   approvalRespondedAt?: string | null;
   approvals?: TaskApproval[];
   images?: TaskImage[];
+  isPublic?: boolean | null;
+  publicShareToken?: string | null;
+  publicLinkExpiresAt?: string | null;
 };
 
 export default Task;

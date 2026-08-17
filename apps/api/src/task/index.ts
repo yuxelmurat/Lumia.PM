@@ -39,7 +39,9 @@ import {
   requireBulkTaskPermission,
   requireTaskAssigneePermission,
 } from "./controllers/require-task-permission";
+import regenerateTaskPublicLink from "./controllers/regenerate-task-public-link";
 import resetTaskApproval from "./controllers/reset-task-approval";
+import setTaskPublicLink from "./controllers/set-task-public-link";
 import updateTask from "./controllers/update-task";
 import updateTaskAssignee from "./controllers/update-task-assignee";
 import updateTaskDescription from "./controllers/update-task-description";
@@ -551,6 +553,72 @@ const task = new Hono<{
     },
   )
   .put(
+    "/:id/public-link",
+    describeRoute({
+      operationId: "setTaskPublicLink",
+      tags: ["Tasks"],
+      description:
+        "Share (or unshare) a single task's own client-review link — the client sees only this task, never the rest of the project board",
+      responses: {
+        200: {
+          description: "Task sharing updated successfully",
+          content: {
+            "application/json": { schema: resolver(taskSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    validator(
+      "json",
+      v.object({
+        isPublic: v.boolean(),
+        expiresAt: v.nullable(v.string()),
+      }),
+    ),
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ project: ["share"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const { isPublic, expiresAt } = c.req.valid("json");
+
+      const task = await setTaskPublicLink(
+        id,
+        isPublic,
+        expiresAt ? new Date(expiresAt) : null,
+      );
+
+      return c.json(task);
+    },
+  )
+  .post(
+    "/:id/public-link/regenerate",
+    describeRoute({
+      operationId: "regenerateTaskPublicLink",
+      tags: ["Tasks"],
+      description:
+        "Rotate the task's public share token, invalidating any previously shared link",
+      responses: {
+        200: {
+          description: "Public link regenerated successfully",
+          content: {
+            "application/json": { schema: resolver(taskSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ project: ["share"] }),
+    async (c) => {
+      const { id } = c.req.valid("param");
+
+      const task = await regenerateTaskPublicLink(id);
+
+      return c.json(task);
+    },
+  )
+  .put(
     "/priority/:id",
     describeRoute({
       operationId: "updateTaskPriority",
@@ -814,6 +882,7 @@ const task = new Hono<{
           projectId: taskTable.projectId,
           workspaceId: workspaceTable.id,
           isPublic: projectTable.isPublic,
+          taskIsPublic: taskTable.isPublic,
           watermarkEnabled: workspaceTable.watermarkEnabled,
           watermarkImageUrl: workspaceTable.watermarkImageUrl,
           workspaceLogo: workspaceTable.logo,
@@ -849,10 +918,11 @@ const task = new Hono<{
       }
 
       // Branding/deterrent watermark for renders shared via the public-
-      // project link — see watermark-task-image.ts. No-op (and never
-      // throws) unless the project is public and the workspace opted in.
+      // project or public-task link — see watermark-task-image.ts. No-op
+      // (and never throws) unless one of those is public and the workspace
+      // opted in.
       await watermarkTaskImageIfNeeded({
-        isPublic: Boolean(taskContext.isPublic),
+        isPublic: Boolean(taskContext.isPublic || taskContext.taskIsPublic),
         watermarkEnabled: Boolean(taskContext.watermarkEnabled),
         watermarkImageUrl:
           taskContext.watermarkImageUrl || taskContext.workspaceLogo,

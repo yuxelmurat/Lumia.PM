@@ -4,6 +4,7 @@ import db from "../../database";
 import { taskApprovalTable, taskTable } from "../../database/schema";
 import { publishEvent } from "../../events";
 import { resolvePublicProject } from "../../utils/resolve-public-project";
+import { resolvePublicTask } from "../../utils/resolve-public-task";
 
 const VALID_APPROVAL_STATUSES = ["approved", "changes_requested"] as const;
 type ApprovalStatus = (typeof VALID_APPROVAL_STATUSES)[number];
@@ -11,15 +12,11 @@ type ApprovalStatus = (typeof VALID_APPROVAL_STATUSES)[number];
 const MAX_CLIENT_NAME_LENGTH = 100;
 const MAX_NOTE_LENGTH = 2000;
 
-async function setTaskApproval({
-  token,
-  taskId,
+function validateApprovalInput({
   status,
   clientName,
   note,
 }: {
-  token: string;
-  taskId: string;
   status: string;
   clientName: string;
   note?: string;
@@ -49,20 +46,20 @@ async function setTaskApproval({
     });
   }
 
-  // Validates the link itself (exists, public, not expired) before ever
-  // touching the task, same as the read route.
-  const project = await resolvePublicProject(token);
+  return { trimmedClientName, trimmedNote };
+}
 
-  const task = await db.query.taskTable.findFirst({
-    where: eq(taskTable.id, taskId),
-  });
-
-  if (!task || task.projectId !== project.id) {
-    throw new HTTPException(404, {
-      message: "Task not found",
-    });
-  }
-
+// Shared by both public entry points (project-scoped and task-scoped
+// links) once each has resolved and authorized its own token — this is
+// the actual write, kept in one place so the two flows can't drift.
+async function recordTaskApproval(
+  taskId: string,
+  {
+    status,
+    trimmedClientName,
+    trimmedNote,
+  }: { status: string; trimmedClientName: string; trimmedNote?: string },
+) {
   const [updatedTask] = await db
     .update(taskTable)
     .set({
@@ -114,6 +111,74 @@ async function setTaskApproval({
   });
 
   return updatedTask;
+}
+
+async function setTaskApproval({
+  token,
+  taskId,
+  status,
+  clientName,
+  note,
+}: {
+  token: string;
+  taskId: string;
+  status: string;
+  clientName: string;
+  note?: string;
+}) {
+  const { trimmedClientName, trimmedNote } = validateApprovalInput({
+    status,
+    clientName,
+    note,
+  });
+
+  // Validates the link itself (exists, public, not expired) before ever
+  // touching the task, same as the read route.
+  const project = await resolvePublicProject(token);
+
+  const task = await db.query.taskTable.findFirst({
+    where: eq(taskTable.id, taskId),
+  });
+
+  if (!task || task.projectId !== project.id) {
+    throw new HTTPException(404, {
+      message: "Task not found",
+    });
+  }
+
+  return recordTaskApproval(taskId, {
+    status,
+    trimmedClientName,
+    trimmedNote,
+  });
+}
+
+// Task-level share link: the token resolves directly to one task, so
+// there's no separate `taskId` to cross-check against a project.
+export async function setTaskApprovalByTaskToken({
+  token,
+  status,
+  clientName,
+  note,
+}: {
+  token: string;
+  status: string;
+  clientName: string;
+  note?: string;
+}) {
+  const { trimmedClientName, trimmedNote } = validateApprovalInput({
+    status,
+    clientName,
+    note,
+  });
+
+  const task = await resolvePublicTask(token);
+
+  return recordTaskApproval(task.id, {
+    status,
+    trimmedClientName,
+    trimmedNote,
+  });
 }
 
 export default setTaskApproval;

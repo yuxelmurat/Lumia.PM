@@ -54,8 +54,13 @@ import search from "./search";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
 import task from "./task";
-import addImagePin from "./task/controllers/add-image-pin";
-import setTaskApproval from "./task/controllers/set-task-approval";
+import addImagePin, {
+  addImagePinByTaskToken,
+} from "./task/controllers/add-image-pin";
+import { getPublicTask } from "./task/controllers/get-public-task";
+import setTaskApproval, {
+  setTaskApprovalByTaskToken,
+} from "./task/controllers/set-task-approval";
 import taskRelation from "./task-relation";
 import telegramIntegration from "./telegram-integration";
 import timeEntry from "./time-entry";
@@ -278,6 +283,50 @@ export function createApp() {
       const pin = await addImagePin({
         token: projectId,
         taskId,
+        assetId,
+        clientName: body?.clientName,
+        content: body?.content,
+        xPercent: Number(body?.xPercent),
+        yPercent: Number(body?.yPercent),
+      });
+
+      return c.json(pin);
+    },
+  );
+
+  // Task-level share link: `:token` resolves directly to one task via
+  // resolvePublicTask, so the client only ever sees that task, never the
+  // rest of the project board.
+  const publicTaskApi = api.get("/public-task/:token", async (c) => {
+    const { token } = c.req.param();
+    const task = await getPublicTask(token);
+
+    return c.json(task);
+  });
+
+  const publicTaskApprovalApi = api.put(
+    "/public-task/:token/approval",
+    async (c) => {
+      const { token } = c.req.param();
+      const body = await c.req.json();
+      const task = await setTaskApprovalByTaskToken({
+        token,
+        status: body?.status,
+        clientName: body?.clientName,
+        note: body?.note,
+      });
+
+      return c.json(task);
+    },
+  );
+
+  const publicTaskImagePinApi = api.put(
+    "/public-task/:token/asset/:assetId/pin",
+    async (c) => {
+      const { token, assetId } = c.req.param();
+      const body = await c.req.json();
+      const pin = await addImagePinByTaskToken({
+        token,
         assetId,
         clientName: body?.clientName,
         content: body?.content,
@@ -795,6 +844,9 @@ export function createApp() {
     publicProjectApi,
     publicProjectApprovalApi,
     publicProjectImagePinApi,
+    publicTaskApi,
+    publicTaskApprovalApi,
+    publicTaskImagePinApi,
     searchApi,
     slackIntegrationApi,
     taskApi,
@@ -917,6 +969,9 @@ const {
   publicProjectApi,
   publicProjectApprovalApi,
   publicProjectImagePinApi,
+  publicTaskApi,
+  publicTaskApprovalApi,
+  publicTaskImagePinApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
@@ -967,6 +1022,9 @@ export type AppType =
   | typeof publicProjectApi
   | typeof publicProjectApprovalApi
   | typeof publicProjectImagePinApi
+  | typeof publicTaskApi
+  | typeof publicTaskApprovalApi
+  | typeof publicTaskImagePinApi
   | typeof invitationPublicApi
   | typeof oauthApi;
 
