@@ -344,9 +344,17 @@ export default function CommentEditor({
 
   const handleAssetFileUpload = useCallback(
     async (file: File, targetEditor?: Editor | null, range?: SlashRange) => {
-      const activeEditor = targetEditor || lastEditorRef.current;
+      const initialEditor = targetEditor || lastEditorRef.current;
       const resolvedTaskId =
         taskIdRef.current ?? (await ensureTaskIdRef.current?.());
+
+      // `ensureTaskIdRef.current?.()` creates the draft task on first
+      // upload, which changes `taskId` — a dep of the `useEditor` call
+      // below — causing TipTap to destroy and recreate the editor
+      // instance. Re-resolve from `lastEditorRef` (kept current by the
+      // effect that tracks `editor`) instead of the pre-await reference,
+      // which may now point at a destroyed editor.
+      const activeEditor = lastEditorRef.current || initialEditor;
 
       if (!activeEditor || !resolvedTaskId) {
         toast.error(t("activity:comment.editor.uploadsOnlyOnSavedTasks"));
@@ -952,7 +960,6 @@ export default function CommentEditor({
       handleAssetFileUpload,
       resolvedPlaceholder,
       toShikiLanguage,
-      taskId,
       uploadSurface,
       uploadImageNewVersion,
       getImageVersions,
