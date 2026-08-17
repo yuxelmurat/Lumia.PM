@@ -27,6 +27,9 @@ const getBaseURL = () => {
 export const authClient = createAuthClient({
   baseURL: getBaseURL(),
   basePath: "/api/auth",
+  fetchOptions: {
+    cache: "no-store",
+  },
   plugins: [
     anonymousClient(),
     lastLoginMethodClient(),

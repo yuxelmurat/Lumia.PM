@@ -9,6 +9,7 @@ export async function getInstanceStatus(): Promise<InstanceStatus> {
   const baseUrl = resolveApiBaseUrl(import.meta.env.VITE_API_URL);
   const response = await fetch(`${baseUrl}/instance/status`, {
     credentials: "include",
+    cache: "no-store",
   });
   if (!response.ok) {
     // Surface the server's error body when available so the UI can
