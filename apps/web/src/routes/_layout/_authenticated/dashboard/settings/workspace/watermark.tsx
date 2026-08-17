@@ -116,7 +116,10 @@ function RouteComponent() {
           .string()
           .optional()
           .refine(
-            (value) => !value || z.url().safeParse(value).success,
+            (value) =>
+              !value ||
+              value.startsWith("data:image/") ||
+              z.url().safeParse(value).success,
             t("settings:workspaceWatermark.validation.imageUrlInvalid"),
           ),
         watermarkCorner: z.enum(WATERMARK_CORNERS),
