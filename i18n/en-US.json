@@ -83,6 +83,12 @@
 				"keyHint": "Used for ticket IDs (e.g., {{example}}-123)",
 				"templateLabel": "Start from template",
 				"blankProject": "Blank project",
+				"projectType": {
+					"label": "Project type",
+					"generic": "Generic",
+					"architecture": "Architecture",
+					"interior_design": "Interior Design"
+				},
 				"createButton": "Create Project",
 				"successToast": "Project created successfully",
 				"errorToast": "Failed to create project"
@@ -954,7 +960,19 @@
 				"iconRequired": "Icon is required"
 			},
 			"importExportTasks": "Import/Export",
-			"importExportTasksDescription": "Import and export tasks."
+			"importExportTasksDescription": "Import and export tasks.",
+			"completionTitle": "Completion",
+			"completionSubtitle": "Mark this project as complete once all work is done.",
+			"markComplete": "Mark as complete",
+			"projectCompleted": "Project completed",
+			"reopenProject": "Reopen",
+			"openPunchItems": "{{count}} punch list item(s) still open",
+			"noPunchItems": "No open punch list items",
+			"completeBlockedTooltip": "Resolve all punch list items first",
+			"completeSuccess": "Project completed",
+			"completeError": "Failed to complete project",
+			"uncompleteSuccess": "Project reopened",
+			"uncompleteError": "Failed to reopen project"
 		},
 		"projectIntegrations": {
 			"pageTitle": "Project Integrations",
@@ -1433,6 +1451,7 @@
 			"overview": "Overview",
 			"projects": "Projects",
 			"members": "Members",
+			"workload": "Workload",
 			"invitations": "Invitations",
 			"more": "More",
 			"backToBoard": "Back to board"
@@ -1703,6 +1722,15 @@
 		}
 	},
 	"tasks": {
+		"column": {
+			"budget": {
+				"setBudget": "Set budget",
+				"usage": "{{consumed}}h / {{budget}}h",
+				"hoursLabel": "Budget (hours)",
+				"placeholder": "No limit",
+				"updateFailed": "Failed to update budget"
+			}
+		},
 		"status": {
 			"label": "Status",
 			"to-do": "To Do",
@@ -2402,6 +2430,334 @@
 			"cancel": "Cancel",
 			"submitSuccess": "Your response has been recorded",
 			"submitError": "Failed to submit your response"
+		}
+	},
+	"assetPins": {
+		"loading": "Loading…",
+		"linkInvalid": "This link is invalid, expired, or has been revoked.",
+		"clickToAnnotate": "Click anywhere to leave a pin note.",
+		"newPinPlaceholder": "What should change here?",
+		"replyPlaceholder": "Reply…",
+		"failedToCreate": "Failed to add pin",
+		"status": {
+			"open": "Open",
+			"resolved": "Resolved"
+		},
+		"actions": {
+			"addPin": "Add pin",
+			"reply": "Reply",
+			"resolve": "Mark resolved",
+			"reopen": "Reopen"
+		},
+		"shareLink": {
+			"title": "Share with client",
+			"create": "New link",
+			"empty": "No active links. Create one to let a client view and annotate this file without an account.",
+			"copy": "Copy",
+			"copied": "Copied",
+			"copyFailed": "Failed to copy link",
+			"revoke": "Revoke",
+			"created": "Share link created",
+			"createFailed": "Failed to create link",
+			"revokeFailed": "Failed to revoke link"
+		},
+		"guest": {
+			"title": "Leave feedback on this render",
+			"description": "Enter your name and email so the team knows who left the note. No account needed.",
+			"name": "Name",
+			"email": "Email",
+			"continue": "Continue",
+			"missingFields": "Please enter your name and email"
+		},
+		"dwg": {
+			"viewAndAnnotate": "View & annotate",
+			"loadingViewer": "Loading 3D viewer…",
+			"loadFailed": "Failed to load the DWG file: {{error}}",
+			"notTranslated": "This DWG hasn't been prepared for viewing yet.",
+			"translate": "Prepare for viewing",
+			"translateFailed": "Failed to submit for viewing",
+			"translating": "Preparing the DWG for viewing…",
+			"translationFailed": "Preparing this DWG failed.",
+			"retry": "Retry",
+			"notReadyForGuest": "This file isn't ready to view yet — check back shortly."
+		},
+		"punch": {
+			"mark": "Mark as punch item",
+			"unmark": "Unmark punch item",
+			"unassigned": "Unassigned",
+			"setDueDate": "Set due date",
+			"clearDueDate": "Clear date"
+		},
+		"approval": {
+			"badge": {
+				"pending": "Pending approval",
+				"approved": "Approved",
+				"changes_requested": "Changes requested"
+			},
+			"sendForApproval": "Send for approval",
+			"sendForApprovalSuccess": "Sent for approval",
+			"sendForApprovalFailed": "Failed to send for approval",
+			"approve": "Approve",
+			"requestChanges": "Request changes",
+			"notePlaceholder": "Add a note (required for requesting changes)…",
+			"decideSuccess": "Decision recorded",
+			"decideFailed": "Failed to record decision",
+			"missingNote": "Please add a note explaining what should change",
+			"history": "Approval history",
+			"guestTitle": "This file is pending your approval",
+			"guestNotPending": "No decision needed right now.",
+			"resendAfterChanges": "Send for approval again"
+		},
+		"revision": {
+			"title": "Revision history",
+			"uploadNew": "Upload new revision",
+			"uploadSuccess": "New revision uploaded",
+			"uploadFailed": "Failed to upload new revision",
+			"current": "Current",
+			"revisionLabel": "Rev {{n}} — {{name}}",
+			"unknownUploader": "Unknown"
+		}
+	},
+	"productSpec": {
+		"pageTitle": "Materials · {{name}}",
+		"pin": {
+			"addAsMaterial": "Add as material"
+		},
+		"status": {
+			"proposed": "Proposed",
+			"client_approved": "Client approved",
+			"ordered": "Ordered",
+			"received": "Received",
+			"installed": "Installed"
+		},
+		"list": {
+			"title": "Materials",
+			"add": "Add material",
+			"empty": "No materials yet",
+			"emptySubtitle": "Add furniture, fixtures and equipment specs for this project.",
+			"room": "Room",
+			"name": "Name",
+			"vendor": "Vendor",
+			"unitCost": "Unit cost",
+			"quantity": "Qty",
+			"status": "Status",
+			"delete": "Delete",
+			"updateFailed": "Failed to update status",
+			"deleteFailed": "Failed to delete item",
+			"overdue": "Overdue"
+		},
+		"form": {
+			"createTitle": "Add material",
+			"editTitle": "Edit material",
+			"description": "Track FF&E and material specs for this project.",
+			"room": "Room",
+			"roomPlaceholder": "Living room",
+			"vendor": "Vendor",
+			"name": "Name",
+			"unitCost": "Unit cost",
+			"quantity": "Quantity",
+			"image": "Reference image",
+			"removeImage": "Remove",
+			"uploading": "Uploading…",
+			"imageUploadFailed": "Failed to upload image",
+			"notes": "Notes",
+			"save": "Save",
+			"create": "Add",
+			"saveFailed": "Failed to save item",
+			"orderDetails": "Order details",
+			"poNumber": "PO number",
+			"carrier": "Carrier",
+			"expectedShipDate": "Expected ship date",
+			"actualShipDate": "Actual ship date",
+			"trackingNumber": "Tracking number"
+		}
+	},
+	"rfi": {
+		"pageTitle": "RFIs \u00b7 {{name}}",
+		"unassigned": "Unassigned",
+		"clearDueDate": "Clear date",
+		"status": {
+			"open": "Open",
+			"answered": "Answered",
+			"closed": "Closed"
+		},
+		"list": {
+			"title": "RFIs",
+			"add": "New RFI",
+			"empty": "No RFIs yet",
+			"emptySubtitle": "Track formal questions to the design team and their answers.",
+			"number": "#",
+			"subject": "Subject",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New RFI",
+			"description": "Ask the design team a formal question and track the answer.",
+			"subject": "Subject",
+			"question": "Question",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"setDueDate": "Set due date",
+			"create": "Create RFI",
+			"saveFailed": "Failed to create RFI"
+		},
+		"detail": {
+			"answer": "Answer",
+			"answerPlaceholder": "Write the formal answer\u2026",
+			"submitAnswer": "Submit answer",
+			"answerFailed": "Failed to submit answer",
+			"close": "Close",
+			"reopen": "Reopen",
+			"statusFailed": "Failed to update status",
+			"assignFailed": "Failed to update assignee",
+			"dueDateFailed": "Failed to update due date"
+		}
+	},
+	"changeOrder": {
+		"pageTitle": "Change Orders \u00b7 {{name}}",
+		"status": {
+			"pending_review": "Pending review",
+			"approved": "Approved",
+			"rejected": "Rejected"
+		},
+		"list": {
+			"title": "Change Orders",
+			"add": "New change order",
+			"empty": "No change orders yet",
+			"emptySubtitle": "Track client-requested scope changes with their cost and time impact.",
+			"number": "#",
+			"title2": "Title",
+			"costImpact": "Cost impact",
+			"hoursImpact": "Hours impact",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New change order",
+			"description": "Log a client-requested scope change with its cost and time impact.",
+			"title": "Title",
+			"descriptionLabel": "Description",
+			"costImpact": "Cost impact",
+			"hoursImpact": "Hours impact",
+			"create": "Create change order",
+			"saveFailed": "Failed to create change order"
+		},
+		"detail": {
+			"decisionNote": "Decision note",
+			"decisionNotePlaceholder": "Optional note explaining the decision\u2026",
+			"approve": "Approve",
+			"reject": "Reject",
+			"reopen": "Reopen for review",
+			"decisionFailed": "Failed to record decision",
+			"statusFailed": "Failed to update status"
+		}
+	},
+	"submittal": {
+		"pageTitle": "Submittals \u00b7 {{name}}",
+		"unassigned": "Unassigned",
+		"clearDueDate": "Clear date",
+		"status": {
+			"open": "Open",
+			"approved": "Approved",
+			"revise_resubmit": "Revise & resubmit",
+			"closed": "Closed"
+		},
+		"list": {
+			"title": "Submittals",
+			"add": "New submittal",
+			"empty": "No submittals yet",
+			"emptySubtitle": "Track documents sent for review and their decisions.",
+			"number": "#",
+			"title2": "Title",
+			"specSection": "Spec section",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New submittal",
+			"resubmitTitle": "Resubmit",
+			"description": "Track a document sent for review and its decision.",
+			"title": "Title",
+			"specSection": "Spec section",
+			"descriptionLabel": "Description",
+			"assignee": "Assignee",
+			"dueDate": "Due date",
+			"setDueDate": "Set due date",
+			"create": "Create submittal",
+			"resubmit": "Resubmit",
+			"saveFailed": "Failed to create submittal"
+		},
+		"detail": {
+			"approve": "Approve",
+			"reviseResubmit": "Revise & resubmit",
+			"resubmit": "Resubmit",
+			"supersedes": "Supersedes",
+			"reviewNote": "Review note",
+			"reviewNotePlaceholder": "Notes for the reviewer's decision\u2026",
+			"reviewedBy": "Reviewed by",
+			"close": "Close",
+			"reopen": "Reopen",
+			"decisionFailed": "Failed to record decision",
+			"statusFailed": "Failed to update status",
+			"assignFailed": "Failed to update assignee",
+			"dueDateFailed": "Failed to update due date"
+		}
+	},
+	"workload": {
+		"pageTitle": "Workload",
+		"member": "Member",
+		"unknownMember": "Unknown",
+		"empty": "No upcoming workload",
+		"emptySubtitle": "Assign tasks with a due date and estimated hours to see capacity here.",
+		"estimatedHours": "Estimated hours",
+		"estimatedHoursPlaceholder": "e.g. 8",
+		"estimatedHoursFailed": "Failed to update estimated hours",
+		"save": "Save"
+	},
+	"permit": {
+		"pageTitle": "Permits \u00b7 {{name}}",
+		"unassigned": "Unassigned",
+		"status": {
+			"not_submitted": "Not submitted",
+			"submitted": "Submitted",
+			"corrections_required": "Corrections required",
+			"approved": "Approved",
+			"issued": "Issued"
+		},
+		"list": {
+			"title": "Permits",
+			"add": "New permit",
+			"empty": "No permits yet",
+			"emptySubtitle": "Track municipal permit applications and their status.",
+			"number": "#",
+			"jurisdiction": "Jurisdiction",
+			"type": "Type",
+			"assignee": "Assignee",
+			"permitNumber": "Permit #",
+			"status": "Status"
+		},
+		"form": {
+			"createTitle": "New permit",
+			"description": "Track a permit application's status with the local jurisdiction.",
+			"jurisdictionName": "Jurisdiction",
+			"jurisdictionPlaceholder": "Seattle DCI",
+			"permitType": "Permit type",
+			"permitTypePlaceholder": "Building permit",
+			"assignee": "Assignee",
+			"notes": "Notes",
+			"create": "Create permit",
+			"saveFailed": "Failed to create permit"
+		},
+		"detail": {
+			"status": "Status",
+			"permitNumber": "Official permit number",
+			"permitNumberPlaceholder": "Set once issued by the AHJ",
+			"save": "Save",
+			"saveFailed": "Failed to save details",
+			"statusFailed": "Failed to update status",
+			"assignFailed": "Failed to update assignee"
 		}
 	}
 }

@@ -39,6 +39,7 @@ export async function finalizeImageUpload({
   size,
   surface,
   previousAssetId,
+  supersedesAssetId,
 }: {
   taskId: string;
   key: string;
@@ -47,6 +48,7 @@ export async function finalizeImageUpload({
   size: number;
   surface: "description" | "comment";
   previousAssetId?: string;
+  supersedesAssetId?: string;
 }) {
   const response = await client.task["image-upload"][":id"].finalize.$post({
     param: { id: taskId },
@@ -57,6 +59,7 @@ export async function finalizeImageUpload({
       size,
       surface,
       previousAssetId,
+      supersedesAssetId,
     },
   });
 

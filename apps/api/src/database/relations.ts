@@ -3,7 +3,13 @@ import {
   accountTable,
   activityTable,
   apikeyTable,
+  assetApprovalEventTable,
+  assetGuestTable,
+  assetPinNoteTable,
+  assetPinTable,
+  assetShareLinkTable,
   assetTable,
+  changeOrderTable,
   columnTable,
   commentTable,
   customFieldDefinitionTable,
@@ -15,11 +21,15 @@ import {
   invitationTable,
   labelTable,
   notificationTable,
+  permitTable,
+  productSpecTable,
   projectTable,
   projectTemplateColumnTable,
   projectTemplateTable,
   projectTemplateTaskTable,
+  rfiTable,
   sessionTable,
+  submittalTable,
   taskApprovalTable,
   taskRelationTable,
   taskReminderSentTable,
@@ -144,6 +154,7 @@ export const projectTableRelations = relations(
     }),
     tasks: many(taskTable),
     assets: many(assetTable),
+    productSpecs: many(productSpecTable),
     columns: many(columnTable),
     workflowRules: many(workflowRuleTable),
     githubIntegration: many(githubIntegrationTable),
@@ -255,6 +266,15 @@ export const assetTableRelations = relations(assetTable, ({ one, many }) => ({
     references: [userTable.id],
   }),
   pins: many(imagePinTable),
+  assetPins: many(assetPinTable),
+  shareLinks: many(assetShareLinkTable),
+  approvalEvents: many(assetApprovalEventTable),
+  supersedesAsset: one(assetTable, {
+    fields: [assetTable.supersedesAssetId],
+    references: [assetTable.id],
+    relationName: "assetRevision",
+  }),
+  supersededByAssets: many(assetTable, { relationName: "assetRevision" }),
 }));
 
 export const imagePinTableRelations = relations(imagePinTable, ({ one }) => ({
@@ -269,6 +289,196 @@ export const imagePinTableRelations = relations(imagePinTable, ({ one }) => ({
   user: one(userTable, {
     fields: [imagePinTable.userId],
     references: [userTable.id],
+  }),
+}));
+
+export const assetShareLinkTableRelations = relations(
+  assetShareLinkTable,
+  ({ one, many }) => ({
+    asset: one(assetTable, {
+      fields: [assetShareLinkTable.assetId],
+      references: [assetTable.id],
+    }),
+    createdBy: one(userTable, {
+      fields: [assetShareLinkTable.createdByUserId],
+      references: [userTable.id],
+    }),
+    guests: many(assetGuestTable),
+  }),
+);
+
+export const assetGuestTableRelations = relations(
+  assetGuestTable,
+  ({ one, many }) => ({
+    shareLink: one(assetShareLinkTable, {
+      fields: [assetGuestTable.shareLinkId],
+      references: [assetShareLinkTable.id],
+    }),
+    pins: many(assetPinTable),
+    notes: many(assetPinNoteTable),
+  }),
+);
+
+export const assetPinTableRelations = relations(
+  assetPinTable,
+  ({ one, many }) => ({
+    asset: one(assetTable, {
+      fields: [assetPinTable.assetId],
+      references: [assetTable.id],
+    }),
+    createdByUser: one(userTable, {
+      fields: [assetPinTable.createdByUserId],
+      references: [userTable.id],
+    }),
+    createdByGuest: one(assetGuestTable, {
+      fields: [assetPinTable.createdByGuestId],
+      references: [assetGuestTable.id],
+    }),
+    notes: many(assetPinNoteTable),
+  }),
+);
+
+export const assetPinNoteTableRelations = relations(
+  assetPinNoteTable,
+  ({ one }) => ({
+    pin: one(assetPinTable, {
+      fields: [assetPinNoteTable.pinId],
+      references: [assetPinTable.id],
+    }),
+    authorUser: one(userTable, {
+      fields: [assetPinNoteTable.authorUserId],
+      references: [userTable.id],
+    }),
+    authorGuest: one(assetGuestTable, {
+      fields: [assetPinNoteTable.authorGuestId],
+      references: [assetGuestTable.id],
+    }),
+  }),
+);
+
+export const assetApprovalEventTableRelations = relations(
+  assetApprovalEventTable,
+  ({ one }) => ({
+    asset: one(assetTable, {
+      fields: [assetApprovalEventTable.assetId],
+      references: [assetTable.id],
+    }),
+    actorUser: one(userTable, {
+      fields: [assetApprovalEventTable.actorUserId],
+      references: [userTable.id],
+    }),
+    actorGuest: one(assetGuestTable, {
+      fields: [assetApprovalEventTable.actorGuestId],
+      references: [assetGuestTable.id],
+    }),
+  }),
+);
+
+export const productSpecTableRelations = relations(
+  productSpecTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [productSpecTable.projectId],
+      references: [projectTable.id],
+    }),
+    imageAsset: one(assetTable, {
+      fields: [productSpecTable.imageAssetId],
+      references: [assetTable.id],
+    }),
+    linkedPin: one(assetPinTable, {
+      fields: [productSpecTable.linkedPinId],
+      references: [assetPinTable.id],
+    }),
+    createdByUser: one(userTable, {
+      fields: [productSpecTable.createdByUserId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
+export const rfiTableRelations = relations(rfiTable, ({ one }) => ({
+  project: one(projectTable, {
+    fields: [rfiTable.projectId],
+    references: [projectTable.id],
+  }),
+  assignee: one(userTable, {
+    fields: [rfiTable.assigneeUserId],
+    references: [userTable.id],
+    relationName: "rfiAssignee",
+  }),
+  createdByUser: one(userTable, {
+    fields: [rfiTable.createdByUserId],
+    references: [userTable.id],
+    relationName: "rfiCreatedBy",
+  }),
+  answeredByUser: one(userTable, {
+    fields: [rfiTable.answeredByUserId],
+    references: [userTable.id],
+    relationName: "rfiAnsweredBy",
+  }),
+}));
+
+export const changeOrderTableRelations = relations(
+  changeOrderTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [changeOrderTable.projectId],
+      references: [projectTable.id],
+    }),
+    createdByUser: one(userTable, {
+      fields: [changeOrderTable.createdByUserId],
+      references: [userTable.id],
+      relationName: "changeOrderCreatedBy",
+    }),
+    decidedByUser: one(userTable, {
+      fields: [changeOrderTable.decidedByUserId],
+      references: [userTable.id],
+      relationName: "changeOrderDecidedBy",
+    }),
+  }),
+);
+
+export const submittalTableRelations = relations(submittalTable, ({ one }) => ({
+  project: one(projectTable, {
+    fields: [submittalTable.projectId],
+    references: [projectTable.id],
+  }),
+  assignee: one(userTable, {
+    fields: [submittalTable.assigneeUserId],
+    references: [userTable.id],
+    relationName: "submittalAssignee",
+  }),
+  supersedesSubmittal: one(submittalTable, {
+    fields: [submittalTable.supersedesSubmittalId],
+    references: [submittalTable.id],
+    relationName: "submittalRevision",
+  }),
+  createdByUser: one(userTable, {
+    fields: [submittalTable.createdByUserId],
+    references: [userTable.id],
+    relationName: "submittalCreatedBy",
+  }),
+  reviewedByUser: one(userTable, {
+    fields: [submittalTable.reviewedByUserId],
+    references: [userTable.id],
+    relationName: "submittalReviewedBy",
+  }),
+}));
+
+export const permitTableRelations = relations(permitTable, ({ one }) => ({
+  project: one(projectTable, {
+    fields: [permitTable.projectId],
+    references: [projectTable.id],
+  }),
+  assignee: one(userTable, {
+    fields: [permitTable.assigneeUserId],
+    references: [userTable.id],
+    relationName: "permitAssignee",
+  }),
+  createdByUser: one(userTable, {
+    fields: [permitTable.createdByUserId],
+    references: [userTable.id],
+    relationName: "permitCreatedBy",
   }),
 }));
 

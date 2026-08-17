@@ -2,9 +2,14 @@ import {
   Calendar,
   CalendarDays,
   Check,
+  FileCheck2,
+  FileWarning,
   Menu,
+  MessageCircleQuestion,
+  Package,
   Plus,
   SquareKanban,
+  Stamp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,11 +24,25 @@ import { cn } from "@/lib/cn";
 type MobileProjectNavProps = {
   workspaceId: string;
   projectId: string;
-  activeView: "backlog" | "board" | "gantt" | "calendar";
+  activeView:
+    | "backlog"
+    | "board"
+    | "gantt"
+    | "calendar"
+    | "materials"
+    | "rfis"
+    | "changeOrders"
+    | "submittals"
+    | "permits";
   onSelectBoard: () => void;
   onSelectBacklog: () => void;
   onSelectGantt: () => void;
   onSelectCalendar: () => void;
+  onSelectMaterials: () => void;
+  onSelectRfis: () => void;
+  onSelectChangeOrders: () => void;
+  onSelectSubmittals: () => void;
+  onSelectPermits: () => void;
   onSelectProject: (projectId: string) => void;
   onAddProject: () => void;
 };
@@ -36,6 +55,11 @@ export default function MobileProjectNav({
   onSelectBacklog,
   onSelectGantt,
   onSelectCalendar,
+  onSelectMaterials,
+  onSelectRfis,
+  onSelectChangeOrders,
+  onSelectSubmittals,
+  onSelectPermits,
   onSelectProject,
   onAddProject,
 }: MobileProjectNavProps) {
@@ -60,7 +84,7 @@ export default function MobileProjectNav({
             <p className="px-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
               View
             </p>
-            <div className="grid grid-cols-4 gap-1">
+            <div className="grid grid-cols-2 gap-1">
               <button
                 type="button"
                 onClick={onSelectBacklog}
@@ -111,6 +135,71 @@ export default function MobileProjectNav({
               >
                 <Calendar className="size-3.5" />
                 Calendar
+              </button>
+              <button
+                type="button"
+                onClick={onSelectMaterials}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "materials"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <Package className="size-3.5" />
+                Materials
+              </button>
+              <button
+                type="button"
+                onClick={onSelectRfis}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "rfis"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <MessageCircleQuestion className="size-3.5" />
+                RFIs
+              </button>
+              <button
+                type="button"
+                onClick={onSelectChangeOrders}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "changeOrders"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <FileWarning className="size-3.5" />
+                Change Orders
+              </button>
+              <button
+                type="button"
+                onClick={onSelectSubmittals}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "submittals"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <FileCheck2 className="size-3.5" />
+                Submittals
+              </button>
+              <button
+                type="button"
+                onClick={onSelectPermits}
+                className={cn(
+                  "flex w-full items-center justify-center gap-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-xs font-medium transition-colors",
+                  activeView === "permits"
+                    ? "border-border bg-secondary text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent",
+                )}
+              >
+                <Stamp className="size-3.5" />
+                Permits
               </button>
             </div>
           </div>

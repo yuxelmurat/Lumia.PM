@@ -2,8 +2,13 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   Calendar,
   CalendarDays,
+  FileCheck2,
+  FileWarning,
+  MessageCircleQuestion,
+  Package,
   SquareKanban,
   SquircleDashed,
+  Stamp,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import MobileProjectNav from "@/components/common/header/mobile-project-nav";
@@ -31,7 +36,16 @@ type ProjectLayoutProps = {
   headerActions?: ReactNode;
   children: ReactNode;
   showViewSwitcher?: boolean;
-  activeView?: "backlog" | "board" | "gantt" | "calendar";
+  activeView?:
+    | "backlog"
+    | "board"
+    | "gantt"
+    | "calendar"
+    | "materials"
+    | "rfis"
+    | "changeOrders"
+    | "submittals"
+    | "permits";
 };
 
 export default function ProjectLayout({
@@ -58,7 +72,17 @@ export default function ProjectLayout({
         ? "gantt"
         : location.pathname.includes("/calendar")
           ? "calendar"
-          : "board");
+          : location.pathname.includes("/materials")
+            ? "materials"
+            : location.pathname.includes("/rfis")
+              ? "rfis"
+              : location.pathname.includes("/change-orders")
+                ? "changeOrders"
+                : location.pathname.includes("/submittals")
+                  ? "submittals"
+                  : location.pathname.includes("/permits")
+                    ? "permits"
+                    : "board");
 
   const handleNavigateToBacklog = () => {
     navigate({
@@ -88,6 +112,41 @@ export default function ProjectLayout({
     });
   };
 
+  const handleNavigateToMaterials = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/materials",
+      params: { workspaceId, projectId },
+    });
+  };
+
+  const handleNavigateToRfis = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/rfis",
+      params: { workspaceId, projectId },
+    });
+  };
+
+  const handleNavigateToChangeOrders = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/change-orders",
+      params: { workspaceId, projectId },
+    });
+  };
+
+  const handleNavigateToSubmittals = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/submittals",
+      params: { workspaceId, projectId },
+    });
+  };
+
+  const handleNavigateToPermits = () => {
+    navigate({
+      to: "/dashboard/workspace/$workspaceId/project/$projectId/permits",
+      params: { workspaceId, projectId },
+    });
+  };
+
   const handleProjectSwitch = (nextProjectId: string) => {
     navigate({
       to:
@@ -97,7 +156,17 @@ export default function ProjectLayout({
             ? "/dashboard/workspace/$workspaceId/project/$projectId/gantt"
             : resolvedView === "calendar"
               ? "/dashboard/workspace/$workspaceId/project/$projectId/calendar"
-              : "/dashboard/workspace/$workspaceId/project/$projectId/board",
+              : resolvedView === "materials"
+                ? "/dashboard/workspace/$workspaceId/project/$projectId/materials"
+                : resolvedView === "rfis"
+                  ? "/dashboard/workspace/$workspaceId/project/$projectId/rfis"
+                  : resolvedView === "changeOrders"
+                    ? "/dashboard/workspace/$workspaceId/project/$projectId/change-orders"
+                    : resolvedView === "submittals"
+                      ? "/dashboard/workspace/$workspaceId/project/$projectId/submittals"
+                      : resolvedView === "permits"
+                        ? "/dashboard/workspace/$workspaceId/project/$projectId/permits"
+                        : "/dashboard/workspace/$workspaceId/project/$projectId/board",
       params: {
         workspaceId,
         projectId: nextProjectId,
@@ -152,6 +221,11 @@ export default function ProjectLayout({
                 onSelectBoard={handleNavigateToBoard}
                 onSelectGantt={handleNavigateToGantt}
                 onSelectCalendar={handleNavigateToCalendar}
+                onSelectMaterials={handleNavigateToMaterials}
+                onSelectRfis={handleNavigateToRfis}
+                onSelectChangeOrders={handleNavigateToChangeOrders}
+                onSelectSubmittals={handleNavigateToSubmittals}
+                onSelectPermits={handleNavigateToPermits}
                 onSelectProject={handleProjectSwitch}
                 onAddProject={() => setIsCreateProjectModalOpen(true)}
               />
@@ -206,6 +280,70 @@ export default function ProjectLayout({
                 >
                   <Calendar className="size-3.5" />
                   Calendar
+                </Button>
+                <Button
+                  variant={resolvedView === "materials" ? "secondary" : "ghost"}
+                  size="xs"
+                  onClick={handleNavigateToMaterials}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "materials" && "text-muted-foreground",
+                  )}
+                >
+                  <Package className="size-3.5" />
+                  Materials
+                </Button>
+                <Button
+                  variant={resolvedView === "rfis" ? "secondary" : "ghost"}
+                  size="xs"
+                  onClick={handleNavigateToRfis}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "rfis" && "text-muted-foreground",
+                  )}
+                >
+                  <MessageCircleQuestion className="size-3.5" />
+                  RFIs
+                </Button>
+                <Button
+                  variant={
+                    resolvedView === "changeOrders" ? "secondary" : "ghost"
+                  }
+                  size="xs"
+                  onClick={handleNavigateToChangeOrders}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "changeOrders" && "text-muted-foreground",
+                  )}
+                >
+                  <FileWarning className="size-3.5" />
+                  Change Orders
+                </Button>
+                <Button
+                  variant={
+                    resolvedView === "submittals" ? "secondary" : "ghost"
+                  }
+                  size="xs"
+                  onClick={handleNavigateToSubmittals}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "submittals" && "text-muted-foreground",
+                  )}
+                >
+                  <FileCheck2 className="size-3.5" />
+                  Submittals
+                </Button>
+                <Button
+                  variant={resolvedView === "permits" ? "secondary" : "ghost"}
+                  size="xs"
+                  onClick={handleNavigateToPermits}
+                  className={cn(
+                    "h-6 gap-1.5 rounded-md px-2 text-xs",
+                    resolvedView !== "permits" && "text-muted-foreground",
+                  )}
+                >
+                  <Stamp className="size-3.5" />
+                  Permits
                 </Button>
               </div>
             )}

@@ -9,6 +9,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  real,
   text,
   timestamp,
   unique,
@@ -348,7 +349,14 @@ export const projectTable = pgTable(
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     isPublic: boolean("is_public").default(false),
     archivedAt: timestamp("archived_at", { mode: "date" }),
+    completedAt: timestamp("completed_at", { mode: "date" }),
     lastTaskNumber: integer("last_task_number").notNull().default(0),
+    lastRfiNumber: integer("last_rfi_number").notNull().default(0),
+    lastChangeOrderNumber: integer("last_change_order_number")
+      .notNull()
+      .default(0),
+    lastSubmittalNumber: integer("last_submittal_number").notNull().default(0),
+    lastPermitNumber: integer("last_permit_number").notNull().default(0),
     position: integer("position").notNull().default(0),
     // The public share link is addressed by this token, not by `id`, so a
     // leaked link can be revoked (regenerate the token) without disabling
@@ -387,6 +395,7 @@ export const columnTable = pgTable(
     icon: text("icon"),
     color: text("color"),
     isFinal: boolean("is_final").default(false).notNull(),
+    budgetHours: integer("budget_hours"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" })
       .defaultNow()
@@ -456,6 +465,7 @@ export const taskTable = pgTable(
     priority: text("priority").default("low"),
     startDate: timestamp("start_date", { mode: "date" }),
     dueDate: timestamp("due_date", { mode: "date" }),
+    estimatedHours: integer("estimated_hours"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" })
       .defaultNow()
@@ -703,6 +713,20 @@ export const assetTable = pgTable(
     ),
     versionNumber: integer("version_number").notNull().default(1),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    // Autodesk Platform Services (APS) fields, populated for kind="dwg" assets
+    // once a translation job has been submitted. `apsUrn` is the base64url
+    // object URN the Model Derivative API and Viewer SDK key off of.
+    apsUrn: text("aps_urn"),
+    apsTranslationStatus: text("aps_translation_status"),
+    // Denormalized current approval state; null = no approval cycle started.
+    // Full history lives in assetApprovalEventTable.
+    approvalStatus: text("approval_status"),
+    // Self-reference: set when this asset was uploaded to replace an earlier
+    // one (e.g. after changes were requested). Forms a revision chain.
+    supersedesAssetId: text("supersedes_asset_id").references(
+      (): AnyPgColumn => assetTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
   },
   (table) => [
     index("asset_workspaceId_idx").on(table.workspaceId),
@@ -711,6 +735,7 @@ export const assetTable = pgTable(
     index("asset_activityId_idx").on(table.activityId),
     index("asset_createdBy_idx").on(table.createdBy),
     index("asset_versionGroupId_idx").on(table.versionGroupId),
+    index("asset_supersedesAssetId_idx").on(table.supersedesAssetId),
   ],
 );
 
@@ -754,6 +779,397 @@ export const imagePinTable = pgTable(
   (table) => [
     index("image_pin_assetId_idx").on(table.assetId),
     index("image_pin_taskId_idx").on(table.taskId),
+  ],
+);
+
+export const assetShareLinkTable = pgTable(
+  "asset_share_link",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    token: text("token").notNull().unique(),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    expiresAt: timestamp("expires_at", { mode: "date" }),
+    revokedAt: timestamp("revoked_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("asset_share_link_assetId_idx").on(table.assetId),
+    uniqueIndex("asset_share_link_token_uidx").on(table.token),
+  ],
+);
+
+export const assetGuestTable = pgTable(
+  "asset_guest",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    shareLinkId: text("share_link_id")
+      .notNull()
+      .references(() => assetShareLinkTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [index("asset_guest_shareLinkId_idx").on(table.shareLinkId)],
+);
+
+export const assetPinTable = pgTable(
+  "asset_pin",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    // Normalized 0-1 image-space coordinates, used for raster assets
+    // (renders). Left null for CAD/DWG pins, which use `viewerState`
+    // instead since their anchor is a camera/viewpoint, not a flat point.
+    x: real("x"),
+    y: real("y"),
+    viewerState: jsonb("viewer_state"),
+    status: text("status").notNull().default("open"),
+    label: text("label"),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdByGuestId: text("created_by_guest_id").references(
+      () => assetGuestTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    resolvedByUserId: text("resolved_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    resolvedAt: timestamp("resolved_at", { mode: "date" }),
+    // Punch-list fields: any pin can be flagged as a site-defect item that
+    // gates project completion (see projectTable.completedAt) until resolved.
+    isPunchItem: boolean("is_punch_item").default(false).notNull(),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    dueDate: timestamp("due_date", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("asset_pin_assetId_idx").on(table.assetId),
+    index("asset_pin_createdByUserId_idx").on(table.createdByUserId),
+    index("asset_pin_createdByGuestId_idx").on(table.createdByGuestId),
+    index("asset_pin_assetId_isPunchItem_idx").on(
+      table.assetId,
+      table.isPunchItem,
+    ),
+  ],
+);
+
+export const assetPinNoteTable = pgTable(
+  "asset_pin_note",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    pinId: text("pin_id")
+      .notNull()
+      .references(() => assetPinTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    content: text("content").notNull(),
+    authorUserId: text("author_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    authorGuestId: text("author_guest_id").references(
+      () => assetGuestTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [index("asset_pin_note_pinId_idx").on(table.pinId)],
+);
+
+export const assetApprovalEventTable = pgTable(
+  "asset_approval_event",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => assetTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    status: text("status").notNull(),
+    actorUserId: text("actor_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    actorGuestId: text("actor_guest_id").references(() => assetGuestTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    note: text("note"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [index("asset_approval_event_assetId_idx").on(table.assetId)],
+);
+
+export const productSpecTable = pgTable(
+  "product_spec",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    roomLabel: text("room_label"),
+    name: text("name").notNull(),
+    vendor: text("vendor"),
+    // Stored in the smallest currency unit (e.g. cents) to avoid float
+    // rounding; nullable because a price may not be known yet.
+    unitCost: integer("unit_cost"),
+    quantity: integer("quantity").notNull().default(1),
+    status: text("status").notNull().default("proposed"),
+    imageAssetId: text("image_asset_id").references(() => assetTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    linkedPinId: text("linked_pin_id").references(() => assetPinTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    notes: text("notes"),
+    poNumber: text("po_number"),
+    expectedShipDate: timestamp("expected_ship_date", { mode: "date" }),
+    actualShipDate: timestamp("actual_ship_date", { mode: "date" }),
+    trackingNumber: text("tracking_number"),
+    carrier: text("carrier"),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("product_spec_projectId_idx").on(table.projectId),
+    index("product_spec_status_idx").on(table.status),
+  ],
+);
+
+export const rfiTable = pgTable(
+  "rfi",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    subject: text("subject").notNull(),
+    question: text("question").notNull(),
+    answer: text("answer"),
+    status: text("status").notNull().default("open"),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    dueDate: timestamp("due_date", { mode: "date" }),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    answeredByUserId: text("answered_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    answeredAt: timestamp("answered_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("rfi_project_number_unique").on(table.projectId, table.number),
+    index("rfi_projectId_idx").on(table.projectId),
+    index("rfi_status_idx").on(table.status),
+  ],
+);
+
+export const changeOrderTable = pgTable(
+  "change_order",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    // Stored in the smallest currency unit (e.g. cents); nullable because
+    // cost impact may not be estimated yet.
+    costImpactCents: integer("cost_impact_cents"),
+    hoursImpact: integer("hours_impact"),
+    status: text("status").notNull().default("pending_review"),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    decidedByUserId: text("decided_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    decisionNote: text("decision_note"),
+    decidedAt: timestamp("decided_at", { mode: "date" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("change_order_project_number_unique").on(
+      table.projectId,
+      table.number,
+    ),
+    index("change_order_projectId_idx").on(table.projectId),
+    index("change_order_status_idx").on(table.status),
+  ],
+);
+
+export const submittalTable = pgTable(
+  "submittal",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    specSection: text("spec_section"),
+    description: text("description").notNull(),
+    status: text("status").notNull().default("open"),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    dueDate: timestamp("due_date", { mode: "date" }),
+    // Set when this submittal was resubmitted in response to a
+    // "revise_resubmit" decision on an earlier one. Forms a resubmission
+    // chain, mirroring assetTable.supersedesAssetId.
+    supersedesSubmittalId: text("supersedes_submittal_id").references(
+      (): AnyPgColumn => submittalTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    reviewNote: text("review_note"),
+    reviewedByUserId: text("reviewed_by_user_id").references(
+      () => userTable.id,
+      { onDelete: "set null", onUpdate: "cascade" },
+    ),
+    reviewedAt: timestamp("reviewed_at", { mode: "date" }),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("submittal_project_number_unique").on(table.projectId, table.number),
+    index("submittal_projectId_idx").on(table.projectId),
+    index("submittal_status_idx").on(table.status),
+    index("submittal_supersedesSubmittalId_idx").on(
+      table.supersedesSubmittalId,
+    ),
+  ],
+);
+
+export const permitTable = pgTable(
+  "permit",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projectTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    jurisdictionName: text("jurisdiction_name").notNull(),
+    permitType: text("permit_type"),
+    status: text("status").notNull().default("not_submitted"),
+    // Official number issued by the AHJ/municipality once the permit is
+    // issued; distinct from the internal sequential `number` above.
+    permitNumber: text("permit_number"),
+    submittedDate: timestamp("submitted_date", { mode: "date" }),
+    approvalDate: timestamp("approval_date", { mode: "date" }),
+    notes: text("notes"),
+    assigneeUserId: text("assignee_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdByUserId: text("created_by_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("permit_project_number_unique").on(table.projectId, table.number),
+    index("permit_projectId_idx").on(table.projectId),
+    index("permit_status_idx").on(table.status),
   ],
 );
 

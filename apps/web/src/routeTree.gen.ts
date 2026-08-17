@@ -22,6 +22,7 @@ import { Route as AuthVerifyOtpRouteImport } from './routes/auth/verify-otp'
 import { Route as DeviceIndexRouteImport } from './routes/device/index'
 import { Route as DeviceApproveRouteImport } from './routes/device/approve'
 import { Route as McpAuthorizeRouteImport } from './routes/mcp.authorize'
+import { Route as PublicAssetTokenRouteImport } from './routes/public-asset.$token'
 import { Route as PublicProjectProjectIdRouteImport } from './routes/public-project.$projectId'
 import { Route as PublicTaskTokenRouteImport } from './routes/public-task.$token'
 import { Route as LayoutAuthenticatedDashboardRouteImport } from './routes/_layout/_authenticated/dashboard'
@@ -51,6 +52,7 @@ import { Route as LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRouteImp
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/index'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/members'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/search'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/workload'
 import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdGeneralRouteImport } from './routes/_layout/_authenticated/dashboard/settings/projects/$projectId/general'
 import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRouteImport } from './routes/_layout/_authenticated/dashboard/settings/projects/$projectId/integrations'
 import { Route as LayoutAuthenticatedDashboardSettingsProjectsProjectIdVisibilityRouteImport } from './routes/_layout/_authenticated/dashboard/settings/projects/$projectId/visibility'
@@ -59,7 +61,12 @@ import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProject
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
+import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals'
 import { Route as LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRouteImport } from './routes/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_'
 
 const IndexRoute = IndexRouteImport.update({
@@ -123,6 +130,11 @@ const DeviceApproveRoute = DeviceApproveRouteImport.update({
 const McpAuthorizeRoute = McpAuthorizeRouteImport.update({
   id: '/mcp/authorize',
   path: '/mcp/authorize',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicAssetTokenRoute = PublicAssetTokenRouteImport.update({
+  id: '/public-asset/$token',
+  path: '/public-asset/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicProjectProjectIdRoute = PublicProjectProjectIdRouteImport.update({
@@ -299,6 +311,12 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute =
     path: '/search',
     getParentRoute: () => LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
   } as any)
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRouteImport.update({
+    id: '/workload',
+    path: '/workload',
+    getParentRoute: () => LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+  } as any)
 const LayoutAuthenticatedDashboardSettingsProjectsProjectIdGeneralRoute =
   LayoutAuthenticatedDashboardSettingsProjectsProjectIdGeneralRouteImport.update(
     {
@@ -367,11 +385,56 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRo
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
     } as any,
   )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport.update(
+    {
+      id: '/project/$projectId/change-orders',
+      path: '/project/$projectId/change-orders',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
 const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute =
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport.update(
     {
       id: '/project/$projectId/gantt',
       path: '/project/$projectId/gantt',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRouteImport.update(
+    {
+      id: '/project/$projectId/materials',
+      path: '/project/$projectId/materials',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRouteImport.update(
+    {
+      id: '/project/$projectId/permits',
+      path: '/project/$projectId/permits',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRouteImport.update(
+    {
+      id: '/project/$projectId/rfis',
+      path: '/project/$projectId/rfis',
+      getParentRoute: () =>
+        LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
+    } as any,
+  )
+const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute =
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRouteImport.update(
+    {
+      id: '/project/$projectId/submittals',
+      path: '/project/$projectId/submittals',
       getParentRoute: () =>
         LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute,
     } as any,
@@ -397,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/device/approve': typeof DeviceApproveRoute
   '/mcp/authorize': typeof McpAuthorizeRoute
+  '/public-asset/$token': typeof PublicAssetTokenRoute
   '/public-project/$projectId': typeof PublicProjectProjectIdRoute
   '/public-task/$token': typeof PublicTaskTokenRoute
   '/device/': typeof DeviceIndexRoute
@@ -426,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/workspace/watermark': typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
   '/dashboard/workspace/$workspaceId/members': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   '/dashboard/workspace/$workspaceId/search': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
+  '/dashboard/workspace/$workspaceId/workload': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute
   '/dashboard/workspace/$workspaceId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
   '/dashboard/settings/projects/$projectId/general': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdGeneralRoute
   '/dashboard/settings/projects/$projectId/integrations': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRoute
@@ -434,7 +499,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/permits': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/submittals': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -448,6 +518,7 @@ export interface FileRoutesByTo {
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/device/approve': typeof DeviceApproveRoute
   '/mcp/authorize': typeof McpAuthorizeRoute
+  '/public-asset/$token': typeof PublicAssetTokenRoute
   '/public-project/$projectId': typeof PublicProjectProjectIdRoute
   '/public-task/$token': typeof PublicTaskTokenRoute
   '/device': typeof DeviceIndexRoute
@@ -475,6 +546,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/workspace/watermark': typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
   '/dashboard/workspace/$workspaceId/members': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   '/dashboard/workspace/$workspaceId/search': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
+  '/dashboard/workspace/$workspaceId/workload': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute
   '/dashboard/workspace/$workspaceId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
   '/dashboard/settings/projects/$projectId/general': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdGeneralRoute
   '/dashboard/settings/projects/$projectId/integrations': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRoute
@@ -483,7 +555,12 @@ export interface FileRoutesByTo {
   '/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/permits': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
+  '/dashboard/workspace/$workspaceId/project/$projectId/submittals': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   '/dashboard/workspace/$workspaceId/project/$projectId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
   '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -501,6 +578,7 @@ export interface FileRoutesById {
   '/auth/verify-otp': typeof AuthVerifyOtpRoute
   '/device/approve': typeof DeviceApproveRoute
   '/mcp/authorize': typeof McpAuthorizeRoute
+  '/public-asset/$token': typeof PublicAssetTokenRoute
   '/public-project/$projectId': typeof PublicProjectProjectIdRoute
   '/public-task/$token': typeof PublicTaskTokenRoute
   '/device/': typeof DeviceIndexRoute
@@ -530,6 +608,7 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/settings/workspace/watermark': typeof LayoutAuthenticatedDashboardSettingsWorkspaceWatermarkRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/members': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/search': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/workload': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
   '/_layout/_authenticated/dashboard/settings/projects/$projectId/general': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdGeneralRoute
   '/_layout/_authenticated/dashboard/settings/projects/$projectId/integrations': typeof LayoutAuthenticatedDashboardSettingsProjectsProjectIdIntegrationsRoute
@@ -538,7 +617,12 @@ export interface FileRoutesById {
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
+  '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
   '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_': typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -555,6 +639,7 @@ export interface FileRouteTypes {
     | '/auth/verify-otp'
     | '/device/approve'
     | '/mcp/authorize'
+    | '/public-asset/$token'
     | '/public-project/$projectId'
     | '/public-task/$token'
     | '/device/'
@@ -584,6 +669,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/workspace/watermark'
     | '/dashboard/workspace/$workspaceId/members'
     | '/dashboard/workspace/$workspaceId/search'
+    | '/dashboard/workspace/$workspaceId/workload'
     | '/dashboard/workspace/$workspaceId/'
     | '/dashboard/settings/projects/$projectId/general'
     | '/dashboard/settings/projects/$projectId/integrations'
@@ -592,7 +678,12 @@ export interface FileRouteTypes {
     | '/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/dashboard/workspace/$workspaceId/project/$projectId/calendar'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/materials'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/permits'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/submittals'
     | '/dashboard/workspace/$workspaceId/project/$projectId/'
     | '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId'
   fileRoutesByTo: FileRoutesByTo
@@ -606,6 +697,7 @@ export interface FileRouteTypes {
     | '/auth/verify-otp'
     | '/device/approve'
     | '/mcp/authorize'
+    | '/public-asset/$token'
     | '/public-project/$projectId'
     | '/public-task/$token'
     | '/device'
@@ -633,6 +725,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/workspace/watermark'
     | '/dashboard/workspace/$workspaceId/members'
     | '/dashboard/workspace/$workspaceId/search'
+    | '/dashboard/workspace/$workspaceId/workload'
     | '/dashboard/workspace/$workspaceId'
     | '/dashboard/settings/projects/$projectId/general'
     | '/dashboard/settings/projects/$projectId/integrations'
@@ -641,7 +734,12 @@ export interface FileRouteTypes {
     | '/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/dashboard/workspace/$workspaceId/project/$projectId/calendar'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/materials'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/permits'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
+    | '/dashboard/workspace/$workspaceId/project/$projectId/submittals'
     | '/dashboard/workspace/$workspaceId/project/$projectId'
     | '/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId'
   id:
@@ -658,6 +756,7 @@ export interface FileRouteTypes {
     | '/auth/verify-otp'
     | '/device/approve'
     | '/mcp/authorize'
+    | '/public-asset/$token'
     | '/public-project/$projectId'
     | '/public-task/$token'
     | '/device/'
@@ -687,6 +786,7 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/settings/workspace/watermark'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/members'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/search'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/workload'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/'
     | '/_layout/_authenticated/dashboard/settings/projects/$projectId/general'
     | '/_layout/_authenticated/dashboard/settings/projects/$projectId/integrations'
@@ -695,7 +795,12 @@ export interface FileRouteTypes {
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/backlog'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/board'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/calendar'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
+    | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/'
     | '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_'
   fileRoutesById: FileRoutesById
@@ -707,6 +812,7 @@ export interface RootRouteChildren {
   DeviceRoute: typeof DeviceRouteWithChildren
   TestErrorRoute: typeof TestErrorRoute
   McpAuthorizeRoute: typeof McpAuthorizeRoute
+  PublicAssetTokenRoute: typeof PublicAssetTokenRoute
   PublicProjectProjectIdRoute: typeof PublicProjectProjectIdRoute
   PublicTaskTokenRoute: typeof PublicTaskTokenRoute
   InvitationAcceptInviteIdRoute: typeof InvitationAcceptInviteIdRoute
@@ -803,6 +909,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp/authorize'
       fullPath: '/mcp/authorize'
       preLoaderRoute: typeof McpAuthorizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public-asset/$token': {
+      id: '/public-asset/$token'
+      path: '/public-asset/$token'
+      fullPath: '/public-asset/$token'
+      preLoaderRoute: typeof PublicAssetTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/public-project/$projectId': {
@@ -1008,6 +1121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/workload': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/workload'
+      path: '/workload'
+      fullPath: '/dashboard/workspace/$workspaceId/workload'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
     '/_layout/_authenticated/dashboard/settings/projects/$projectId/general': {
       id: '/_layout/_authenticated/dashboard/settings/projects/$projectId/general'
       path: '/$projectId/general'
@@ -1064,11 +1184,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
+      path: '/project/$projectId/change-orders'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/change-orders'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt': {
       id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/gantt'
       path: '/project/$projectId/gantt'
       fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/gantt'
       preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/materials'
+      path: '/project/$projectId/materials'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/materials'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/permits'
+      path: '/project/$projectId/permits'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/permits'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/rfis'
+      path: '/project/$projectId/rfis'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/rfis'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRouteImport
+      parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
+    }
+    '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals': {
+      id: '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/submittals'
+      path: '/project/$projectId/submittals'
+      fullPath: '/dashboard/workspace/$workspaceId/project/$projectId/submittals'
+      preLoaderRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRouteImport
       parentRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRoute
     }
     '/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/task/$taskId_': {
@@ -1186,11 +1341,17 @@ const LayoutAuthenticatedDashboardSettingsRouteWithChildren =
 interface LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren {
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute
+  LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute
   LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute: typeof LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute
 }
@@ -1201,6 +1362,8 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren: LayoutAuthe
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdMembersRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdSearchRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdWorkloadRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdIndexRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBacklogRoute:
@@ -1209,8 +1372,18 @@ const LayoutAuthenticatedDashboardWorkspaceWorkspaceIdRouteChildren: LayoutAuthe
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdBoardRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdCalendarRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdChangeOrdersRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdGanttRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdMaterialsRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdPermitsRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdRfisRoute,
+    LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute:
+      LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdSubmittalsRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute:
       LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdIndexRoute,
     LayoutAuthenticatedDashboardWorkspaceWorkspaceIdProjectProjectIdTaskTaskIdRoute:
@@ -1314,6 +1487,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeviceRoute: DeviceRouteWithChildren,
   TestErrorRoute: TestErrorRoute,
   McpAuthorizeRoute: McpAuthorizeRoute,
+  PublicAssetTokenRoute: PublicAssetTokenRoute,
   PublicProjectProjectIdRoute: PublicProjectProjectIdRoute,
   PublicTaskTokenRoute: PublicTaskTokenRoute,
   InvitationAcceptInviteIdRoute: InvitationAcceptInviteIdRoute,

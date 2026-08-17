@@ -20,7 +20,15 @@ type WorkspaceIdSource =
         | "comment"
         | "column"
         | "workflowRule"
-        | "projectTemplate";
+        | "projectTemplate"
+        | "asset"
+        | "assetPin"
+        | "assetShareLink"
+        | "productSpec"
+        | "rfi"
+        | "changeOrder"
+        | "submittal"
+        | "permit";
       idKey: string;
     }
   | {
@@ -141,7 +149,15 @@ async function lookupWorkspaceId(
     | "comment"
     | "column"
     | "workflowRule"
-    | "projectTemplate",
+    | "projectTemplate"
+    | "asset"
+    | "assetPin"
+    | "assetShareLink"
+    | "productSpec"
+    | "rfi"
+    | "changeOrder"
+    | "submittal"
+    | "permit",
   id: string,
 ): Promise<string | null> {
   try {
@@ -293,6 +309,106 @@ async function lookupWorkspaceId(
         return template?.workspaceId || null;
       }
 
+      case "asset": {
+        const [asset] = await db
+          .select({ workspaceId: schema.assetTable.workspaceId })
+          .from(schema.assetTable)
+          .where(eq(schema.assetTable.id, id))
+          .limit(1);
+        return asset?.workspaceId || null;
+      }
+
+      case "assetPin": {
+        const [pin] = await db
+          .select({ workspaceId: schema.assetTable.workspaceId })
+          .from(schema.assetPinTable)
+          .innerJoin(
+            schema.assetTable,
+            eq(schema.assetPinTable.assetId, schema.assetTable.id),
+          )
+          .where(eq(schema.assetPinTable.id, id))
+          .limit(1);
+        return pin?.workspaceId || null;
+      }
+
+      case "assetShareLink": {
+        const [shareLink] = await db
+          .select({ workspaceId: schema.assetTable.workspaceId })
+          .from(schema.assetShareLinkTable)
+          .innerJoin(
+            schema.assetTable,
+            eq(schema.assetShareLinkTable.assetId, schema.assetTable.id),
+          )
+          .where(eq(schema.assetShareLinkTable.id, id))
+          .limit(1);
+        return shareLink?.workspaceId || null;
+      }
+
+      case "productSpec": {
+        const [productSpec] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.productSpecTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.productSpecTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.productSpecTable.id, id))
+          .limit(1);
+        return productSpec?.workspaceId || null;
+      }
+
+      case "rfi": {
+        const [rfi] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.rfiTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.rfiTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.rfiTable.id, id))
+          .limit(1);
+        return rfi?.workspaceId || null;
+      }
+
+      case "changeOrder": {
+        const [changeOrder] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.changeOrderTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.changeOrderTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.changeOrderTable.id, id))
+          .limit(1);
+        return changeOrder?.workspaceId || null;
+      }
+
+      case "submittal": {
+        const [submittal] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.submittalTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.submittalTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.submittalTable.id, id))
+          .limit(1);
+        return submittal?.workspaceId || null;
+      }
+
+      case "permit": {
+        const [permit] = await db
+          .select({ workspaceId: schema.projectTable.workspaceId })
+          .from(schema.permitTable)
+          .innerJoin(
+            schema.projectTable,
+            eq(schema.permitTable.projectId, schema.projectTable.id),
+          )
+          .where(eq(schema.permitTable.id, id))
+          .limit(1);
+        return permit?.workspaceId || null;
+      }
+
       default:
         return null;
     }
@@ -398,6 +514,70 @@ export const workspaceAccess = {
     workspaceAccessMiddleware({
       sources: [
         { type: "lookup", resource: "projectTemplate", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromAssetId: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "asset", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromAssetPin: (idKey = "pinId") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "assetPin", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromAssetShareLink: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "assetShareLink", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromProductSpec: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "productSpec", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromRfi: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "rfi", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromChangeOrder: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "changeOrder", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromSubmittal: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "submittal", idKey },
+        { type: "query", key: "workspaceId" },
+      ],
+    }),
+
+  fromPermit: (idKey = "id") =>
+    workspaceAccessMiddleware({
+      sources: [
+        { type: "lookup", resource: "permit", idKey },
         { type: "query", key: "workspaceId" },
       ],
     }),

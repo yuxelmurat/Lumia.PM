@@ -45,11 +45,15 @@ type CreateProjectModalProps = {
   onClose: () => void;
 };
 
+const PROJECT_TYPES = ["generic", "architecture", "interior_design"] as const;
+
 function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [selectedIcon, setSelectedIcon] = useState("Layout");
+  const [projectType, setProjectType] =
+    useState<(typeof PROJECT_TYPES)[number]>("generic");
   const [iconPopoverOpen, setIconPopoverOpen] = useState(false);
   const [iconSearch, setIconSearch] = useState("");
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
@@ -64,6 +68,7 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
     workspaceId: workspace?.id ?? "",
     icon: selectedIcon,
     templateId: selectedTemplateId || undefined,
+    projectType,
   });
   const SelectedIcon =
     icons[selectedIcon as keyof typeof icons] || icons.Layout;
@@ -76,6 +81,7 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
     setName("");
     setSlug("");
     setSelectedIcon("Layout");
+    setProjectType("generic");
     setIconPopoverOpen(false);
     setIconSearch("");
     setSelectedTemplateId("");
@@ -274,6 +280,29 @@ function CreateProjectModal({ open, onClose }: CreateProjectModalProps) {
                   })()}
               </div>
             )}
+
+            <div className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">
+                {t("common:modals.createProject.projectType.label")}
+              </span>
+              <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-0.5">
+                {PROJECT_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setProjectType(type)}
+                    className={cn(
+                      "flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+                      projectType === type
+                        ? "bg-secondary text-foreground"
+                        : "text-muted-foreground hover:bg-accent",
+                    )}
+                  >
+                    {t(`common:modals.createProject.projectType.${type}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <DialogFooter>

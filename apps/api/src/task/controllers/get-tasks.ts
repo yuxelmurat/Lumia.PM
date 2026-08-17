@@ -20,6 +20,7 @@ import {
   projectTable,
   taskApprovalTable,
   taskTable,
+  timeEntryTable,
   userTable,
 } from "../../database/schema";
 import { normalizeApiServerUrl } from "../../utils/openapi-spec";
@@ -133,6 +134,7 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     priority: taskTable.priority,
     startDate: taskTable.startDate,
     dueDate: taskTable.dueDate,
+    estimatedHours: taskTable.estimatedHours,
     position: taskTable.position,
     createdAt: taskTable.createdAt,
     userId: taskTable.userId,
@@ -363,12 +365,34 @@ async function getTasks(projectId: string, options: GetTasksOptions = {}) {
     .where(eq(columnTable.projectId, projectId))
     .orderBy(asc(columnTable.position));
 
+  // Rolled up across every task in the project (not just the current page),
+  // so a column's consumed time is correct regardless of pagination.
+  const consumedSecondsByStatus = await db
+    .select({
+      status: taskTable.status,
+      consumedSeconds: sql<number>`coalesce(sum(${timeEntryTable.duration}), 0)`,
+    })
+    .from(timeEntryTable)
+    .innerJoin(taskTable, eq(timeEntryTable.taskId, taskTable.id))
+    .where(eq(taskTable.projectId, projectId))
+    .groupBy(taskTable.status);
+
+  const consumedSecondsMap = new Map(
+    consumedSecondsByStatus.map((row) => [
+      row.status,
+      Number(row.consumedSeconds),
+    ]),
+  );
+
   const columns = projectColumns.map((column) => ({
     id: column.slug,
+    columnId: column.id,
     slug: column.slug,
     name: column.name,
     icon: column.icon,
     isFinal: column.isFinal,
+    budgetHours: column.budgetHours,
+    consumedSeconds: consumedSecondsMap.get(column.slug) ?? 0,
     tasks: paginatedTasks
       .filter((task) => task.status === column.slug)
       .map((task) => ({

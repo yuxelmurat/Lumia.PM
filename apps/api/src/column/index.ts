@@ -136,6 +136,9 @@ const column = new Hono<{
         icon: v.optional(v.nullable(v.string())),
         color: v.optional(v.nullable(v.string())),
         isFinal: v.optional(v.boolean()),
+        budgetHours: v.optional(
+          v.nullable(v.pipe(v.number(), v.integer(), v.minValue(0))),
+        ),
       }),
     ),
     workspaceAccess.fromColumn("id"),

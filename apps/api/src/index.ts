@@ -6,7 +6,7 @@ import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import * as Sentry from "@sentry/node";
 import type { Session, User } from "better-auth/types";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -19,8 +19,15 @@ import {
 } from "hono-openapi";
 import * as v from "valibot";
 import activity from "./activity";
+import aps from "./aps";
+import assetApproval from "./asset-approval";
+import assetPin from "./asset-pin";
+import publicAssetPin from "./asset-pin/public";
+import assetRevision from "./asset-revision";
+import assetShare from "./asset-share";
 import { auth } from "./auth";
 import billing from "./billing";
+import changeOrder from "./change-order";
 import column from "./column";
 import comment from "./comment";
 import config from "./config";
@@ -44,15 +51,19 @@ import { migrateColumns } from "./migrations/column-migration";
 import notification from "./notification";
 import notificationPreferences from "./notification-preferences";
 import oauth from "./oauth";
+import permit from "./permit";
 import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
+import productSpec from "./product-spec";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
 import projectTemplate from "./project-template";
+import rfi from "./rfi";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import slackIntegration from "./slack-integration";
 import { getPrivateObject } from "./storage/s3";
+import submittal from "./submittal";
 import task from "./task";
 import addImagePin, {
   addImagePinByTaskToken,
@@ -87,6 +98,7 @@ import {
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
 import workflowRule from "./workflow-rule";
+import workload from "./workload";
 import workspace from "./workspace";
 import {
   addConnection,
@@ -338,6 +350,8 @@ export function createApp() {
     },
   );
 
+  const publicAssetPinApi = api.route("/public-asset", publicAssetPin);
+
   api.post("/github-integration/webhook", handleGithubWebhookRoute);
 
   api.post(
@@ -413,7 +427,33 @@ export function createApp() {
         throw new HTTPException(404, { message: "Asset not found" });
       }
 
-      await authorizeAssetAccess(c, asset);
+      const shareToken = c.req.query("shareToken");
+      const hasValidShareToken = shareToken
+        ? await (async () => {
+            const [link] = await db
+              .select({
+                revokedAt: schema.assetShareLinkTable.revokedAt,
+                expiresAt: schema.assetShareLinkTable.expiresAt,
+              })
+              .from(schema.assetShareLinkTable)
+              .where(
+                and(
+                  eq(schema.assetShareLinkTable.token, shareToken),
+                  eq(schema.assetShareLinkTable.assetId, id),
+                ),
+              )
+              .limit(1);
+            return Boolean(
+              link &&
+                !link.revokedAt &&
+                (!link.expiresAt || link.expiresAt.getTime() > Date.now()),
+            );
+          })()
+        : false;
+
+      if (!hasValidShareToken) {
+        await authorizeAssetAccess(c, asset);
+      }
 
       try {
         const object = await getPrivateObject(asset.objectKey);
@@ -651,6 +691,17 @@ export function createApp() {
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
   const commentApi = api.route("/comment", comment);
+  const assetPinApi = api.route("/asset-pin", assetPin);
+  const assetShareApi = api.route("/asset-share", assetShare);
+  const assetApsApi = api.route("/asset-aps", aps);
+  const assetApprovalApi = api.route("/asset-approval", assetApproval);
+  const assetRevisionApi = api.route("/asset-revision", assetRevision);
+  const productSpecApi = api.route("/product-spec", productSpec);
+  const rfiApi = api.route("/rfi", rfi);
+  const changeOrderApi = api.route("/change-order", changeOrder);
+  const submittalApi = api.route("/submittal", submittal);
+  const permitApi = api.route("/permit", permit);
+  const workloadApi = api.route("/workload", workload);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
   const customFieldApi = api.route("/custom-field", customField);
@@ -824,6 +875,17 @@ export function createApp() {
     api,
     injectWebSocket,
     activityApi,
+    assetPinApi,
+    assetShareApi,
+    assetApsApi,
+    assetApprovalApi,
+    assetRevisionApi,
+    productSpecApi,
+    rfiApi,
+    changeOrderApi,
+    submittalApi,
+    permitApi,
+    workloadApi,
     billingApi,
     columnApi,
     commentApi,
@@ -847,6 +909,7 @@ export function createApp() {
     publicTaskApi,
     publicTaskApprovalApi,
     publicTaskImagePinApi,
+    publicAssetPinApi,
     searchApi,
     slackIntegrationApi,
     taskApi,
@@ -949,6 +1012,17 @@ const {
   app,
   injectWebSocket,
   activityApi,
+  assetPinApi,
+  assetShareApi,
+  assetApsApi,
+  assetApprovalApi,
+  assetRevisionApi,
+  productSpecApi,
+  rfiApi,
+  changeOrderApi,
+  submittalApi,
+  permitApi,
+  workloadApi,
   billingApi,
   columnApi,
   commentApi,
@@ -972,6 +1046,7 @@ const {
   publicTaskApi,
   publicTaskApprovalApi,
   publicTaskImagePinApi,
+  publicAssetPinApi,
   searchApi,
   slackIntegrationApi,
   taskApi,
@@ -1001,6 +1076,17 @@ export type AppType =
   | typeof columnApi
   | typeof activityApi
   | typeof commentApi
+  | typeof assetPinApi
+  | typeof assetShareApi
+  | typeof assetApsApi
+  | typeof assetApprovalApi
+  | typeof assetRevisionApi
+  | typeof productSpecApi
+  | typeof rfiApi
+  | typeof changeOrderApi
+  | typeof submittalApi
+  | typeof permitApi
+  | typeof workloadApi
   | typeof timeEntryApi
   | typeof labelApi
   | typeof customFieldApi
@@ -1025,6 +1111,7 @@ export type AppType =
   | typeof publicTaskApi
   | typeof publicTaskApprovalApi
   | typeof publicTaskImagePinApi
+  | typeof publicAssetPinApi
   | typeof invitationPublicApi
   | typeof oauthApi;
 

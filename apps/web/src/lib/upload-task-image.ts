@@ -37,11 +37,13 @@ export async function uploadTaskImage({
   surface,
   file,
   previousAssetId,
+  supersedesAssetId,
 }: {
   taskId: string;
   surface: UploadSurface;
   file: File;
   previousAssetId?: string;
+  supersedesAssetId?: string;
 }) {
   if (!isSupportedImageFile(file)) {
     if (!isSupportedTaskAsset(file)) {
@@ -75,6 +77,7 @@ export async function uploadTaskImage({
     size: file.size,
     surface,
     previousAssetId,
+    supersedesAssetId,
   });
 
   return {

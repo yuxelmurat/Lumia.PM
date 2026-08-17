@@ -107,6 +107,7 @@ export const projectSchema = v.object({
   createdAt: v.date(),
   isPublic: v.nullable(v.boolean()),
   archivedAt: v.nullable(v.date()),
+  completedAt: v.nullable(v.date()),
   position: v.number(),
   publicShareToken: v.optional(v.nullable(v.string())),
   publicLinkExpiresAt: v.optional(v.nullable(v.date())),
@@ -130,6 +131,7 @@ export const taskSchema = v.object({
   ] as const),
   startDate: v.optional(v.date()),
   dueDate: v.optional(v.date()),
+  estimatedHours: v.nullable(v.number()),
   createdAt: v.date(),
   approvalStatus: v.optional(
     v.nullable(v.picklist(["approved", "changes_requested"] as const)),
@@ -361,6 +363,189 @@ export const commentSchema = v.object({
       image: v.nullable(v.string()),
     }),
   ),
+});
+
+export const assetPinAuthorSchema = v.object({
+  type: v.picklist(["user", "guest"]),
+  id: v.string(),
+  name: v.nullable(v.string()),
+});
+
+export const assetPinNoteSchema = v.object({
+  id: v.string(),
+  pinId: v.string(),
+  content: v.string(),
+  createdAt: v.date(),
+  author: assetPinAuthorSchema,
+});
+
+export const assetPinAssigneeSchema = v.object({
+  id: v.string(),
+  name: v.nullable(v.string()),
+});
+
+export const assetPinSchema = v.object({
+  id: v.string(),
+  assetId: v.string(),
+  x: v.nullable(v.number()),
+  y: v.nullable(v.number()),
+  viewerState: v.nullable(v.any()),
+  status: v.picklist(["open", "resolved"]),
+  label: v.nullable(v.string()),
+  createdAt: v.date(),
+  resolvedAt: v.nullable(v.date()),
+  isPunchItem: v.boolean(),
+  dueDate: v.nullable(v.date()),
+  assignee: v.nullable(assetPinAssigneeSchema),
+  author: assetPinAuthorSchema,
+  notes: v.array(assetPinNoteSchema),
+});
+
+export const assetShareLinkSchema = v.object({
+  id: v.string(),
+  assetId: v.string(),
+  token: v.string(),
+  expiresAt: v.nullable(v.date()),
+  revokedAt: v.nullable(v.date()),
+  createdAt: v.date(),
+});
+
+export const assetApprovalEventSchema = v.object({
+  id: v.string(),
+  assetId: v.string(),
+  status: v.picklist(["pending", "approved", "changes_requested"]),
+  note: v.nullable(v.string()),
+  createdAt: v.date(),
+  actor: assetPinAuthorSchema,
+});
+
+export const assetRevisionSchema = v.object({
+  id: v.string(),
+  filename: v.string(),
+  createdAt: v.date(),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  approvalStatus: v.nullable(
+    v.picklist(["pending", "approved", "changes_requested"]),
+  ),
+  revisionNumber: v.number(),
+});
+
+export const rfiSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  subject: v.string(),
+  question: v.string(),
+  answer: v.nullable(v.string()),
+  status: v.picklist(["open", "answered", "closed"]),
+  dueDate: v.nullable(v.date()),
+  assignee: v.nullable(
+    v.object({ id: v.string(), name: v.nullable(v.string()) }),
+  ),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  answeredByUserId: v.nullable(v.string()),
+  answeredByUserName: v.nullable(v.string()),
+  answeredAt: v.nullable(v.date()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const changeOrderSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  title: v.string(),
+  description: v.string(),
+  costImpactCents: v.nullable(v.number()),
+  hoursImpact: v.nullable(v.number()),
+  status: v.picklist(["pending_review", "approved", "rejected"]),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  decidedByUserId: v.nullable(v.string()),
+  decidedByUserName: v.nullable(v.string()),
+  decisionNote: v.nullable(v.string()),
+  decidedAt: v.nullable(v.date()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const submittalSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  title: v.string(),
+  specSection: v.nullable(v.string()),
+  description: v.string(),
+  status: v.picklist(["open", "approved", "revise_resubmit", "closed"]),
+  dueDate: v.nullable(v.date()),
+  assignee: v.nullable(
+    v.object({ id: v.string(), name: v.nullable(v.string()) }),
+  ),
+  supersedesSubmittalId: v.nullable(v.string()),
+  supersedesSubmittalNumber: v.nullable(v.number()),
+  reviewNote: v.nullable(v.string()),
+  reviewedByUserId: v.nullable(v.string()),
+  reviewedByUserName: v.nullable(v.string()),
+  reviewedAt: v.nullable(v.date()),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const permitSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  number: v.number(),
+  jurisdictionName: v.string(),
+  permitType: v.nullable(v.string()),
+  status: v.picklist([
+    "not_submitted",
+    "submitted",
+    "corrections_required",
+    "approved",
+    "issued",
+  ]),
+  permitNumber: v.nullable(v.string()),
+  submittedDate: v.nullable(v.date()),
+  approvalDate: v.nullable(v.date()),
+  notes: v.nullable(v.string()),
+  assignee: v.nullable(
+    v.object({ id: v.string(), name: v.nullable(v.string()) }),
+  ),
+  createdByUserId: v.nullable(v.string()),
+  createdByUserName: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
+});
+
+export const productSpecSchema = v.object({
+  id: v.string(),
+  projectId: v.string(),
+  roomLabel: v.nullable(v.string()),
+  name: v.string(),
+  vendor: v.nullable(v.string()),
+  unitCost: v.nullable(v.number()),
+  quantity: v.number(),
+  status: v.picklist([
+    "proposed",
+    "client_approved",
+    "ordered",
+    "received",
+    "installed",
+  ]),
+  imageAssetId: v.nullable(v.string()),
+  linkedPinId: v.nullable(v.string()),
+  notes: v.nullable(v.string()),
+  poNumber: v.nullable(v.string()),
+  expectedShipDate: v.nullable(v.date()),
+  actualShipDate: v.nullable(v.date()),
+  trackingNumber: v.nullable(v.string()),
+  carrier: v.nullable(v.string()),
+  createdAt: v.date(),
+  updatedAt: v.date(),
 });
 
 export const configSchema = v.object({

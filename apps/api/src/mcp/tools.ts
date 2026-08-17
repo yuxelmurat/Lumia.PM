@@ -590,6 +590,48 @@ export function registerMcpTools(
   );
 
   registerTool(
+    "list_asset_pins",
+    {
+      description:
+        "List position-anchored pin annotations left on an asset (e.g. a render image), including client/guest notes.",
+      inputSchema: z.object({ assetId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/asset-pin/${encodeURIComponent(args.assetId)}`, {
+          method: "GET",
+        }),
+      ),
+  );
+
+  registerTool(
+    "create_asset_pin",
+    {
+      description:
+        "Leave a pin annotation on an asset anchored to a normalized (0-1) x/y point, with a note.",
+      inputSchema: z.object({
+        assetId: nonEmptyString,
+        content: nonEmptyString,
+        x: z.number().min(0).max(1).optional(),
+        y: z.number().min(0).max(1).optional(),
+        label: z.string().optional(),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(`/api/asset-pin/${encodeURIComponent(args.assetId)}`, {
+          method: "POST",
+          body: JSON.stringify({
+            content: args.content,
+            x: args.x,
+            y: args.y,
+            label: args.label,
+          }),
+        }),
+      ),
+  );
+
+  registerTool(
     "list_workspace_labels",
     {
       description: "List labels defined in a workspace.",

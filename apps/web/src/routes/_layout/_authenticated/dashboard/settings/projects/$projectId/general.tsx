@@ -37,8 +37,12 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import icons from "@/constants/project-icons";
+import useCompleteProject from "@/hooks/mutations/project/use-complete-project";
 import useDeleteProject from "@/hooks/mutations/project/use-delete-project";
+import useUncompleteProject from "@/hooks/mutations/project/use-uncomplete-project";
 import useUpdateProject from "@/hooks/mutations/project/use-update-project";
+import useGetProject from "@/hooks/queries/project/use-get-project";
+import useGetPunchSummary from "@/hooks/queries/project/use-get-punch-summary";
 import { useGetTasks } from "@/hooks/queries/task/use-get-tasks";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
@@ -127,6 +131,54 @@ function RouteComponent() {
   const { canManageProjects, canDeleteProjects } = useWorkspacePermission();
   const canEdit = canManageProjects();
   const canDelete = canDeleteProjects();
+
+  const { data: projectDetails } = useGetProject({
+    id: projectId,
+    workspaceId: workspace?.id ?? "",
+  });
+  const { data: punchSummary } = useGetPunchSummary(projectId);
+  const { mutateAsync: completeProject, isPending: isCompleting } =
+    useCompleteProject();
+  const { mutateAsync: uncompleteProject, isPending: isUncompleting } =
+    useUncompleteProject();
+  const openPunchCount = punchSummary?.openCount ?? 0;
+  const isCompleted = !!projectDetails?.completedAt;
+
+  const handleCompleteProject = useCallback(async () => {
+    try {
+      await completeProject(projectId);
+      toast.success(
+        t("settings:projectGeneral.completeSuccess", "Project completed"),
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t(
+              "settings:projectGeneral.completeError",
+              "Failed to complete project",
+            ),
+      );
+    }
+  }, [completeProject, projectId, t]);
+
+  const handleUncompleteProject = useCallback(async () => {
+    try {
+      await uncompleteProject(projectId);
+      toast.success(
+        t("settings:projectGeneral.uncompleteSuccess", "Project reopened"),
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t(
+              "settings:projectGeneral.uncompleteError",
+              "Failed to reopen project",
+            ),
+      );
+    }
+  }, [uncompleteProject, projectId, t]);
 
   const projectForm = useForm<ProjectFormValues>({
     resolver: standardSchemaResolver(projectSchema),
@@ -552,6 +604,82 @@ function RouteComponent() {
             </div>
           </div>
         </div>
+
+        {canEdit && (
+          <div className="space-y-6">
+            <div className="space-y-1">
+              <h2 className="text-md font-medium">
+                {t("settings:projectGeneral.completionTitle", "Completion")}
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  "settings:projectGeneral.completionSubtitle",
+                  "Mark this project as complete once all work is done.",
+                )}
+              </p>
+            </div>
+
+            <div className="space-y-4 border border-border rounded-md p-4 bg-sidebar">
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium">
+                    {isCompleted
+                      ? t(
+                          "settings:projectGeneral.projectCompleted",
+                          "Project completed",
+                        )
+                      : t(
+                          "settings:projectGeneral.markComplete",
+                          "Mark as complete",
+                        )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {openPunchCount > 0
+                      ? t(
+                          "settings:projectGeneral.openPunchItems",
+                          "{{count}} punch list item(s) still open",
+                          { count: openPunchCount },
+                        )
+                      : t(
+                          "settings:projectGeneral.noPunchItems",
+                          "No open punch list items",
+                        )}
+                  </p>
+                </div>
+                {isCompleted ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isUncompleting}
+                    onClick={handleUncompleteProject}
+                  >
+                    {t("settings:projectGeneral.reopenProject", "Reopen")}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    disabled={isCompleting || openPunchCount > 0}
+                    title={
+                      openPunchCount > 0
+                        ? t(
+                            "settings:projectGeneral.completeBlockedTooltip",
+                            "Resolve all punch list items first",
+                          )
+                        : undefined
+                    }
+                    onClick={handleCompleteProject}
+                  >
+                    {t(
+                      "settings:projectGeneral.markComplete",
+                      "Mark as complete",
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {canDelete && (
           <div className="space-y-6">

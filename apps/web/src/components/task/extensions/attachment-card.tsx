@@ -1,7 +1,13 @@
 import { mergeAttributes, Node } from "@tiptap/core";
 import type { NodeViewProps } from "@tiptap/react";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
-import { FileText } from "lucide-react";
+import { Box, FileText } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import ApprovalPanel from "@/components/asset-pin/approval-panel";
+import DwgPinViewer from "@/components/asset-pin/dwg-pin-viewer";
+import ShareLinkManager from "@/components/asset-pin/share-link-manager";
+import { Dialog, DialogPopup } from "@/components/ui/dialog";
 import { escapeHtml, isValidUrl } from "./url-safety";
 
 function formatBytes(size: number) {
@@ -13,33 +19,80 @@ function formatBytes(size: number) {
   return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
+function isDwgFilename(filename: string) {
+  return filename.toLowerCase().endsWith(".dwg");
+}
+
+function extractAssetId(url: string) {
+  return url.match(/\/asset\/([^/?]+)/)?.[1] ?? null;
+}
+
 function AttachmentCardView({ node }: NodeViewProps) {
+  const { t } = useTranslation();
   const rawUrl = String(node.attrs.url || "");
   const url = isValidUrl(rawUrl) ? rawUrl : "";
   const filename = String(node.attrs.filename || "Attachment");
   const mimeType = String(node.attrs.mimeType || "");
   const size = Number(node.attrs.size || 0);
+  const [viewerOpen, setViewerOpen] = useState(false);
+
+  const assetId = url ? extractAssetId(url) : null;
+  const isDwg = isDwgFilename(filename);
 
   return (
     <NodeViewWrapper as="span" className="kaneo-attachment-node">
-      <a
-        href={url || undefined}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="kaneo-attachment-card"
-        title={filename}
-      >
-        <span className="kaneo-attachment-card-icon">
-          <FileText className="size-4" />
-        </span>
-        <span className="kaneo-attachment-card-content">
-          <span className="kaneo-attachment-card-title">{filename}</span>
-          <span className="kaneo-attachment-card-meta">
-            {formatBytes(size)}
-            {mimeType ? ` · ${mimeType}` : ""}
+      {isDwg && assetId ? (
+        <button
+          type="button"
+          onClick={() => setViewerOpen(true)}
+          className="kaneo-attachment-card"
+          title={filename}
+        >
+          <span className="kaneo-attachment-card-icon">
+            <Box className="size-4" />
           </span>
-        </span>
-      </a>
+          <span className="kaneo-attachment-card-content">
+            <span className="kaneo-attachment-card-title">{filename}</span>
+            <span className="kaneo-attachment-card-meta">
+              {t("assetPins:dwg.viewAndAnnotate", "View & annotate")}
+            </span>
+          </span>
+        </button>
+      ) : (
+        <a
+          href={url || undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="kaneo-attachment-card"
+          title={filename}
+        >
+          <span className="kaneo-attachment-card-icon">
+            <FileText className="size-4" />
+          </span>
+          <span className="kaneo-attachment-card-content">
+            <span className="kaneo-attachment-card-title">{filename}</span>
+            <span className="kaneo-attachment-card-meta">
+              {formatBytes(size)}
+              {mimeType ? ` · ${mimeType}` : ""}
+            </span>
+          </span>
+        </a>
+      )}
+      {isDwg && assetId && (
+        <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
+          <DialogPopup
+            className="max-w-6xl border-0 bg-transparent p-0 shadow-none before:hidden"
+            showCloseButton={false}
+            bottomStickOnMobile={false}
+          >
+            <div className="flex max-h-[90vh] flex-col gap-3 p-4">
+              <DwgPinViewer assetId={assetId} />
+              <ApprovalPanel assetId={assetId} />
+              <ShareLinkManager assetId={assetId} />
+            </div>
+          </DialogPopup>
+        </Dialog>
+      )}
     </NodeViewWrapper>
   );
 }

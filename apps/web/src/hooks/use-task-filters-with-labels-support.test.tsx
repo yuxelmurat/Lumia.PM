@@ -32,10 +32,13 @@ describe("useTaskFiltersWithLabelsSupport", () => {
       columns: [
         {
           id: "todo",
+          columnId: "todo",
           slug: "todo",
           name: "Todo",
           icon: null,
           isFinal: false,
+          budgetHours: null,
+          consumedSeconds: 0,
           tasks: [
             {
               id: "task-1",
@@ -46,6 +49,7 @@ describe("useTaskFiltersWithLabelsSupport", () => {
               priority: null,
               startDate: null,
               dueDate: null,
+              estimatedHours: null,
               position: 0,
               createdAt: "2026-04-16T00:00:00.000Z",
               updatedAt: "2026-04-16T00:00:00.000Z",
@@ -72,6 +76,7 @@ describe("useTaskFiltersWithLabelsSupport", () => {
               priority: null,
               startDate: null,
               dueDate: null,
+              estimatedHours: null,
               position: 1,
               createdAt: "2026-04-16T00:00:00.000Z",
               updatedAt: "2026-04-16T00:00:00.000Z",
@@ -120,10 +125,13 @@ describe("useTaskFiltersWithLabelsSupport", () => {
         columns: [
           {
             id: "todo",
+            columnId: "todo",
             slug: "todo",
             name: "Todo",
             icon: null,
             isFinal: false,
+            budgetHours: null,
+            consumedSeconds: 0,
             tasks: [
               {
                 id: "task-123",
@@ -134,6 +142,7 @@ describe("useTaskFiltersWithLabelsSupport", () => {
                 priority: null,
                 startDate: null,
                 dueDate: null,
+                estimatedHours: null,
                 position: 0,
                 createdAt: "2026-04-16T00:00:00.000Z",
                 updatedAt: "2026-04-16T00:00:00.000Z",
@@ -154,6 +163,7 @@ describe("useTaskFiltersWithLabelsSupport", () => {
                 priority: null,
                 startDate: null,
                 dueDate: null,
+                estimatedHours: null,
                 position: 1,
                 createdAt: "2026-04-16T00:00:00.000Z",
                 updatedAt: "2026-04-16T00:00:00.000Z",

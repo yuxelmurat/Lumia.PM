@@ -16,6 +16,7 @@ import { taskSchema } from "../schemas";
 import {
   assertTaskImageKeyMatchesContext,
   createTaskImageUploadUrl,
+  isDwgAsset,
   isImageContentType,
   validateTaskAssetUploadInput,
 } from "../storage/s3";
@@ -46,6 +47,7 @@ import updateTask from "./controllers/update-task";
 import updateTaskAssignee from "./controllers/update-task-assignee";
 import updateTaskDescription from "./controllers/update-task-description";
 import updateTaskDueDate from "./controllers/update-task-due-date";
+import updateTaskEstimatedHours from "./controllers/update-task-estimated-hours";
 import updateTaskPriority from "./controllers/update-task-priority";
 import updateTaskStatus from "./controllers/update-task-status";
 import updateTaskTitle from "./controllers/update-task-title";
@@ -649,6 +651,42 @@ const task = new Hono<{
     },
   )
   .put(
+    "/estimated-hours/:id",
+    describeRoute({
+      operationId: "updateTaskEstimatedHours",
+      tags: ["Tasks"],
+      description: "Update only the estimated hours of a task",
+      responses: {
+        200: {
+          description: "Task estimated hours updated successfully",
+          content: {
+            "application/json": { schema: resolver(taskSchema) },
+          },
+        },
+      },
+    }),
+    validator("param", v.object({ id: v.string() })),
+    validator(
+      "json",
+      v.object({
+        estimatedHours: v.nullable(
+          v.pipe(v.number(), v.integer(), v.minValue(0)),
+        ),
+      }),
+    ),
+    workspaceAccess.fromTask(),
+    requireWorkspacePermission({ task: ["update"] }),
+    requireEntitlement,
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const { estimatedHours } = c.req.valid("json");
+
+      const task = await updateTaskEstimatedHours({ id, estimatedHours });
+
+      return c.json(task);
+    },
+  )
+  .put(
     "/assignee/:id",
     describeRoute({
       operationId: "updateTaskAssignee",
@@ -854,6 +892,7 @@ const task = new Hono<{
         size: v.number(),
         surface: v.picklist(["description", "comment"] as const),
         previousAssetId: v.optional(v.string()),
+        supersedesAssetId: v.optional(v.string()),
       }),
     ),
     workspaceAccess.fromTask(),
@@ -861,8 +900,15 @@ const task = new Hono<{
     requireEntitlement,
     async (c) => {
       const { id } = c.req.valid("param");
-      const { key, filename, contentType, size, surface, previousAssetId } =
-        c.req.valid("json");
+      const {
+        key,
+        filename,
+        contentType,
+        size,
+        surface,
+        previousAssetId,
+        supersedesAssetId,
+      } = c.req.valid("json");
       const userId = c.get("userId");
 
       try {
@@ -933,6 +979,20 @@ const task = new Hono<{
         contentType,
       });
 
+      if (supersedesAssetId) {
+        const [supersededAsset] = await db
+          .select({ taskId: assetTable.taskId })
+          .from(assetTable)
+          .where(eq(assetTable.id, supersedesAssetId))
+          .limit(1);
+
+        if (!supersededAsset || supersededAsset.taskId !== taskContext.taskId) {
+          throw new HTTPException(400, {
+            message: "supersedesAssetId must belong to the same task.",
+          });
+        }
+      }
+
       const [existingAsset] = await db
         .select({ id: assetTable.id })
         .from(assetTable)
@@ -982,7 +1042,11 @@ const task = new Hono<{
               filename,
               mimeType: contentType,
               size,
-              kind: isImageContentType(contentType) ? "image" : "attachment",
+              kind: isImageContentType(contentType)
+                ? "image"
+                : isDwgAsset(filename, contentType)
+                  ? "dwg"
+                  : "attachment",
               surface,
               createdBy: userId || null,
             })
@@ -1000,11 +1064,16 @@ const task = new Hono<{
               filename,
               mimeType: contentType,
               size,
-              kind: isImageContentType(contentType) ? "image" : "attachment",
+              kind: isImageContentType(contentType)
+                ? "image"
+                : isDwgAsset(filename, contentType)
+                  ? "dwg"
+                  : "attachment",
               surface,
               createdBy: userId || null,
               versionGroupId,
               versionNumber,
+              supersedesAssetId: supersedesAssetId || null,
             })
             .returning({
               id: assetTable.id,

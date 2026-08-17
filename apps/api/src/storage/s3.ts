@@ -31,7 +31,22 @@ export function isImageContentType(contentType: string) {
   return allowedImageMimeTypes.has(contentType.toLowerCase());
 }
 
-type UploadSurface = "description" | "comment";
+const dwgMimeTypes = new Set([
+  "image/vnd.dwg",
+  "application/dwg",
+  "application/x-dwg",
+  "application/acad",
+  "drawing/x-dwg",
+]);
+
+export function isDwgAsset(filename: string, contentType: string) {
+  return (
+    dwgMimeTypes.has(contentType.toLowerCase()) ||
+    filename.toLowerCase().endsWith(".dwg")
+  );
+}
+
+type UploadSurface = "description" | "comment" | "product-spec";
 
 type StorageConfig = {
   endpoint: string;
@@ -49,7 +64,9 @@ type StorageConfig = {
 type TaskImageUploadContext = {
   workspaceId: string;
   projectId: string;
-  taskId: string;
+  // Absent for project-scoped uploads (e.g. product-spec images) that
+  // aren't attached to any single task.
+  taskId?: string;
   surface: UploadSurface;
   filename: string;
   contentType: string;
@@ -228,6 +245,17 @@ export function getFileExtension(filename: string) {
 export function buildObjectKeyPrefix(
   context: Omit<TaskImageUploadContext, "filename" | "contentType">,
 ) {
+  if (!context.taskId) {
+    // Project-scoped upload (e.g. a product-spec image), not tied to a task.
+    return [
+      "workspace",
+      sanitizePathSegment(context.workspaceId),
+      "project",
+      sanitizePathSegment(context.projectId),
+      "product-specs",
+    ].join("/");
+  }
+
   const surfaceFolder =
     context.surface === "comment" ? "comments" : "descriptions";
 

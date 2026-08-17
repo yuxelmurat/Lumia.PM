@@ -3,6 +3,7 @@ import {
   CalendarClock,
   CalendarDays,
   CalendarX,
+  Clock,
   Copy,
   GitBranch,
   Plus,
@@ -43,6 +44,7 @@ import TaskApprovalSection from "./task-approval-section";
 import TaskAssigneePopover from "./task-assignee-popover";
 import TaskCustomFields from "./task-custom-fields";
 import TaskDueDatePopover from "./task-due-date-popover";
+import TaskEstimatedHoursPopover from "./task-estimated-hours-popover";
 import TaskLabelsPopover from "./task-labels-popover";
 import TaskMovePopover from "./task-move-popover";
 import TaskPriorityPopover from "./task-priority-popover";
@@ -228,6 +230,22 @@ export default function TaskPropertiesSidebar({
                     </span>
                   </Button>
                 </TaskPriorityPopover>
+              )}
+              {task && (
+                <TaskEstimatedHoursPopover task={task}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start h-7 px-1.5 gap-1.5"
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    <span className="text-xs font-semibold truncate">
+                      {task.estimatedHours != null
+                        ? `${task.estimatedHours}h`
+                        : t("workload:estimatedHours", "Estimated hours")}
+                    </span>
+                  </Button>
+                </TaskEstimatedHoursPopover>
               )}
               {task && (
                 <TaskAssigneePopover task={task} workspaceId={workspaceId}>
@@ -421,6 +439,22 @@ export default function TaskPropertiesSidebar({
                   </TaskPriorityPopover>
                 )}
                 {task && (
+                  <TaskEstimatedHoursPopover task={task}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start h-7 px-1.5 gap-1.5"
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      <span className="text-xs font-semibold truncate">
+                        {task.estimatedHours != null
+                          ? `${task.estimatedHours}h`
+                          : t("workload:estimatedHours", "Estimated hours")}
+                      </span>
+                    </Button>
+                  </TaskEstimatedHoursPopover>
+                )}
+                {task && (
                   <TaskAssigneePopover task={task} workspaceId={workspaceId}>
                     <Button
                       variant="ghost"
@@ -612,6 +646,22 @@ export default function TaskPropertiesSidebar({
                       </span>
                     </Button>
                   </TaskPriorityPopover>
+                )}
+                {task && (
+                  <TaskEstimatedHoursPopover task={task}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start h-7 px-1.5 gap-1.5 w-full"
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      <span className="text-xs font-semibold truncate">
+                        {task.estimatedHours != null
+                          ? `${task.estimatedHours}h`
+                          : t("workload:estimatedHours", "Estimated hours")}
+                      </span>
+                    </Button>
+                  </TaskEstimatedHoursPopover>
                 )}
                 {task && (
                   <TaskAssigneePopover task={task} workspaceId={workspaceId}>

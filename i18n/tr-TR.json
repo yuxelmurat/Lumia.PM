@@ -72,6 +72,14 @@
 				"projectName": "Proje adı",
 				"keyLabel": "Anahtar:",
 				"keyHint": "Talep kimlikleri için kullanılır (örn. {{example}}-123)",
+				"templateLabel": "Şablondan başlat",
+				"blankProject": "Boş proje",
+				"projectType": {
+					"label": "Proje türü",
+					"generic": "Genel",
+					"architecture": "Mimari",
+					"interior_design": "İç Mimari"
+				},
 				"createButton": "Proje Oluştur",
 				"successToast": "Proje başarıyla oluşturuldu",
 				"errorToast": "Proje oluşturulamadı"
