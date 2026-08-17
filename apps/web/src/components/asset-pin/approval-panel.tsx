@@ -3,10 +3,16 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import useDecideApproval from "@/hooks/mutations/asset-approval/use-decide-approval";
+import useCreateAssetShareLink from "@/hooks/mutations/asset-share/use-create-asset-share-link";
 import useRequestApproval from "@/hooks/mutations/asset-approval/use-request-approval";
 import useGetApprovalEvents from "@/hooks/queries/asset-approval/use-get-approval-events";
+import useGetAssetShareLinks from "@/hooks/queries/asset-share/use-get-asset-share-links";
 import { cn } from "@/lib/cn";
 import { toast } from "@/lib/toast";
+
+function shareUrlFor(token: string) {
+  return `${window.location.origin}/public-asset/${token}`;
+}
 
 type ApprovalStatus = "pending" | "approved" | "changes_requested";
 
@@ -43,10 +49,13 @@ type ApprovalPanelProps = {
 export default function ApprovalPanel({ assetId }: ApprovalPanelProps) {
   const { t } = useTranslation();
   const { data: events = [] } = useGetApprovalEvents(assetId);
+  const { data: shareLinks = [] } = useGetAssetShareLinks(assetId);
   const { mutateAsync: requestApproval, isPending: isRequesting } =
     useRequestApproval(assetId);
   const { mutateAsync: decideApproval, isPending: isDeciding } =
     useDecideApproval(assetId);
+  const { mutateAsync: createShareLink, isPending: isCreatingLink } =
+    useCreateAssetShareLink(assetId);
   const [note, setNote] = useState("");
 
   const latest = events[events.length - 1] as
@@ -56,8 +65,22 @@ export default function ApprovalPanel({ assetId }: ApprovalPanelProps) {
   const handleRequest = async () => {
     try {
       await requestApproval();
+
+      const activeLink = (
+        shareLinks as { token: string; revokedAt: string | null }[]
+      ).find((link) => !link.revokedAt);
+      const token = activeLink
+        ? activeLink.token
+        : (await createShareLink({ assetId })).token;
+      const url = shareUrlFor(token);
+
+      await navigator.clipboard.writeText(url).catch(() => {});
       toast.success(
-        t("assetPins:approval.sendForApprovalSuccess", "Sent for approval"),
+        t(
+          "assetPins:approval.sendForApprovalSuccess",
+          "Sent for approval — link copied: {{url}}",
+          { url },
+        ),
       );
     } catch (error) {
       console.error("Failed to request approval:", error);
@@ -109,7 +132,7 @@ export default function ApprovalPanel({ assetId }: ApprovalPanelProps) {
         <Button
           size="xs"
           variant="outline"
-          disabled={isRequesting}
+          disabled={isRequesting || isCreatingLink}
           onClick={handleRequest}
         >
           {latest

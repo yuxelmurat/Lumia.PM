@@ -2495,7 +2495,7 @@
 				"changes_requested": "Changes requested"
 			},
 			"sendForApproval": "Send for approval",
-			"sendForApprovalSuccess": "Sent for approval",
+			"sendForApprovalSuccess": "Sent for approval — link copied: {{url}}",
 			"sendForApprovalFailed": "Failed to send for approval",
 			"approve": "Approve",
 			"requestChanges": "Request changes",
