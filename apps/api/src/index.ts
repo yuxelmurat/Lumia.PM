@@ -32,6 +32,7 @@ import column from "./column";
 import comment from "./comment";
 import config from "./config";
 import customField from "./custom-field";
+import dashboard from "./dashboard";
 import db, { getDatabase, schema } from "./database";
 import { prepareDatabaseStartup } from "./database/prepare-database-startup";
 import { waitForDatabase } from "./database/wait-for-database";
@@ -701,6 +702,7 @@ export function createApp() {
   const changeOrderApi = api.route("/change-order", changeOrder);
   const submittalApi = api.route("/submittal", submittal);
   const permitApi = api.route("/permit", permit);
+  const dashboardApi = api.route("/dashboard", dashboard);
   const workloadApi = api.route("/workload", workload);
   const timeEntryApi = api.route("/time-entry", timeEntry);
   const labelApi = api.route("/label", label);
@@ -885,6 +887,7 @@ export function createApp() {
     changeOrderApi,
     submittalApi,
     permitApi,
+    dashboardApi,
     workloadApi,
     billingApi,
     columnApi,
@@ -1022,6 +1025,7 @@ const {
   changeOrderApi,
   submittalApi,
   permitApi,
+  dashboardApi,
   workloadApi,
   billingApi,
   columnApi,
@@ -1086,6 +1090,7 @@ export type AppType =
   | typeof changeOrderApi
   | typeof submittalApi
   | typeof permitApi
+  | typeof dashboardApi
   | typeof workloadApi
   | typeof timeEntryApi
   | typeof labelApi
