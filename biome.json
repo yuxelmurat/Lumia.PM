@@ -25,7 +25,7 @@
 			"!**/out",
 			"!**/.cache",
 			"!**/coverage",
-			"!**/.claude",
+			"!.claude",
 			"!**/.agents",
 			"!**/openapi.json"
 		]
