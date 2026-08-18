@@ -2706,6 +2706,29 @@
 			"dueDateFailed": "Failed to update due date"
 		}
 	},
+	"dashboard": {
+		"pageTitle": "Dashboard",
+		"statusSummary": {
+			"title": "Task status",
+			"empty": "No tasks yet"
+		},
+		"overdueTasks": {
+			"title": "Overdue tasks",
+			"emptyTitle": "Nothing overdue",
+			"emptyDescription": "Tasks past their due date will show up here."
+		},
+		"projectProgress": {
+			"title": "Projects",
+			"empty": "No projects yet",
+			"taskCount_one": "{{count}} task",
+			"taskCount_other": "{{count}} tasks"
+		},
+		"recentActivity": {
+			"title": "Recent activity",
+			"empty": "No recent activity",
+			"unknownUser": "Someone"
+		}
+	},
 	"workload": {
 		"pageTitle": "Workload",
 		"member": "Member",
