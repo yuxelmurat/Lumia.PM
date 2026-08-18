@@ -1449,6 +1449,7 @@
 		"notifications": "Notifications",
 		"sidebar": {
 			"overview": "Overview",
+			"dashboard": "Dashboard",
 			"projects": "Projects",
 			"members": "Members",
 			"workload": "Workload",

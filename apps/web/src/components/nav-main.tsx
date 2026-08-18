@@ -29,10 +29,18 @@ export function NavMain() {
 
   const navItems = [
     {
-      title: t("navigation:sidebar.projects"),
+      title: t("navigation:sidebar.dashboard"),
       url: `/dashboard/workspace/${workspace.id}`,
       isActive:
         window.location.pathname === `/dashboard/workspace/${workspace.id}`,
+      badge: null,
+    },
+    {
+      title: t("navigation:sidebar.projects"),
+      url: `/dashboard/workspace/${workspace.id}/projects`,
+      isActive:
+        window.location.pathname ===
+        `/dashboard/workspace/${workspace.id}/projects`,
       badge: null,
     },
     {
