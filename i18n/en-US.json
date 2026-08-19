@@ -2719,7 +2719,9 @@
 		},
 		"projectProgress": {
 			"title": "Projects",
-			"empty": "No projects yet",
+			"emptyTitle": "No projects yet",
+			"emptyDescription": "Create a project to start tracking tasks and progress.",
+			"emptyAction": "Go to projects",
 			"taskCount_one": "{{count}} task",
 			"taskCount_other": "{{count}} tasks"
 		},

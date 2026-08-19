@@ -1,6 +1,16 @@
 import { useNavigate } from "@tanstack/react-router";
+import { FolderKanban } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import icons from "@/constants/project-icons";
@@ -65,9 +75,31 @@ export function ProjectProgressCards({ workspaceId }: { workspaceId: string }) {
             })}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            {t("dashboard:projectProgress.empty")}
-          </p>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <FolderKanban />
+              </EmptyMedia>
+              <EmptyTitle>
+                {t("dashboard:projectProgress.emptyTitle")}
+              </EmptyTitle>
+              <EmptyDescription>
+                {t("dashboard:projectProgress.emptyDescription")}
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <Button
+                onClick={() =>
+                  navigate({
+                    to: "/dashboard/workspace/$workspaceId/projects",
+                    params: { workspaceId },
+                  })
+                }
+              >
+                {t("dashboard:projectProgress.emptyAction")}
+              </Button>
+            </EmptyContent>
+          </Empty>
         )}
       </CardContent>
     </Card>

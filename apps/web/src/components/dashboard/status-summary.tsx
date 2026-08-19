@@ -2,12 +2,9 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_COLUMNS } from "@/constants/columns";
+import { getStatusLabel } from "@/lib/i18n/domain";
 
 type StatusCount = { status: string; count: number };
-
-function statusLabel(status: string) {
-  return DEFAULT_COLUMNS.find((column) => column.id === status)?.name ?? status;
-}
 
 function StatusIcon({ status }: { status: string }) {
   const Icon = DEFAULT_COLUMNS.find((column) => column.id === status)?.icon;
@@ -54,7 +51,7 @@ export function StatusSummary({
                     {row.count}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {statusLabel(row.status)}
+                    {getStatusLabel(row.status)}
                   </div>
                 </div>
               </div>
